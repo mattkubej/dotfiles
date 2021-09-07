@@ -107,7 +107,9 @@ stow_dirs() {
 }
 
 bootstrap_nvim_packer() {
-  sudo git clone --depth 1 https://github.com/wbthomason/packer.nvim \
+  git
+
+  git clone --depth 1 https://github.com/wbthomason/packer.nvim \
     ~/.local/share/nvim/site/pack/packer/start/packer.nvim
 
   nvim --headless \
