@@ -89,13 +89,16 @@ install_nvim_nightly() {
 }
 
 install_dependencies() {
+  install_fzf &
+  install_exa &
+  install_delta &
+  install_fd &
+  install_stow &
+
+  # order matters
   install_ripgrep
-  install_fzf
-  install_exa
-  install_delta
   install_bat
-  install_fd
-  install_stow
+
   install_nvim_nightly
 }
 
