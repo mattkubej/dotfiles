@@ -43,7 +43,6 @@ return require('packer').startup(function()
     run = ':TSUpdate',
     config = [[require('mk.plugins.configs.treesitter')]]
   }
-  use 'nvim-treesitter/playground'
 
   -- language specific plugins
   use 'fatih/vim-go' -- Go language support

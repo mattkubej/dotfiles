@@ -141,10 +141,6 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/mattkubej/.local/share/nvim/site/pack/packer/start/packer.nvim"
   },
-  playground = {
-    loaded = true,
-    path = "/Users/mattkubej/.local/share/nvim/site/pack/packer/start/playground"
-  },
   ["plenary.nvim"] = {
     loaded = true,
     path = "/Users/mattkubej/.local/share/nvim/site/pack/packer/start/plenary.nvim"
@@ -219,22 +215,22 @@ time([[Config for vimwiki]], false)
 time([[Config for nvim-compe]], true)
 require("mk.plugins.configs.compe")
 time([[Config for nvim-compe]], false)
--- Config for: gruvbox-flat.nvim
-time([[Config for gruvbox-flat.nvim]], true)
-require('mk.plugins.configs.gruvbox-flat')
-time([[Config for gruvbox-flat.nvim]], false)
 -- Config for: nvim-lspconfig
 time([[Config for nvim-lspconfig]], true)
 require("mk.plugins.configs.lsp")
 time([[Config for nvim-lspconfig]], false)
--- Config for: gitsigns.nvim
-time([[Config for gitsigns.nvim]], true)
-require('mk.plugins.configs.gitsigns')
-time([[Config for gitsigns.nvim]], false)
+-- Config for: gruvbox-flat.nvim
+time([[Config for gruvbox-flat.nvim]], true)
+require('mk.plugins.configs.gruvbox-flat')
+time([[Config for gruvbox-flat.nvim]], false)
 -- Config for: nvim-treesitter
 time([[Config for nvim-treesitter]], true)
 require('mk.plugins.configs.treesitter')
 time([[Config for nvim-treesitter]], false)
+-- Config for: gitsigns.nvim
+time([[Config for gitsigns.nvim]], true)
+require('mk.plugins.configs.gitsigns')
+time([[Config for gitsigns.nvim]], false)
 -- Config for: vim-easy-align
 time([[Config for vim-easy-align]], true)
 require('mk.plugins.configs.easyalign')
