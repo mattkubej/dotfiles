@@ -203,46 +203,46 @@ time([[Defining packer_plugins]], false)
 time([[Config for lualine.nvim]], true)
 require('mk.plugins.configs.lualine')
 time([[Config for lualine.nvim]], false)
--- Config for: telescope.nvim
-time([[Config for telescope.nvim]], true)
-require('mk.plugins.configs.telescope')
-time([[Config for telescope.nvim]], false)
--- Config for: nerdcommenter
-time([[Config for nerdcommenter]], true)
-require('mk.plugins.configs.nerdtree')
-time([[Config for nerdcommenter]], false)
--- Config for: vim-easy-align
-time([[Config for vim-easy-align]], true)
-require('mk.plugins.configs.easyalign')
-time([[Config for vim-easy-align]], false)
--- Config for: nvim-lspconfig
-time([[Config for nvim-lspconfig]], true)
-require("mk.plugins.configs.lsp")
-time([[Config for nvim-lspconfig]], false)
--- Config for: vimwiki
-time([[Config for vimwiki]], true)
-require('mk.plugins.configs.vimwiki')
-time([[Config for vimwiki]], false)
--- Config for: gitsigns.nvim
-time([[Config for gitsigns.nvim]], true)
-require('mk.plugins.configs.gitsigns')
-time([[Config for gitsigns.nvim]], false)
--- Config for: gruvbox-flat.nvim
-time([[Config for gruvbox-flat.nvim]], true)
-require('mk.plugins.configs.gruvbox-flat')
-time([[Config for gruvbox-flat.nvim]], false)
--- Config for: nvim-compe
-time([[Config for nvim-compe]], true)
-require("mk.plugins.configs.compe")
-time([[Config for nvim-compe]], false)
 -- Config for: formatter.nvim
 time([[Config for formatter.nvim]], true)
 require('mk.plugins.configs.formatter')
 time([[Config for formatter.nvim]], false)
+-- Config for: telescope.nvim
+time([[Config for telescope.nvim]], true)
+require('mk.plugins.configs.telescope')
+time([[Config for telescope.nvim]], false)
+-- Config for: vimwiki
+time([[Config for vimwiki]], true)
+require('mk.plugins.configs.vimwiki')
+time([[Config for vimwiki]], false)
+-- Config for: nvim-compe
+time([[Config for nvim-compe]], true)
+require("mk.plugins.configs.compe")
+time([[Config for nvim-compe]], false)
+-- Config for: gruvbox-flat.nvim
+time([[Config for gruvbox-flat.nvim]], true)
+require('mk.plugins.configs.gruvbox-flat')
+time([[Config for gruvbox-flat.nvim]], false)
+-- Config for: nvim-lspconfig
+time([[Config for nvim-lspconfig]], true)
+require("mk.plugins.configs.lsp")
+time([[Config for nvim-lspconfig]], false)
+-- Config for: gitsigns.nvim
+time([[Config for gitsigns.nvim]], true)
+require('mk.plugins.configs.gitsigns')
+time([[Config for gitsigns.nvim]], false)
 -- Config for: nvim-treesitter
 time([[Config for nvim-treesitter]], true)
 require('mk.plugins.configs.treesitter')
 time([[Config for nvim-treesitter]], false)
+-- Config for: vim-easy-align
+time([[Config for vim-easy-align]], true)
+require('mk.plugins.configs.easyalign')
+time([[Config for vim-easy-align]], false)
+-- Config for: nerdcommenter
+time([[Config for nerdcommenter]], true)
+require('mk.plugins.configs.nerdtree')
+time([[Config for nerdcommenter]], false)
 if should_profile then save_profiles() end
 
 end)

@@ -117,6 +117,7 @@ bootstrap_nvim_packer() {
 }
 
 install_language_servers() {
+  echo "\n -- installing language servers -- \n"
   sudo npm install -g typescript typescript-language-server
 }
 
