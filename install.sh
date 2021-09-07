@@ -89,10 +89,10 @@ install_nvim_nightly() {
 }
 
 install_dependencies() {
-  install_fzf &
-  install_exa &
-  install_delta &
-  install_fd &
+  install_fzf
+  install_exa
+  install_delta
+  install_fd
 
   # order matters
   install_ripgrep
@@ -107,7 +107,8 @@ stow_dirs() {
 }
 
 bootstrap_nvim_packer() {
-  git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim
+  sudo git clone --depth 1 https://github.com/wbthomason/packer.nvim \
+    ~/.local/share/nvim/site/pack/packer/start/packer.nvim
 
   nvim --headless \
     -c 'autocmd User PackerComplete quitall' -c 'PackerSync' &> /dev/null
