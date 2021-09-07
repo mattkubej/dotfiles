@@ -107,11 +107,11 @@ stow_dirs() {
 }
 
 bootstrap_nvim_packer() {
-  git
-
+  echo "\n -- cloning packer -- \n"
   git clone --depth 1 https://github.com/wbthomason/packer.nvim \
-    ~/.local/share/nvim/site/pack/packer/start/packer.nvim
+    ~/.local/share/nvim/site/pack/packer/start/packer.nvim &> /dev/null
 
+  echo "\n -- installing packer plugins -- \n"
   nvim --headless \
     -c 'autocmd User PackerComplete quitall' -c 'PackerSync' &> /dev/null
 }
