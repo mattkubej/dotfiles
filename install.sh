@@ -93,12 +93,12 @@ install_dependencies() {
   install_exa &
   install_delta &
   install_fd &
-  install_stow &
 
   # order matters
   install_ripgrep
   install_bat
 
+  install_stow
   install_nvim_nightly
 }
 
