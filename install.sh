@@ -88,6 +88,11 @@ install_nvim_nightly() {
   [ -f /usr/local/bin/nvim ] || sudo ln -s /squashfs-root/usr/bin/nvim /usr/local/bin/nvim
 }
 
+install_language_servers() {
+  echo "\n -- installing language servers -- \n"
+  sudo npm install -g typescript typescript-language-server
+}
+
 install_dependencies() {
   install_fzf
   install_exa
@@ -100,6 +105,7 @@ install_dependencies() {
 
   install_stow
   install_nvim_nightly
+  install_language_servers
 }
 
 stow_dirs() {
@@ -113,17 +119,11 @@ bootstrap_nvim_packer() {
 
   echo "\n -- installing packer plugins -- \n"
   nvim --headless \
-    -c 'autocmd User PackerComplete quitall' -c 'PackerSync' &> /dev/null
-}
-
-install_language_servers() {
-  echo "\n -- installing language servers -- \n"
-  sudo npm install -g typescript typescript-language-server
+    -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
 }
 
 if [ $SPIN ]; then
   install_dependencies
   stow_dirs
   bootstrap_nvim_packer
-  install_language_servers
 fi
