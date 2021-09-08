@@ -8,7 +8,7 @@ return require('packer').startup(function()
   -- text formatting
   use {
     'junegunn/vim-easy-align', -- text alignment
-    config = [[require('mk.plugins.configs.easyalign')]]
+    config = function() require('mk.plugins.configs.easyalign') end
   }
   use 'tpope/vim-surround' -- surround text helpers
 
@@ -20,28 +20,28 @@ return require('packer').startup(function()
     requires = {
       'nvim-lua/plenary.nvim'
     },
-    config = [[require('mk.plugins.configs.gitsigns')]]
+    config = function() require('mk.plugins.configs.gitsigns') end
   }
 
   -- general language configuration
   use 'editorconfig/editorconfig-vim' -- EditorConfig plugin
   use {
     'neovim/nvim-lspconfig', -- common lsp configurations
-    config = [[require("mk.plugins.configs.lsp")]]
+    config = function() require("mk.plugins.configs.lsp") end
   }
   use {
     'hrsh7th/nvim-compe', -- lsp auto completion
-    config = [[require("mk.plugins.configs.compe")]]
+    config = function() require("mk.plugins.configs.compe") end
   }
   use {
     'scrooloose/nerdcommenter', -- comment functions
-    config = [[require('mk.plugins.configs.nerdtree')]]
+    config = function() require('mk.plugins.configs.nerdtree') end
   }
   use 'jxnblk/vim-mdx-js' -- mdx highlighting
   use {
     'nvim-treesitter/nvim-treesitter',
     run = ':TSUpdate',
-    config = [[require('mk.plugins.configs.treesitter')]]
+    config = function() require('mk.plugins.configs.treesitter') end
   }
 
   -- language specific plugins
@@ -50,7 +50,7 @@ return require('packer').startup(function()
   use 'mattn/emmet-vim' -- emmet shortcuts
   use {
     'mhartington/formatter.nvim', -- formatting
-    config = [[require('mk.plugins.configs.formatter')]]
+    config = function() require('mk.plugins.configs.formatter') end
   }
 
   -- search/navigation
@@ -58,24 +58,24 @@ return require('packer').startup(function()
   use 'junegunn/fzf.vim'
   use {
     'nvim-lua/telescope.nvim', -- fuzzy finder and previewer
-    config = [[require('mk.plugins.configs.telescope')]]
+    config = function() require('mk.plugins.configs.telescope') end
   }
   use 'scrooloose/nerdtree' -- file explorer
 
   -- aesthetics
   use {
     'eddyekofo94/gruvbox-flat.nvim', -- gruvbox theme
-    config = [[require('mk.plugins.configs.gruvbox-flat')]]
+    config = function() require('mk.plugins.configs.gruvbox-flat') end
   }
   use {
     'hoob3rt/lualine.nvim', -- statusline
-    config = [[require('mk.plugins.configs.lualine')]]
+    config = function() require('mk.plugins.configs.lualine') end
   }
 
   -- misc
   use {
     'vimwiki/vimwiki', -- wiki within vim
-    config = [[require('mk.plugins.configs.vimwiki')]]
+    config = function() require('mk.plugins.configs.vimwiki') end
   }
   use 'tpope/vim-unimpaired' -- common mappings
 
