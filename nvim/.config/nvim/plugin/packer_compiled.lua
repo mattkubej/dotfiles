@@ -78,7 +78,7 @@ _G.packer_plugins = {
     path = "/Users/mattkubej/.local/share/nvim/site/pack/packer/start/emmet-vim"
   },
   ["formatter.nvim"] = {
-    config = { "require('mk.plugins.configs.formatter')" },
+    config = { "\27LJ\2\n<\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0!mk.plugins.configs.formatter\frequire\0" },
     loaded = true,
     path = "/Users/mattkubej/.local/share/nvim/site/pack/packer/start/formatter.nvim"
   },
@@ -91,12 +91,12 @@ _G.packer_plugins = {
     path = "/Users/mattkubej/.local/share/nvim/site/pack/packer/start/fzf.vim"
   },
   ["gitsigns.nvim"] = {
-    config = { "require('mk.plugins.configs.gitsigns')" },
+    config = { "\27LJ\2\n;\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0 mk.plugins.configs.gitsigns\frequire\0" },
     loaded = true,
     path = "/Users/mattkubej/.local/share/nvim/site/pack/packer/start/gitsigns.nvim"
   },
   ["gruvbox-flat.nvim"] = {
-    config = { "require('mk.plugins.configs.gruvbox-flat')" },
+    config = { "\27LJ\2\n?\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0$mk.plugins.configs.gruvbox-flat\frequire\0" },
     loaded = true,
     path = "/Users/mattkubej/.local/share/nvim/site/pack/packer/start/gruvbox-flat.nvim"
   },
@@ -109,12 +109,12 @@ _G.packer_plugins = {
     path = "/Users/mattkubej/.local/share/nvim/site/pack/packer/start/jest.nvim"
   },
   ["lualine.nvim"] = {
-    config = { "require('mk.plugins.configs.lualine')" },
+    config = { "\27LJ\2\n:\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\31mk.plugins.configs.lualine\frequire\0" },
     loaded = true,
     path = "/Users/mattkubej/.local/share/nvim/site/pack/packer/start/lualine.nvim"
   },
   nerdcommenter = {
-    config = { "require('mk.plugins.configs.nerdtree')" },
+    config = { "\27LJ\2\n;\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0 mk.plugins.configs.nerdtree\frequire\0" },
     loaded = true,
     path = "/Users/mattkubej/.local/share/nvim/site/pack/packer/start/nerdcommenter"
   },
@@ -123,17 +123,17 @@ _G.packer_plugins = {
     path = "/Users/mattkubej/.local/share/nvim/site/pack/packer/start/nerdtree"
   },
   ["nvim-compe"] = {
-    config = { 'require("mk.plugins.configs.compe")' },
+    config = { "\27LJ\2\n8\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\29mk.plugins.configs.compe\frequire\0" },
     loaded = true,
     path = "/Users/mattkubej/.local/share/nvim/site/pack/packer/start/nvim-compe"
   },
   ["nvim-lspconfig"] = {
-    config = { 'require("mk.plugins.configs.lsp")' },
+    config = { "\27LJ\2\n6\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\27mk.plugins.configs.lsp\frequire\0" },
     loaded = true,
     path = "/Users/mattkubej/.local/share/nvim/site/pack/packer/start/nvim-lspconfig"
   },
   ["nvim-treesitter"] = {
-    config = { "require('mk.plugins.configs.treesitter')" },
+    config = { "\27LJ\2\n=\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\"mk.plugins.configs.treesitter\frequire\0" },
     loaded = true,
     path = "/Users/mattkubej/.local/share/nvim/site/pack/packer/start/nvim-treesitter"
   },
@@ -150,12 +150,12 @@ _G.packer_plugins = {
     path = "/Users/mattkubej/.local/share/nvim/site/pack/packer/start/popup.nvim"
   },
   ["telescope.nvim"] = {
-    config = { "require('mk.plugins.configs.telescope')" },
+    config = { "\27LJ\2\n<\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0!mk.plugins.configs.telescope\frequire\0" },
     loaded = true,
     path = "/Users/mattkubej/.local/share/nvim/site/pack/packer/start/telescope.nvim"
   },
   ["vim-easy-align"] = {
-    config = { "require('mk.plugins.configs.easyalign')" },
+    config = { "\27LJ\2\n<\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0!mk.plugins.configs.easyalign\frequire\0" },
     loaded = true,
     path = "/Users/mattkubej/.local/share/nvim/site/pack/packer/start/vim-easy-align"
   },
@@ -188,57 +188,57 @@ _G.packer_plugins = {
     path = "/Users/mattkubej/.local/share/nvim/site/pack/packer/start/vim-unimpaired"
   },
   vimwiki = {
-    config = { "require('mk.plugins.configs.vimwiki')" },
+    config = { "\27LJ\2\n:\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\31mk.plugins.configs.vimwiki\frequire\0" },
     loaded = true,
     path = "/Users/mattkubej/.local/share/nvim/site/pack/packer/start/vimwiki"
   }
 }
 
 time([[Defining packer_plugins]], false)
--- Config for: lualine.nvim
-time([[Config for lualine.nvim]], true)
-require('mk.plugins.configs.lualine')
-time([[Config for lualine.nvim]], false)
+-- Config for: gitsigns.nvim
+time([[Config for gitsigns.nvim]], true)
+try_loadstring("\27LJ\2\n;\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0 mk.plugins.configs.gitsigns\frequire\0", "config", "gitsigns.nvim")
+time([[Config for gitsigns.nvim]], false)
+-- Config for: nvim-compe
+time([[Config for nvim-compe]], true)
+try_loadstring("\27LJ\2\n8\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\29mk.plugins.configs.compe\frequire\0", "config", "nvim-compe")
+time([[Config for nvim-compe]], false)
+-- Config for: vim-easy-align
+time([[Config for vim-easy-align]], true)
+try_loadstring("\27LJ\2\n<\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0!mk.plugins.configs.easyalign\frequire\0", "config", "vim-easy-align")
+time([[Config for vim-easy-align]], false)
+-- Config for: nvim-lspconfig
+time([[Config for nvim-lspconfig]], true)
+try_loadstring("\27LJ\2\n6\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\27mk.plugins.configs.lsp\frequire\0", "config", "nvim-lspconfig")
+time([[Config for nvim-lspconfig]], false)
+-- Config for: nvim-treesitter
+time([[Config for nvim-treesitter]], true)
+try_loadstring("\27LJ\2\n=\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\"mk.plugins.configs.treesitter\frequire\0", "config", "nvim-treesitter")
+time([[Config for nvim-treesitter]], false)
 -- Config for: formatter.nvim
 time([[Config for formatter.nvim]], true)
-require('mk.plugins.configs.formatter')
+try_loadstring("\27LJ\2\n<\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0!mk.plugins.configs.formatter\frequire\0", "config", "formatter.nvim")
 time([[Config for formatter.nvim]], false)
+-- Config for: lualine.nvim
+time([[Config for lualine.nvim]], true)
+try_loadstring("\27LJ\2\n:\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\31mk.plugins.configs.lualine\frequire\0", "config", "lualine.nvim")
+time([[Config for lualine.nvim]], false)
 -- Config for: telescope.nvim
 time([[Config for telescope.nvim]], true)
-require('mk.plugins.configs.telescope')
+try_loadstring("\27LJ\2\n<\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0!mk.plugins.configs.telescope\frequire\0", "config", "telescope.nvim")
 time([[Config for telescope.nvim]], false)
 -- Config for: vimwiki
 time([[Config for vimwiki]], true)
-require('mk.plugins.configs.vimwiki')
+try_loadstring("\27LJ\2\n:\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\31mk.plugins.configs.vimwiki\frequire\0", "config", "vimwiki")
 time([[Config for vimwiki]], false)
--- Config for: nvim-compe
-time([[Config for nvim-compe]], true)
-require("mk.plugins.configs.compe")
-time([[Config for nvim-compe]], false)
--- Config for: nvim-lspconfig
-time([[Config for nvim-lspconfig]], true)
-require("mk.plugins.configs.lsp")
-time([[Config for nvim-lspconfig]], false)
--- Config for: gruvbox-flat.nvim
-time([[Config for gruvbox-flat.nvim]], true)
-require('mk.plugins.configs.gruvbox-flat')
-time([[Config for gruvbox-flat.nvim]], false)
--- Config for: nvim-treesitter
-time([[Config for nvim-treesitter]], true)
-require('mk.plugins.configs.treesitter')
-time([[Config for nvim-treesitter]], false)
--- Config for: gitsigns.nvim
-time([[Config for gitsigns.nvim]], true)
-require('mk.plugins.configs.gitsigns')
-time([[Config for gitsigns.nvim]], false)
--- Config for: vim-easy-align
-time([[Config for vim-easy-align]], true)
-require('mk.plugins.configs.easyalign')
-time([[Config for vim-easy-align]], false)
 -- Config for: nerdcommenter
 time([[Config for nerdcommenter]], true)
-require('mk.plugins.configs.nerdtree')
+try_loadstring("\27LJ\2\n;\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0 mk.plugins.configs.nerdtree\frequire\0", "config", "nerdcommenter")
 time([[Config for nerdcommenter]], false)
+-- Config for: gruvbox-flat.nvim
+time([[Config for gruvbox-flat.nvim]], true)
+try_loadstring("\27LJ\2\n?\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0$mk.plugins.configs.gruvbox-flat\frequire\0", "config", "gruvbox-flat.nvim")
+time([[Config for gruvbox-flat.nvim]], false)
 if should_profile then save_profiles() end
 
 end)
