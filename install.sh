@@ -110,6 +110,7 @@ install_dependencies() {
 
 stow_dirs() {
   stow -d ~/dotfiles nvim
+  stow -d ~/dotfiles git
 }
 
 bootstrap_nvim_packer() {
