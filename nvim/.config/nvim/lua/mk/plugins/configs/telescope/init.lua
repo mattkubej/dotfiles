@@ -26,10 +26,7 @@ function M.edit_nvim()
     shorten_path = false,
     cwd = "~/.config/nvim",
 
-    layout_strategy = 'horizontal',
-    layout_config = {
-      preview_width = 0.65,
-    },
+    layout_strategy = 'vertical',
   }
 end
 
@@ -37,10 +34,7 @@ function M.git_files()
   require('telescope.builtin').git_files {
     prompt_title = "~ git files ~",
 
-    layout_strategy = 'horizontal',
-    layout_config = {
-      preview_width = 0.65,
-    },
+    layout_strategy = 'vertical',
   }
 end
 
@@ -49,10 +43,7 @@ function M.all_files()
     prompt_title = "~ all files ~",
     find_command = { 'rg', '--no-ignore', '--files', },
 
-    layout_strategy = 'horizontal',
-    layout_config = {
-      preview_width = 0.65,
-    },
+    layout_strategy = 'vertical',
   }
 end
 
@@ -60,10 +51,7 @@ function M.lsp_references()
   require('telescope.builtin').lsp_references {
     prompt_title = "~ lsp references ~",
 
-    layout_strategy = 'horizontal',
-    layout_config = {
-      preview_width = 0.65,
-    },
+    layout_strategy = 'vertical',
   }
 end
 
