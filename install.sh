@@ -120,7 +120,7 @@ bootstrap_nvim_packer() {
 
   echo "\n -- installing packer plugins -- \n"
   nvim --headless \
-    -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
+    -c 'autocmd User PackerComplete quitall' -c 'PackerSync' &> /dev/null
 }
 
 if [ $SPIN ]; then
