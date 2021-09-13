@@ -3,6 +3,11 @@ local nvim_lsp = require('lspconfig')
 require('mk.plugins.configs.lsp.options')
 
 local on_attach = function(client, bufnr)
+  require('lsp_signature').on_attach({
+    bind = true,
+    floating_window = false,
+  }, bufnr)
+
   local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
   local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
 
@@ -22,7 +27,7 @@ local on_attach = function(client, bufnr)
   buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
 end
 
-local servers = {'solargraph', 'tsserver'}
+local servers = {'tsserver'}
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup { on_attach = on_attach }
 end

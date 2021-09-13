@@ -1,4 +1,4 @@
-require('lualine').setup{
+require('lualine').setup({
   options = {
     theme = 'gruvbox-flat',
     icons_enabled = false,
@@ -12,4 +12,4 @@ require('lualine').setup{
     lualine_z = { 'location'  },
   },
   extensions = { 'fugitive', 'fzf', 'nerdtree' }
-}
+})

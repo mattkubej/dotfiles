@@ -3,14 +3,11 @@ P = function(v)
   return v
 end
 
-if pcall(require, 'plenary') then
-  RELOAD = require('plenary.reload').reload_module
-
-  R = function(name)
-    RELOAD(name)
-    return require(name)
-  end
+RELOAD = function(...)
+  return require("plenary.reload").reload_module(...)
 end
 
--- `vim.opt`
-require('mk.globals.opt')
+R = function(name)
+  RELOAD(name)
+  return require(name)
+end

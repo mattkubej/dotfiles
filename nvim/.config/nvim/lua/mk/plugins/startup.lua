@@ -20,7 +20,7 @@ return require('packer').startup(function()
     requires = {
       'nvim-lua/plenary.nvim'
     },
-    config = function() require('mk.plugins.configs.gitsigns') end
+    config = function() require('gitsigns').setup() end
   }
 
   -- general language configuration
@@ -43,6 +43,7 @@ return require('packer').startup(function()
     run = ':TSUpdate',
     config = function() require('mk.plugins.configs.treesitter') end
   }
+  use 'nvim-treesitter/playground'
 
   -- language specific plugins
   use 'fatih/vim-go' -- Go language support
@@ -82,5 +83,18 @@ return require('packer').startup(function()
   -- possibly unmaintained
   use 'christoomey/vim-tmux-navigator' -- navigative between nvim and tmux
   use 'dag/vim-fish' -- fish script support
-end)
 
+  -- testing
+  use {
+    'norcalli/nvim-colorizer.lua', -- highlight css colors
+    config = function() require('mk.plugins.configs.nvim-colorizer') end
+  }
+  use {
+    'windwp/nvim-autopairs',
+    config = function() require('mk.plugins.configs.nvim-autopairs') end
+  }
+  use 'windwp/nvim-ts-autotag' -- auto-closing tags
+  use 'tpope/vim-sleuth' -- auto adjust shiftwidth and expand tab
+  use 'ray-x/lsp_signature.nvim' -- lsp signature help
+  use 'nvim-treesitter/nvim-treesitter-textobjects'
+end)

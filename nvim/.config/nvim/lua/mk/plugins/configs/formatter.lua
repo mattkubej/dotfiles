@@ -10,6 +10,7 @@ require('formatter').setup({
   logging = false,
   filetype = {
     javascript = { prettier },
+    typescript = { prettier },
     typescriptreact = { prettier },
   }
 })

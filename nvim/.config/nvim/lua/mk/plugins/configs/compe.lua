@@ -36,7 +36,7 @@ local set_keymap = vim.api.nvim_set_keymap
 local opts = { noremap=true, silent=true, expr=true }
 
 set_keymap('i', '<C-Space>', 'compe#complete()', opts)
-set_keymap('i', '<CR>', "compe#confirm('<CR>')", opts)
+set_keymap('i', '<CR>', "compe#confirm(luaeval(\"require 'nvim-autopairs'.autopairs_cr()\"))", opts)
 set_keymap('i', '<C-e>', "compe#close('<C-e>')", opts)
 set_keymap('i', '<C-f>', "compe#scroll({ 'delta': +4 })", opts)
 set_keymap('i', '<C-d>', "compe#scroll({ 'delta': -4 })", opts)

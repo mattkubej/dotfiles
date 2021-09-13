@@ -20,7 +20,7 @@ opt.tabstop        = 2
 opt.clipboard      = 'unnamedplus'
 opt.laststatus     = 2
 
-opt.undodir        = '~/.vimdid'
+opt.undodir        = vim.fn.expand('$HOME/.vimdid//')
 opt.undofile       = true
 opt.swapfile       = false
 opt.inccommand     = 'split'
@@ -33,8 +33,7 @@ opt.smartcase      = true
 opt.termguicolors  = true
 opt.number         = true
 opt.signcolumn     = 'yes:1'
-opt.colorcolumn    = 80
-opt.t_vb           = ''
+opt.colorcolumn    = '80'
 opt.belloff        = 'all'
 
 opt.wrap           = false
