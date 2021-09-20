@@ -74,6 +74,14 @@ install_stow() {
   fi
 }
 
+install_prettier() {
+  if ! command -v prettier &> /dev/null; then
+    echo "\n  -- installing stow -- \n"
+
+    sudo npm i -g prettier
+  fi
+}
+
 install_nvim_nightly() {
   echo "\n  -- installing nvim nightly -- \n"
 
@@ -98,6 +106,7 @@ install_dependencies() {
   install_exa
   install_delta
   install_fd
+  install_prettier
 
   # order matters
   install_ripgrep
