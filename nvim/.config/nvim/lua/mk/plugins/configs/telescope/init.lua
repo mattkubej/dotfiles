@@ -63,12 +63,17 @@ function M.grep_prompt()
   require('telescope.builtin').grep_string {
     shorten_path = true,
     search = vim.fn.input("Grep String > "),
+
+    layout_strategy = 'vertical',
   }
 end
 
 function M.buffers()
   require('telescope.builtin').buffers {
+    prompt_title = "~ buffers ~",
     shorten_path = false,
+
+    layout_strategy = 'vertical',
   }
 end
 
