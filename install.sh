@@ -85,11 +85,7 @@ install_prettier() {
 install_nvim_nightly() {
   echo "\n  -- installing nvim nightly -- \n"
 
-  # nightly disappeared?!
-  #curl -L https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage \
-    #-o /tmp/nvim.appimage
-
-  curl -L https://github.com/neovim/neovim/releases/download/v0.5.0/nvim.appimage \
+  curl -L https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage \
     -o /tmp/nvim.appimage
 
   chmod u+x /tmp/nvim.appimage
