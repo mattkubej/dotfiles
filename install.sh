@@ -76,9 +76,17 @@ install_stow() {
 
 install_prettier() {
   if ! command -v prettier &> /dev/null; then
-    echo "\n  -- installing stow -- \n"
+    echo "\n  -- installing prettier -- \n"
 
     sudo npm i -g prettier
+  fi
+}
+
+install_eslint_d() {
+  if ! command -v prettier &> /dev/null; then
+    echo "\n  -- installing eslint_d -- \n"
+
+    sudo npm i -g eslint_d
   fi
 }
 
@@ -111,6 +119,7 @@ install_dependencies() {
   install_delta
   install_fd
   install_prettier
+  install_eslint_d
 
   # order matters
   install_ripgrep

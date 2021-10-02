@@ -29,9 +29,11 @@ return require('packer').startup(function()
     'neovim/nvim-lspconfig', -- common lsp configurations
     config = function() require("mk.plugins.configs.lsp") end
   }
+
+  use 'hrsh7th/cmp-nvim-lsp'
   use {
-    'hrsh7th/nvim-compe', -- lsp auto completion
-    config = function() require("mk.plugins.configs.compe") end
+    'hrsh7th/nvim-cmp', -- lsp auto completion
+    config = function() require("mk.plugins.configs.cmp") end
   }
   use {
     'scrooloose/nerdcommenter', -- comment functions
@@ -49,10 +51,6 @@ return require('packer').startup(function()
   use 'fatih/vim-go' -- Go language support
   use 'kubejm/jest.nvim' -- jest test runner
   use 'mattn/emmet-vim' -- emmet shortcuts
-  use {
-    'mhartington/formatter.nvim', -- formatting
-    config = function() require('mk.plugins.configs.formatter') end
-  }
 
   -- search/navigation
   use {'junegunn/fzf', dir = '~/.fzf', run = './install --all'}
@@ -97,4 +95,7 @@ return require('packer').startup(function()
   use 'tpope/vim-sleuth' -- auto adjust shiftwidth and expand tab
   use 'ray-x/lsp_signature.nvim' -- lsp signature help
   use 'nvim-treesitter/nvim-treesitter-textobjects'
+
+  use 'jose-elias-alvarez/null-ls.nvim'
+  use 'jose-elias-alvarez/nvim-lsp-ts-utils'
 end)
