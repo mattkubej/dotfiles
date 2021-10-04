@@ -77,6 +77,14 @@ function M.buffers()
   }
 end
 
+function M.git_status()
+  require('telescope.builtin').git_status {
+    prompt_title = "~ git status ~",
+
+    layout_strategy = 'vertical',
+  }
+end
+
 require('mk.plugins.configs.telescope.mappings')
 
 return setmetatable({}, {

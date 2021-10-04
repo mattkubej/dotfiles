@@ -40,4 +40,7 @@ map_telescope('<leader>fd', 'fd')
 map_telescope('<leader>fr', 'lsp_references')
 map_telescope('<leader>fb', 'buffers')
 
+-- git
+map_telescope('<leader>fs', 'git_status')
+
 return map_telescope
