@@ -83,7 +83,7 @@ install_prettier() {
 }
 
 install_eslint_d() {
-  if ! command -v prettier &> /dev/null; then
+  if ! command -v eslint_d &> /dev/null; then
     echo "\n  -- installing eslint_d -- \n"
 
     sudo npm i -g eslint_d
