@@ -6,6 +6,24 @@ require('mk.plugins.configs.lsp.options')
 require("null-ls").config {}
 require("lspconfig")["null-ls"].setup {}
 
+local resolve_bin = function(cmd)
+  local lsputil = require("lspconfig.util")
+  local utils = require("nvim-lsp-ts-utils.utils")
+
+  local relative_bin = lsputil.path.join(utils.buffer.root(), "node_modules", ".bin", cmd)
+
+  local root_dir = lsputil.root_pattern(".git")(vim.api.nvim_buf_get_name(0))
+  local root_bin = lsputil.path.join(root_dir, "node_modules", ".bin", cmd)
+
+  if lsputil.path.exists(relative_bin) then
+      return local_bin
+  elseif lsputil.path.exists(root_bin) then
+      return root_bin
+  else
+      return cmd
+  end
+end
+
 local on_attach = function(client, bufnr)
   require('lsp_signature').on_attach({
     bind = true,
@@ -45,7 +63,9 @@ local on_attach = function(client, bufnr)
       -- formatting
       enable_formatting = true,
       formatter = "prettier",
-      formatter_opts = {},
+      formatter_opts = {
+        command = resolve_bin("prettier")
+      },
 
       -- update imports on file move
       update_imports_on_move = false,
@@ -84,6 +104,7 @@ local on_attach = function(client, bufnr)
   buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
   buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
   buf_set_keymap('n', '<leader>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
+  buf_set_keymap('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
 end
 
 local capabilities = function()
