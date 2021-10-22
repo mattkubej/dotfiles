@@ -144,7 +144,7 @@ bootstrap_nvim_packer() {
     -c 'autocmd User PackerComplete quitall' -c 'PackerSync' &> /dev/null
 
   echo "\n -- updating treesitter -- \n"
-  nvim --headless +TSUpdateSync +q &> /dev/null
+  nvim --headless "+TSUpdateSync all" +q &> /dev/null
 }
 
 if [ $SPIN ]; then
