@@ -30,11 +30,22 @@ return require('packer').startup(function()
     config = function() require("mk.plugins.configs.lsp") end
   }
 
-  use 'hrsh7th/cmp-nvim-lsp'
+  -- completion
   use {
     'hrsh7th/nvim-cmp', -- lsp auto completion
+    requires = {
+      'hrsh7th/cmp-nvim-lsp',
+      'hrsh7th/cmp-nvim-lua',
+      'hrsh7th/cmp-path',
+      'hrsh7th/cmp-buffer',
+      'saadparwaiz1/cmp_luasnip',
+      'L3MON4D3/LuaSnip',
+      'rafamadriz/friendly-snippets',
+      'onsails/lspkind-nvim',
+    },
     config = function() require("mk.plugins.configs.cmp") end
   }
+
   use {
     'scrooloose/nerdcommenter', -- comment functions
     config = function() require('mk.plugins.configs.nerdtree') end
@@ -59,6 +70,7 @@ return require('packer').startup(function()
     'nvim-lua/telescope.nvim', -- fuzzy finder and previewer
     config = function() require('mk.plugins.configs.telescope') end
   }
+  use {'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
   use 'scrooloose/nerdtree' -- file explorer
 
   -- aesthetics
