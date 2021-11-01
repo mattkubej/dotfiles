@@ -33,12 +33,9 @@ local ts_utils_attach = function(client, bufnr)
       import_all_scan_buffers = 100,
       import_all_select_source = false,
 
-      -- eslint
-      eslint_enable_code_actions = true,
-      eslint_enable_disable_comments = true,
-      eslint_bin = "eslint_d",
-      eslint_enable_diagnostics = true,
-      eslint_opts = {},
+      -- using eslint language server
+      eslint_enable_code_actions = false,
+      eslint_enable_disable_comments = false,
 
       -- formatting
       enable_formatting = true,
@@ -92,6 +89,8 @@ local custom_attach = function(client, bufnr)
   buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
   buf_set_keymap('n', '<leader>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
 
+  buf_set_keymap('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+
   signature_attach(client, bufnr)
 end
 
@@ -105,6 +104,11 @@ local servers = {
       custom_attach(client, bufnr)
     end,
   },
+  html = true,
+  cssls = true,
+  eslint = true,
+  graphql = true,
+  sumneko_lua = true,
 }
 
 local setup_server = function(server, config)

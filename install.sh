@@ -110,6 +110,8 @@ install_nvim_nightly() {
 install_language_servers() {
   echo "\n -- installing language servers -- \n"
   sudo npm install -g typescript typescript-language-server
+  sudo npm i -g vscode-langservers-extracted
+  sudo npm install -g graphql-language-service-cli
 }
 
 install_dependencies() {
