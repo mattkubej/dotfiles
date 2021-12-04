@@ -93,11 +93,11 @@ install_eslint_d() {
 install_nvim_nightly() {
   echo "\n  -- installing nvim nightly -- \n"
 
-  #curl -L https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage \
-    #-o /tmp/nvim.appimage
-
-  curl -L https://github.com/neovim/neovim/releases/download/v0.5.1/nvim.appimage \
+  curl -L https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage \
     -o /tmp/nvim.appimage
+
+  # curl -L https://github.com/neovim/neovim/releases/download/v0.5.1/nvim.appimage \
+  #   -o /tmp/nvim.appimage
 
   chmod u+x /tmp/nvim.appimage
 
