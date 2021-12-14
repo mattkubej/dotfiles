@@ -6,8 +6,12 @@ local buf_nnoremap = function(bufnr, opts)
 end
 
 -- enable null-ls integration
-require("null-ls").config {}
-require("lspconfig")["null-ls"].setup {}
+local null_ls = require("null-ls")
+null_ls.setup {
+  sources = {
+    null_ls.builtins.formatting.prettier
+  }
+}
 
 local ts_utils_attach = function(client, bufnr)
   -- disable tsserver formatting if you plan on formatting via null-ls
