@@ -1,10 +1,5 @@
 local nvim_lsp = require('lspconfig')
 
-local buf_nnoremap = function(bufnr, opts)
-  opts.buffer = 0
-  vim.api.nvim_buf_set_keymap(bufnr, opts)
-end
-
 -- enable null-ls integration
 local null_ls = require("null-ls")
 null_ls.setup {
@@ -117,7 +112,24 @@ local servers = {
   cssls = true,
   eslint = true,
   graphql = true,
-  sumneko_lua = true,
+  sumneko_lua = {
+    settings = {
+      Lua = {
+        runtime = {
+          version = 'LuaJIT',
+        },
+        diagnostics = {
+          globals = {'vim'},
+        },
+        workspace = {
+          library = vim.api.nvim_get_runtime_file("", true),
+        },
+        telemetry = {
+          enable = false,
+        },
+      },
+    },
+  },
 }
 
 local setup_server = function(server, config)

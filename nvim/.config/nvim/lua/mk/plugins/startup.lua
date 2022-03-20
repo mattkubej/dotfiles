@@ -1,4 +1,4 @@
-return require('packer').startup(function()
+return require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
 
   -- nvim extensions
@@ -40,7 +40,6 @@ return require('packer').startup(function()
       'hrsh7th/cmp-buffer',
       'saadparwaiz1/cmp_luasnip',
       'L3MON4D3/LuaSnip',
-      'rafamadriz/friendly-snippets',
       'onsails/lspkind-nvim',
     },
     config = function() require('mk.plugins.configs.cmp') end,
@@ -107,10 +106,6 @@ return require('packer').startup(function()
   use {
     'norcalli/nvim-colorizer.lua', -- highlight css colors
     config = function() require('mk.plugins.configs.nvim-colorizer') end,
-  }
-  use {
-    'windwp/nvim-autopairs',
-    config = function() require('mk.plugins.configs.nvim-autopairs') end,
   }
   use 'windwp/nvim-ts-autotag' -- auto-closing tags
   use 'tpope/vim-sleuth' -- auto adjust shiftwidth and expand tab
