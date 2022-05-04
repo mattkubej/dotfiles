@@ -15,8 +15,8 @@ null_ls.setup {
 
 local ts_utils_attach = function(client, bufnr)
   -- disable tsserver formatting if you plan on formatting via null-ls
-  client.resolved_capabilities.document_formatting = false
-  client.resolved_capabilities.document_range_formatting = false
+  client.server_capabilities.document_formatting = false
+  client.server_capabilities.document_range_formatting = false
 
   local ts_utils = require("nvim-lsp-ts-utils")
 
@@ -91,7 +91,7 @@ local custom_attach = function(client, bufnr)
 
   buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
   buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-  buf_set_keymap('n', '<leader>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
+  buf_set_keymap('n', '<leader>f', '<cmd>lua vim.lsp.buf.format()<CR>', opts)
 
   buf_set_keymap('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
 
@@ -112,8 +112,6 @@ local servers = {
   cssls = true,
   eslint = true,
   graphql = true,
-  sorbet = true,
-  solargraph = true,
   sumneko_lua = {
     settings = {
       Lua = {
