@@ -111,6 +111,10 @@ return require('packer').startup(function(use)
   use 'tpope/vim-sleuth' -- auto adjust shiftwidth and expand tab
   use 'ray-x/lsp_signature.nvim' -- lsp signature help
   use 'nvim-treesitter/nvim-treesitter-textobjects'
+  use {
+    'windwp/nvim-autopairs',
+    config = function() require('mk.plugins.configs.nvim-autopairs') end,
+  }
 
   use 'jose-elias-alvarez/null-ls.nvim'
   use 'jose-elias-alvarez/nvim-lsp-ts-utils'
