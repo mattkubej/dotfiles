@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# USAGE
+#   ./tat [-c <directory>] [-s <session_name>]
+#
+# OPTIONS
+#   -c
+#     file directory (defaults to current directory)
+#
+#   -s
+#     session name (defaults to basename of current directory)
+#
+# SEE ALSO
+#   based on https://github.com/thoughtbot/dotfiles/blob/master/bin/tat
+
+while getopts ":c:s:" o; do
+  case "${o}" in
+    c)
+      custom_dir=${OPTARG}
+      ;;
+    s)
+      custom_name=${OPTARG}
+      ;;
+  esac
+done
+
+dir=${custom_dir-$PWD}
+
+if [ ! -d $dir ]; then
+  echo "directory '$dir' is invalid or does not exist"
+  exit 1
+fi
+
+path_name=$(basename "$dir")
+session_name=${custom_name-$path_name}
+
+not_in_tmux() {
+  [ -z "$TMUX" ]
+}
+
+session_exists() {
+  tmux has-session -t "=$session_name"
+}
+
+create_detached_session() {
+  (TMUX='' tmux new-session -c "$dir" -Ad -s "$session_name")
+}
+
+create_if_needed_and_attach() {
+  if not_in_tmux; then
+    tmux new-session -c "$dir" -As "$session_name"
+  else
+    if ! session_exists; then
+      create_detached_session
+    fi
+    tmux switch-client -t "$session_name"
+  fi
+}
+
+create_if_needed_and_attach

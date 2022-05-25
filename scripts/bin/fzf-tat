@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# USAGE
+#   ./fzf-tat [directory]
+#
+# PARAMETERS
+#   directory
+#     Directory to fuzzy search, defaults to $HOME
+#
+# DEPENDS ON
+#   https://github.com/kubejm/configs/blob/master/scripts/.local/bin/tat
+
+search_dir=${1-$HOME}
+
+if [ ! -d $search_dir ]; then
+  echo "directory '$search_dir' is invalid or does not exist"
+  exit 1
+fi
+
+find_directories() {
+  fd --exact-depth 2 -t d . $search_dir
+}
+
+strip_directory_prefix() {
+  sed 's|'"$search_dir"'||g'
+}
+
+selected_dir=$(find_directories | strip_directory_prefix | fzf)
+
+if [[ -n $selected_dir ]]; then
+  tat -c "${search_dir}${selected_dir}" -s $selected_dir > /dev/null 2>&1
+fi
+
