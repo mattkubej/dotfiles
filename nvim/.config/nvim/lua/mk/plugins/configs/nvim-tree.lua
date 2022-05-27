@@ -1,4 +1,10 @@
-require'nvim-tree'.setup {}
+require'nvim-tree'.setup {
+  auto_reload_on_write = false,
+  git = {
+    enable = false,
+    ignore = false,
+  }
+}
 
 local set_keymap = vim.api.nvim_set_keymap
 local opts = { noremap=true, silent=true }
