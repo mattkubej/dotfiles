@@ -147,7 +147,6 @@ bootstrap_nvim_packer() {
 
   #echo "\n -- updating treesitter -- \n"
   #nvim --headless "+TSInstallSync all" +q &> /dev/null
-  ##
 }
 
 if [ $SPIN ]; then
