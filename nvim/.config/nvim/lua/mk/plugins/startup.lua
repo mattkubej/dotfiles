@@ -64,7 +64,7 @@ return require('packer').startup(function(use)
 
   -- language specific plugins
   use 'fatih/vim-go' -- Go language support
-  use 'kubejm/jest.nvim' -- jest test runner
+  use 'mattkubej/jest.nvim' -- jest test runner
   use 'mattn/emmet-vim' -- emmet shortcuts
 
   -- search/navigation
