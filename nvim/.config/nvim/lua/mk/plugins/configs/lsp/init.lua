@@ -1,5 +1,4 @@
 local nvim_lsp = require('lspconfig')
-local util = require('vim.lsp.util')
 
 -- enable null-ls integration
 local null_ls = require("null-ls")
@@ -33,15 +32,6 @@ local ts_utils_attach = function(client, bufnr)
       },
       import_all_scan_buffers = 100,
       import_all_select_source = false,
-
-      -- using eslint language server
-      eslint_enable_code_actions = false,
-      eslint_enable_disable_comments = false,
-
-      -- formatting
-      enable_formatting = true,
-      formatter = "prettier",
-      formatter_opts = {},
 
       -- update imports on file move
       update_imports_on_move = false,
@@ -91,7 +81,13 @@ local custom_attach = function(client, bufnr)
 
   if client.name ~= 'tsserver' then
     vim.keymap.set('n', '<leader>f', function()
-      vim.lsp.buf.format({ async = true })
+      vim.lsp.buf.format({
+        async = true,
+        filter = function(clt)
+          return clt.name == "null-ls"
+        end,
+        bufnr = bufnr,
+      })
     end, opts)
   end
 
