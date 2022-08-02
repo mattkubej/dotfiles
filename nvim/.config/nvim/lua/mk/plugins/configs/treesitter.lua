@@ -1,6 +1,6 @@
 require('nvim-treesitter.configs').setup{
   ensure_installed = "all",
-  ignore_install = { "haskell" },
+  ignore_install = { "haskell", "vala", "r", "beancount", "swift", "markdown" },
   highlight = {
     enable = true,
     disable = { "ocaml" },

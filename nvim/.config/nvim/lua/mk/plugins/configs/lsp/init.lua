@@ -4,9 +4,6 @@ local nvim_lsp = require('lspconfig')
 local null_ls = require("null-ls")
 null_ls.setup {
   sources = {
-    null_ls.builtins.diagnostics.eslint.with({
-      only_local = "node_modules/.bin",
-    }),
     null_ls.builtins.formatting.prettier.with({
       prefer_local = "node_modules/.bin",
     })
@@ -65,9 +62,9 @@ end
 local custom_attach = function(client, bufnr)
   local opts = { noremap=true, silent=true }
 
-  vim.keymap.set('n', 'gdp', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
-  vim.keymap.set('n', 'gdn', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
-  vim.keymap.set('n', 'gsl', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
+  vim.keymap.set('n', 'gdp', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
+  vim.keymap.set('n', 'gdn', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
+  vim.keymap.set('n', 'gsl', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
 
   vim.keymap.set('n', '<c-]>', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
   vim.keymap.set('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
