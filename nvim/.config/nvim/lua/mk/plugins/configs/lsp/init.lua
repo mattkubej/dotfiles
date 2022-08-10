@@ -42,14 +42,6 @@ local ts_utils_attach = function(client, bufnr)
 
   -- required to fix code action ranges and filter diagnostics
   ts_utils.setup_client(client)
-
-  local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
-
-  local opts = { silent = true }
-
-  buf_set_keymap("n", "gs", ":TSLspOrganize<CR>", opts)
-  buf_set_keymap("n", "gr", ":TSLspRenameFile<CR>", opts)
-  buf_set_keymap("n", "gi", ":TSLspImportAll<CR>", opts)
 end
 
 local signature_attach = function(client, bufnr)
