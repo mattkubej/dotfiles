@@ -71,6 +71,9 @@ local custom_attach = function(client, bufnr)
   vim.keymap.set('n', '<leader>f', function()
     vim.lsp.buf.format({
       async = true,
+      filter = function(clt)
+        return clt.name == "null-ls"
+      end,
     })
   end, opts)
 
