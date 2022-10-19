@@ -1,6 +1,6 @@
 require('lualine').setup({
   options = {
-    theme = 'gruvbox-baby',
+    theme = 'material-nvim',
     icons_enabled = false,
   },
   sections = {
