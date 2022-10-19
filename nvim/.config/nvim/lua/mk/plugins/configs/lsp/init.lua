@@ -80,8 +80,7 @@ local custom_attach = function(client, bufnr)
   signature_attach(client, bufnr)
 end
 
-local updated_capabilities = vim.lsp.protocol.make_client_capabilities()
-updated_capabilities = require('cmp_nvim_lsp').update_capabilities(updated_capabilities)
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 local servers = {
   tsserver = {
@@ -125,7 +124,7 @@ local setup_server = function(server, config)
 
   config = vim.tbl_deep_extend("force", {
     on_attach = custom_attach,
-    capabilities = updated_capabilities,
+    capabilities = capabilities,
     flags = {
       debounce_text_changes = 50,
     },
