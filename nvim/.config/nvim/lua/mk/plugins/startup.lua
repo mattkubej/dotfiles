@@ -86,9 +86,13 @@ return require('packer').startup(function(use)
   --   'eddyekofo94/gruvbox-flat.nvim', -- gruvbox theme
   --   config = function() require('mk.plugins.configs.gruvbox-flat') end,
   -- }
+  -- use {
+  --   'luisiacc/gruvbox-baby',
+  --   config = function() require('mk.plugins.configs.gruvbox-baby') end,
+  -- }
   use {
-    'luisiacc/gruvbox-baby',
-    config = function() require('mk.plugins.configs.gruvbox-baby') end,
+    'folke/tokyonight.nvim',
+    config = function() require('mk.plugins.configs.tokyonight') end,
   }
   use {
     'hoob3rt/lualine.nvim', -- statusline
