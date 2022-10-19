@@ -90,14 +90,14 @@ return require('packer').startup(function(use)
   --   'luisiacc/gruvbox-baby',
   --   config = function() require('mk.plugins.configs.gruvbox-baby') end,
   -- }
-  -- use {
-  --   'folke/tokyonight.nvim',
-  --   config = function() require('mk.plugins.configs.tokyonight') end,
-  -- }
   use {
-    'marko-cerovac/material.nvim',
-    config = function() require('mk.plugins.configs.material') end,
+    'folke/tokyonight.nvim',
+    config = function() require('mk.plugins.configs.tokyonight') end,
   }
+  -- use {
+  --   'marko-cerovac/material.nvim',
+  --   config = function() require('mk.plugins.configs.material') end,
+  -- }
   use {
     'hoob3rt/lualine.nvim', -- statusline
     config = function() require('mk.plugins.configs.lualine') end,

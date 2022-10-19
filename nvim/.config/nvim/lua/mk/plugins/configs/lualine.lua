@@ -1,6 +1,6 @@
 require('lualine').setup({
   options = {
-    theme = 'material-nvim',
+    theme = 'tokyonight',
     icons_enabled = false,
   },
   sections = {

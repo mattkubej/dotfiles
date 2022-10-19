@@ -25,7 +25,7 @@ require('material').setup({
     },
 
     disable = {
-        colored_cursor = false,
+        colored_cursor = true,
         borders = false,
         background = false,
         term_colors = false,
@@ -33,8 +33,8 @@ require('material').setup({
     },
 
     high_visibility = {
-        lighter = false,
-        darker = false
+        lighter = true,
+        darker = true
     },
 
     lualine_style = "default",
