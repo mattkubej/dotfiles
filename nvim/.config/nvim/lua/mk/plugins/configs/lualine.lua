@@ -1,6 +1,6 @@
 require('lualine').setup({
   options = {
-    theme = 'tokyonight',
+    theme = 'gruvbox-baby',
     icons_enabled = false,
   },
   sections = {
