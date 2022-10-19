@@ -26,6 +26,13 @@ require('telescope').setup {
       override_file_sorter = true,
       case_mode = 'smart_case',
     }
+  },
+  defaults = {
+    borderchars = {
+      prompt = { "─", " ", " ", " ", "─", "─", " ", " " },
+      results = { " " },
+      preview = { " " },
+    },
   }
 }
 
