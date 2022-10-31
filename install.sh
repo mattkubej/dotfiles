@@ -109,9 +109,9 @@ install_nvim_nightly() {
 
 install_language_servers() {
   echo "\n -- installing language servers -- \n"
-  npm i -g typescript typescript-language-server
-  npm i -g vscode-langservers-extracted
-  npm i -g graphql-language-service-cli
+  sudo yarn global add typescript typescript-language-server --prefix /usr/local
+  sudo yarn global add vscode-langservers-extracted --prefix /usr/local
+  sudo yarn global add graphql-language-service-cli --prefix /usr/local
 }
 
 install_dependencies() {
