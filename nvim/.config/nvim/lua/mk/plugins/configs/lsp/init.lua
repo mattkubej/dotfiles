@@ -8,6 +8,7 @@ null_ls.setup {
       prefer_local = "node_modules/.bin",
     }),
     null_ls.builtins.diagnostics.eslint_d,
+    null_ls.builtins.formatting.rustfmt,
   }
 }
 
@@ -94,6 +95,7 @@ local servers = {
   cssls = true,
   eslint = true,
   graphql = true,
+  rust_analyzer = true,
   sumneko_lua = {
     settings = {
       Lua = {
