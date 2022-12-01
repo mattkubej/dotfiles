@@ -130,4 +130,5 @@ return require('packer').startup(function(use)
 
   use 'jose-elias-alvarez/null-ls.nvim'
   use 'jose-elias-alvarez/nvim-lsp-ts-utils'
+  use 'github/copilot.vim'
 end)
