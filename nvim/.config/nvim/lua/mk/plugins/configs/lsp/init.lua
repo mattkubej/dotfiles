@@ -1,68 +1,13 @@
 local nvim_lsp = require('lspconfig')
 
--- enable null-ls integration
-local null_ls = require("null-ls")
-null_ls.setup {
-  sources = {
-    null_ls.builtins.formatting.prettier.with({
-      prefer_local = "node_modules/.bin",
-    }),
-    null_ls.builtins.diagnostics.eslint_d,
-    null_ls.builtins.formatting.rustfmt,
-    null_ls.builtins.formatting.rubocop,
-  }
-}
+local custom_attach = function()
+  local opts = { noremap = true, silent = true }
 
-local ts_utils_attach = function(client, bufnr)
-  local ts_utils = require("nvim-lsp-ts-utils")
+  vim.keymap.set('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
+  vim.keymap.set('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
+  vim.keymap.set('n', '<leader>vd', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
 
-  -- defaults
-  ts_utils.setup {
-      debug = false,
-      disable_commands = false,
-      enable_import_on_completion = false,
-
-      -- import all
-      import_all_timeout = 5000, -- ms
-      import_all_priorities = {
-          buffers = 4, -- loaded buffer names
-          buffer_content = 3, -- loaded buffer content
-          local_files = 2, -- git files or files with relative path markers
-          same_file = 1, -- add to existing import statement
-      },
-      import_all_scan_buffers = 100,
-      import_all_select_source = false,
-
-      -- update imports on file move
-      update_imports_on_move = false,
-      require_confirmation_on_move = false,
-      watch_dir = nil,
-
-      -- filter diagnostics
-      filter_out_diagnostics_by_severity = {},
-      filter_out_diagnostics_by_code = {},
-  }
-
-  -- required to fix code action ranges and filter diagnostics
-  ts_utils.setup_client(client)
-end
-
-local signature_attach = function(client, bufnr)
-  require('lsp_signature').on_attach({
-    bind = true,
-    floating_window = false,
-  }, bufnr)
-end
-
-local custom_attach = function(client, bufnr)
-  local opts = { noremap=true, silent=true }
-
-  vim.keymap.set('n', 'gdp', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
-  vim.keymap.set('n', 'gdn', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
-  vim.keymap.set('n', 'gsl', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
-
-  vim.keymap.set('n', '<c-]>', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-  vim.keymap.set('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+  vim.keymap.set('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
   vim.keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
   vim.keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
 
@@ -70,34 +15,28 @@ local custom_attach = function(client, bufnr)
   vim.keymap.set('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
 
   vim.keymap.set('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  vim.keymap.set('n', '<leader>vrn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
 
   vim.keymap.set('n', '<leader>f', function()
     vim.lsp.buf.format({
       async = true,
-      filter = function(clt)
-        return clt.name == "null-ls"
-      end,
     })
   end, opts)
-
-  signature_attach(client, bufnr)
 end
 
-local capabilities = require("cmp_nvim_lsp").default_capabilities()
+local capabilities = require("cmp_nvim_lsp").default_capabilities(
+  vim.lsp.protocol.make_client_capabilities()
+)
 
 local servers = {
-  tsserver = {
-    on_attach = function(client, bufnr)
-      ts_utils_attach(client, bufnr)
-      custom_attach(client, bufnr)
-    end,
-  },
+  tsserver = true,
   html = true,
   cssls = true,
-  eslint = true,
   graphql = true,
   rust_analyzer = true,
   solargraph = true,
+  --sorbet = true,
+  --ruby_ls = true,
   sumneko_lua = {
     settings = {
       Lua = {
@@ -105,7 +44,7 @@ local servers = {
           version = 'LuaJIT',
         },
         diagnostics = {
-          globals = {'vim'},
+          globals = { 'vim' },
         },
         workspace = {
           library = vim.api.nvim_get_runtime_file("", true),
@@ -141,3 +80,28 @@ end
 for server, config in pairs(servers) do
   setup_server(server, config)
 end
+
+vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+  vim.lsp.diagnostic.on_publish_diagnostics, {
+  underline = true,
+  update_in_insert = false,
+  virtual_text = { spacing = 4, prefix = "●" },
+  severity_sort = true,
+})
+
+-- Diagnostic symbols in the sign column (gutter)
+local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
+for type, icon in pairs(signs) do
+  local hl = "DiagnosticSign" .. type
+  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
+end
+
+vim.diagnostic.config({
+  virtual_text = {
+    prefix = '●'
+  },
+  update_in_insert = true,
+  float = {
+    source = "always", -- Or "if_many"
+  },
+})

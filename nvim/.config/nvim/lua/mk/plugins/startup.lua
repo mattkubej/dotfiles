@@ -26,9 +26,25 @@ return require('packer').startup(function(use)
   -- general language configuration
   use 'editorconfig/editorconfig-vim' -- EditorConfig plugin
   use {
+    'williamboman/mason-lspconfig.nvim',
+    requires = {
+      'williamboman/mason.nvim'
+    },
+    config = function() require('mk.plugins.configs.nvim-mason') end,
+  }
+  use {
     'neovim/nvim-lspconfig', -- common lsp configurations
     config = function() require('mk.plugins.configs.lsp') end,
   }
+  use {
+    'jose-elias-alvarez/null-ls.nvim',
+    config = function() require('mk.plugins.configs.nvim-null-ls') end,
+  }
+  use {
+    'MunifTanjim/prettier.nvim',
+    config = function() require('mk.plugins.configs.nvim-prettier') end,
+  }
+  use 'simrat39/symbols-outline.nvim'
 
   -- completion
   use {
@@ -60,7 +76,7 @@ return require('packer').startup(function(use)
     run = ':TSUpdate',
     config = function() require('mk.plugins.configs.treesitter') end,
   }
-  use 'nvim-treesitter/playground'
+  use 'nvim-treesitter/nvim-treesitter-context'
 
   -- language specific plugins
   use 'fatih/vim-go' -- Go language support
@@ -121,14 +137,11 @@ return require('packer').startup(function(use)
   }
   use 'windwp/nvim-ts-autotag' -- auto-closing tags
   use 'tpope/vim-sleuth' -- auto adjust shiftwidth and expand tab
-  use 'ray-x/lsp_signature.nvim' -- lsp signature help
   use 'nvim-treesitter/nvim-treesitter-textobjects'
   use {
     'windwp/nvim-autopairs',
     config = function() require('mk.plugins.configs.nvim-autopairs') end,
   }
 
-  use 'jose-elias-alvarez/null-ls.nvim'
-  use 'jose-elias-alvarez/nvim-lsp-ts-utils'
   use 'github/copilot.vim'
 end)
