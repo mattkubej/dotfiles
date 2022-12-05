@@ -28,6 +28,8 @@ local capabilities = require("cmp_nvim_lsp").default_capabilities(
   vim.lsp.protocol.make_client_capabilities()
 )
 
+local in_spin = os.getenv('SPIN') == '1'
+
 local servers = {
   tsserver = true,
   html = true,
@@ -35,9 +37,15 @@ local servers = {
   -- eslint = true,
   graphql = true,
   rust_analyzer = true,
-  solargraph = true,
-  --sorbet = true,
-  --ruby_ls = true,
+  solargraph = {
+    autostart = not in_spin,
+  },
+  sorbet = {
+    root_dir = nvim_lsp.util.root_pattern('sorbet'),
+  },
+  ruby_ls = {
+    autostart = in_spin,
+  },
   sumneko_lua = {
     settings = {
       Lua = {
