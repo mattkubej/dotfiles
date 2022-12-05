@@ -32,6 +32,7 @@ local servers = {
   tsserver = true,
   html = true,
   cssls = true,
+  -- eslint = true,
   graphql = true,
   rust_analyzer = true,
   solargraph = true,
