@@ -5,7 +5,9 @@ local formatting = null_ls.builtins.formatting
 
 null_ls.setup({
   sources = {
-    null_ls.builtins.diagnostics.eslint_d,
+    null_ls.builtins.diagnostics.eslint_d.with({
+      extra_args = { "--resolve-plugins-relative-to" },
+    }),
     formatting.prettier,
   },
 })
