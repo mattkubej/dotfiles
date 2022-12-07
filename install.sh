@@ -77,17 +77,17 @@ bootstrap_nvim_packer() {
   git clone --depth 1 https://github.com/wbthomason/packer.nvim \
     ~/.local/share/nvim/site/pack/packer/start/packer.nvim &> /dev/null
 
-  #echo "\n -- installing packer plugins -- \n"
-  #nvim --headless \
-  # -c 'autocmd User PackerComplete quitall' -c 'PackerSync' &> /dev/null
+  echo "\n -- installing packer plugins -- \n"
+  nvim --headless \
+   -c 'autocmd User PackerComplete quitall' -c 'PackerSync' &> /dev/null
 
-  #echo "\n -- updating treesitter -- \n"
-  #nvim --headless "+TSInstallSync all" +q &> /dev/null
+  echo "\n -- updating treesitter -- \n"
+  nvim --headless "+TSInstallSync all" +q &> /dev/null
 }
 
 if [ $SPIN ]; then
   install_dependencies
   link_files
   stow_dirs
-  # bootstrap_nvim_packer
+  bootstrap_nvim_packer
 fi
