@@ -38,9 +38,6 @@ install_nvim_nightly() {
   curl -L https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage \
     -o /tmp/nvim.appimage
 
-  # curl -L https://github.com/neovim/neovim/releases/download/v0.5.1/nvim.appimage \
-  #   -o /tmp/nvim.appimage
-
   chmod u+x /tmp/nvim.appimage
 
   /tmp/nvim.appimage --appimage-extract
@@ -56,18 +53,18 @@ install_language_servers() {
   sudo yarn global add graphql-language-service-cli --prefix /usr/local
 }
 
-link_files() {
-  sudo ln -s $(which batcat) /usr/local/bin/bat
-  sudo ln -s $(which fdfind) /usr/local/bin/fd
-}
-
 install_dependencies() {
   install_delta
   install_prettier
   install_eslint_d
 
-  # install_nvim_nightly
+  install_nvim_nightly
   # install_language_servers
+}
+
+link_files() {
+  sudo ln -s $(which batcat) /usr/local/bin/bat
+  sudo ln -s $(which fdfind) /usr/local/bin/fd
 }
 
 stow_dirs() {
@@ -90,6 +87,7 @@ bootstrap_nvim_packer() {
 
 if [ $SPIN ]; then
   install_dependencies
+  link_files
   stow_dirs
   # bootstrap_nvim_packer
 fi
