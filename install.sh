@@ -1,19 +1,11 @@
 #!/usr/bin/env zsh
 
-install_ripgrep() {
-  if ! command -v rg &> /dev/null; then
-    echo "\n  -- installing ripgrep -- \n"
+autoload -U colors
+colors
 
-    sudo apt-get install -y ripgrep
-  fi
-}
-
-install_fzf() {
-  if ! command -v fzf &> /dev/null; then
-    echo "\n  -- installing fzf -- \n"
-
-    sudo apt-get install -y fzf
-  fi
+link_files() {
+  sudo ln -s $(which batcat) /usr/local/bin/bat
+  sudo ln -s $(which fdfind) /usr/local/bin/fd
 }
 
 install_exa() {
@@ -42,35 +34,6 @@ install_delta() {
     curl -L $delta_pkg_src -o $delta_pkg_dest
 
     sudo dpkg -i $delta_pkg_dest
-  fi
-}
-
-install_bat() {
-  if ! command -v bat &> /dev/null; then
-    echo "\n  -- installing bat -- \n"
-
-    # https://askubuntu.com/a/1300824
-    sudo apt-get install -o Dpkg::Options::="--force-overwrite" -y bat
-
-    sudo ln -s $(which batcat) /usr/local/bin/bat
-  fi
-}
-
-install_fd() {
-  if ! command -v fd &> /dev/null; then
-    echo "\n  -- installing fd -- \n"
-
-    sudo apt-get install -y fd-find
-
-    sudo ln -s $(which fdfind) /usr/local/bin/fd
-  fi
-}
-
-install_stow() {
-  if ! command -v stow &> /dev/null; then
-    echo "\n  -- installing stow -- \n"
-
-    sudo apt-get install -y stow
   fi
 }
 
@@ -115,20 +78,13 @@ install_language_servers() {
 }
 
 install_dependencies() {
-  install_fzf
   install_exa
   install_delta
-  install_fd
   install_prettier
   install_eslint_d
 
-  # order matters
-  install_ripgrep
-  install_bat
-
-  install_stow
-  install_nvim_nightly
-  install_language_servers
+  # install_nvim_nightly
+  # install_language_servers
 }
 
 stow_dirs() {
@@ -152,5 +108,5 @@ bootstrap_nvim_packer() {
 if [ $SPIN ]; then
   install_dependencies
   stow_dirs
-  bootstrap_nvim_packer
+  # bootstrap_nvim_packer
 fi
