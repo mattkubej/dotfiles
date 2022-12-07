@@ -3,32 +3,11 @@
 autoload -U colors
 colors
 
-link_files() {
-  sudo ln -s $(which batcat) /usr/local/bin/bat
-  sudo ln -s $(which fdfind) /usr/local/bin/fd
-}
-
-install_exa() {
-  if ! command -v exa &> /dev/null; then
-    echo "\n  -- installing exa -- \n"
-
-    exa_zip_src="https://github.com/ogham/exa/releases/download/v0.10.1/exa-linux-x86_64-v0.10.1.zip"
-    exa_zip_dest="/tmp/$(basename $exa_zip_src)"
-    exa_dir=/tmp/exa
-
-    curl -L $exa_zip_src -o $exa_zip_dest
-
-    unzip $exa_zip_dest -d $exa_dir
-
-    sudo ln -s "$exa_dir/bin/exa" /usr/local/bin/exa
-  fi
-}
-
 install_delta() {
   if ! command -v delta &> /dev/null; then
     echo "\n  -- installing delta -- \n"
 
-    delta_pkg_src="https://github.com/dandavison/delta/releases/download/0.8.3/git-delta_0.8.3_amd64.deb"
+    delta_pkg_src="https://github.com/dandavison/delta/releases/download/0.15.1/git-delta_0.15.1_amd64.deb"
     delta_pkg_dest="/tmp/$(basename $delta_pkg_src)"
 
     curl -L $delta_pkg_src -o $delta_pkg_dest
@@ -77,8 +56,12 @@ install_language_servers() {
   sudo yarn global add graphql-language-service-cli --prefix /usr/local
 }
 
+link_files() {
+  sudo ln -s $(which batcat) /usr/local/bin/bat
+  sudo ln -s $(which fdfind) /usr/local/bin/fd
+}
+
 install_dependencies() {
-  install_exa
   install_delta
   install_prettier
   install_eslint_d
