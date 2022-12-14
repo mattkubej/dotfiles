@@ -5,7 +5,7 @@ local formatting = null_ls.builtins.formatting
 
 null_ls.setup({
   sources = {
-    null_ls.builtins.diagnostics.eslint_d.with({
+    null_ls.builtins.diagnostics.eslint.with({
       prefer_local = 'node_modules/.bin',
     }),
     formatting.prettier.with({
