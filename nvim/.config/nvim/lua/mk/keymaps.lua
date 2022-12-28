@@ -1,12 +1,33 @@
-local set_keymap = vim.api.nvim_set_keymap
-local opts = { noremap=true, silent=true }
+vim.g.mapleader = " "
 
-set_keymap('i', '<C-c>', '<esc>', { noremap=true })
+vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 
-set_keymap('n', '<leader><leader>', '<c-^>', opts)
+vim.keymap.set("i", "<C-c>", "<esc>")
 
-set_keymap('n', '<leader>+', '<cmd>vertical resize +5<CR>', opts)
-set_keymap('n', '<leader>-', '<cmd>vertical resize -5<CR>', opts)
+vim.keymap.set("n", "<leader><leader>", "<c-^>")
 
-set_keymap('v', 'J', ":m '>+1<CR>gv=gv", { noremap=true })
-set_keymap('v', 'K', ":m '<-2<CR>gv=gv", { noremap=true })
+vim.keymap.set("n", "<leader>+", "<cmd>vertical resize +5<CR>")
+vim.keymap.set("n", "<leader>-", "<cmd>vertical resize -5<CR>")
+
+vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
+vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
+
+vim.keymap.set("n", "J", "mzJ`z")
+vim.keymap.set("n", "<C-d>", "<C-d>zz")
+vim.keymap.set("n", "<C-u>", "<C-u>zz")
+vim.keymap.set("n", "n", "nzzzv")
+vim.keymap.set("n", "N", "Nzzzv")
+
+vim.keymap.set("x", "<leader>p", [["_dP]])
+
+vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])
+vim.keymap.set("n", "<leader>Y", [["+Y]])
+
+vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]])
+
+vim.keymap.set("n", "<C-k>", "<cmd>cnext<CR>zz")
+vim.keymap.set("n", "<C-j>", "<cmd>cprev<CR>zz")
+vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz")
+vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz")
+
+vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])

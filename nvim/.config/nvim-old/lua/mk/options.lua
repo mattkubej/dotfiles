@@ -1,11 +1,8 @@
+--  https://github.com/neovim/neovim/pull/13479
 local opt = vim.opt
 
-opt.guicursor      = ""
-
-opt.number         = true
-opt.relativenumber = true
-
 opt.hidden         = true
+opt.relativenumber = true
 opt.showmode       = false
 opt.updatetime     = 1000
 opt.hlsearch       = false
@@ -33,11 +30,11 @@ opt.tm             = 500
 opt.incsearch      = true
 opt.smartcase      = true
 
-opt.belloff        = 'all'
-
-opt.colorcolumn    = '80'
-opt.signcolumn     = 'yes:1'
 opt.termguicolors  = true
+opt.number         = true
+opt.signcolumn     = 'yes:1'
+opt.colorcolumn    = '80'
+opt.belloff        = 'all'
 
 opt.wrap           = false
 
@@ -46,8 +43,6 @@ opt.foldlevel      = 0
 opt.modelines      = 1
 
 opt.joinspaces     = false
-
-opt.updatetime     = 50
 
 opt.formatoptions  = opt.formatoptions
                      - '2'
