@@ -1,12 +1,21 @@
 require 'nvim-treesitter.configs'.setup {
-  ensure_installed = { "help", "javascript", "typescript", "c", "lua", "rust", "python", "go" },
+  ensure_installed = {
+    "help",
+    "javascript",
+    "typescript",
+    "c",
+    "lua",
+    "rust",
+    "python",
+    "go",
+    "python",
+  },
 
   sync_install = false,
 
   auto_install = true,
 
   highlight = { enable = true, },
-  indent = { enable = true, },
   autotag = { enable = true, },
   incremental_selection = {
     enable = true,

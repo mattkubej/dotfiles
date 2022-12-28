@@ -1,5 +1,4 @@
 local lsp = require("lsp-zero")
-local nvim_lsp = require('lspconfig')
 
 lsp.set_preferences({
   suggest_lsp_servers = true,
@@ -17,22 +16,24 @@ lsp.set_preferences({
   }
 })
 
-lsp.ensure_installed({
+local servers = {
   'tsserver',
   'sumneko_lua',
   'rust_analyzer',
   'graphql',
   'html',
   'cssls',
-  'solargraph',
-  'sorbet',
-  'ruby_ls',
-})
+  'pylsp',
+}
 
-local in_spin = os.getenv('SPIN') == '1'
-lsp.setup_servers({ 'solargraph', opts = { autostart = not in_spin } })
-lsp.setup_servers({ 'ruby_ls', opts = { autostart = in_spin } })
-lsp.setup_servers({ 'sorbet', opts = { root_dir = nvim_lsp.util.root_pattern('sorbet') } })
+if os.getenv('SPIN') == '1' then
+  table.insert(servers, 'sorbet')
+  table.insert(servers, 'ruby_ls')
+else
+  table.insert(servers, 'solargraph')
+end
+
+lsp.ensure_installed(servers)
 
 -- Fix Undefined global 'vim'
 lsp.configure('sumneko_lua', {
