@@ -89,5 +89,5 @@ if [ $SPIN ]; then
   install_dependencies
   link_files
   stow_dirs
-  bootstrap_nvim_packer
+  #bootstrap_nvim_packer
 fi
