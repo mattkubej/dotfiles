@@ -103,7 +103,9 @@ lsp.on_attach(function(client, bufnr)
     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   end, '[W]orkspace [L]ist Folders')
 
-  nmap('<leader>f', vim.lsp.buf.format, 'Format current buffer with LSP')
+  nmap('<leader>f', function()
+    vim.lsp.buf.format({ timeout_ms = 2000 })
+  end, 'Format current buffer with LSP')
 
   if client.name == "tsserver" then
     client.server_capabilities.documentFormattingProvider = false
