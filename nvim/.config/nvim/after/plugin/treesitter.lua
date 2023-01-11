@@ -1,15 +1,20 @@
+local languages = {
+  'help',
+  'javascript',
+  'typescript',
+  'c',
+  'lua',
+  'rust',
+  'python',
+  'go',
+}
+
+if os.getenv('SPIN') ~= '1' then
+  table.insert(languages, 'python')
+end
+
 require 'nvim-treesitter.configs'.setup {
-  ensure_installed = {
-    "help",
-    "javascript",
-    "typescript",
-    "c",
-    "lua",
-    "rust",
-    "python",
-    "go",
-    "python",
-  },
+  ensure_installed = languages,
 
   sync_install = false,
 
