@@ -67,6 +67,15 @@ link_files() {
   sudo ln -s $(which fdfind) /usr/local/bin/fd
 }
 
+setup_copilot() {
+  echo "\n -- installing copilot -- \n"
+
+  if [ -f /etc/spin/secrets/copilot_hosts.json ]; then
+    mkdir -p "${HOME}/.config/github-copilot"
+    cp /etc/spin/secrets/copilot_hosts.json "${HOME}/.config/github-copilot/hosts.json"
+  fi
+}
+
 stow_dirs() {
   stow -d ~/dotfiles nvim
   stow -d ~/dotfiles git
@@ -89,5 +98,6 @@ if [ $SPIN ]; then
   install_dependencies
   link_files
   stow_dirs
+  setup_copilot
   #bootstrap_nvim_packer
 fi
