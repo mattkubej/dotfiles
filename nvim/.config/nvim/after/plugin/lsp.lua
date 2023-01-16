@@ -24,13 +24,15 @@ local servers = {
   'html',
   'cssls',
   'pylsp',
+  'solargraph',
+  'sorbet',
+  'ruby_ls',
 }
 
 if os.getenv('SPIN') == '1' then
-  table.insert(servers, 'sorbet')
-  table.insert(servers, 'ruby_ls')
+  lsp.skip_server_setup({ 'pylsp', 'solargraph' })
 else
-  table.insert(servers, 'solargraph')
+  lsp.skip_server_setup({ 'sorbet', 'ruby_ls' })
 end
 
 lsp.ensure_installed(servers)
