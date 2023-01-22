@@ -79,7 +79,6 @@ setup_copilot() {
 stow_dirs() {
   stow -d ~/dotfiles nvim
   stow -d ~/dotfiles git
-  stow -d ~/dotfiles shell
 }
 
 bootstrap_nvim_packer() {
