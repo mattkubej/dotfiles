@@ -114,11 +114,6 @@ _G.packer_plugins = {
     path = "/home/matt/.local/share/nvim/site/pack/packer/start/copilot.vim",
     url = "https://github.com/github/copilot.vim"
   },
-  ["editorconfig-vim"] = {
-    loaded = true,
-    path = "/home/matt/.local/share/nvim/site/pack/packer/start/editorconfig-vim",
-    url = "https://github.com/editorconfig/editorconfig-vim"
-  },
   ["emmet-vim"] = {
     loaded = true,
     path = "/home/matt/.local/share/nvim/site/pack/packer/start/emmet-vim",
