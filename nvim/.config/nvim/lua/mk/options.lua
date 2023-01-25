@@ -76,3 +76,6 @@ if os.getenv('SPIN') == '1' then
     cache_enabled = 1,
   }
 end
+
+-- copilot configuration needs to execute before the plugin is loaded
+vim.g.copilot_no_tab_map = true
