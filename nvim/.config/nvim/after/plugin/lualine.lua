@@ -6,7 +6,7 @@ require('lualine').setup({
   sections = {
     lualine_a = { 'mode' },
     lualine_b = { 'hostname' },
-    lualine_c = { 'branch', 'filename' },
+    lualine_c = { 'branch', 'filename', 'diff' },
     lualine_x = { 'encoding', 'fileformat' }, -- filetype causes lag
     lualine_y = { 'progress' },
     lualine_z = { 'location'  },
