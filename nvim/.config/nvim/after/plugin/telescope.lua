@@ -1,5 +1,21 @@
 pcall(require('telescope').load_extension, 'fzf')
 
+local actions = require('telescope.actions')
+
+require('telescope').setup{
+  defaults = {
+    mappings = {
+      n = {
+        ['<C-r>'] = actions.delete_buffer
+      },
+      i = {
+        ['<C-h>'] = 'which_key',
+        ['<C-r>'] = actions.delete_buffer
+      }
+    }
+  }
+}
+
 local builtin = require('telescope.builtin')
 
 vim.keymap.set('n', '<leader>?', builtin.oldfiles, { desc = '[?] Find recently opened files' })
