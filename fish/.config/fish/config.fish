@@ -46,4 +46,7 @@ if test -f /opt/dev/dev.fish
   source /opt/dev/dev.fish
 end
 
+# force true color
+set -g fish_term24bit 1
+
 starship init fish | source
