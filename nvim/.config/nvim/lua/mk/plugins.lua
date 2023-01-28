@@ -11,8 +11,16 @@ require('packer').startup(function(use)
 
   use({
     'folke/tokyonight.nvim',
+    -- config = function()
+    --   vim.cmd('colorscheme tokyonight')
+    -- end
+  })
+
+  use({
+    'catppuccin/nvim',
+    as = 'catppuccin',
     config = function()
-      vim.cmd('colorscheme tokyonight')
+      vim.cmd('colorscheme catppuccin-frappe')
     end
   })
 
