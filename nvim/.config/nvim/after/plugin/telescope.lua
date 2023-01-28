@@ -13,6 +13,11 @@ require('telescope').setup{
         ['<C-r>'] = actions.delete_buffer
       }
     }
+  },
+  pickers = {
+    find_files = {
+      find_command = {'rg', '--files', '--hidden', '-g', '!.git'},
+    }
   }
 }
 
