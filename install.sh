@@ -85,8 +85,11 @@ stow_dirs() {
 setup_tmux() {
   echo "\n -- setup tmux -- \n"
 
-  FQDN=$(cat /etc/spin/machine/fqdn | sed "s/\\..*//")
-  git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+  # spin hostname
+  export FQDN=$(cat /etc/spin/machine/fqdn | sed "s/\\..*//")
+
+  # install tmux plugins
+  ~/.tmux/plugins/tpm/scripts/install_plugins.sh
 }
 
 bootstrap_nvim_packer() {
