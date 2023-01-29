@@ -79,6 +79,14 @@ setup_copilot() {
 stow_dirs() {
   stow -d ~/dotfiles nvim
   stow -d ~/dotfiles git
+  stow -d ~/dotfiles tmux
+}
+
+setup_tmux() {
+  echo "\n -- setup tmux -- \n"
+
+  FQDN=$(cat /etc/spin/machine/fqdn | sed "s/\\..*//")
+  git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 }
 
 bootstrap_nvim_packer() {
@@ -98,6 +106,7 @@ if [ $SPIN ]; then
   install_dependencies
   link_files
   stow_dirs
+  setup_tmux
   setup_copilot
   #bootstrap_nvim_packer
 fi
