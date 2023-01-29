@@ -80,6 +80,7 @@ stow_dirs() {
   stow -d ~/dotfiles nvim
   stow -d ~/dotfiles git
   stow -d ~/dotfiles tmux
+  stow -d ~/dotfiles scripts
 }
 
 setup_tmux() {

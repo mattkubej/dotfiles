@@ -1,0 +1,4 @@
+#!/bin/sh
+
+FQDN=$(cat /etc/spin/machine/fqdn | sed "s/\\..*//")
+printf "%s" "$FQDN"
