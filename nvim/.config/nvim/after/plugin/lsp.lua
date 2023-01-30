@@ -30,6 +30,10 @@ local servers = {
   'ruby_ls',
 }
 
+vim.api.nvim_create_user_command("MasonInstallAll", function ()
+  vim.cmd("MasonInstall " .. table.concat(servers, " "))
+end, {})
+
 if os.getenv('SPIN') == '1' then
   lsp.skip_server_setup({ 'pylsp', 'solargraph' })
 else
