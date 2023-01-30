@@ -94,17 +94,13 @@ setup_tmux() {
   ~/.tmux/plugins/tpm/scripts/install_plugins.sh
 }
 
-bootstrap_nvim_packer() {
-  echo "\n -- cloning packer -- \n"
-  git clone --depth 1 https://github.com/wbthomason/packer.nvim \
-    ~/.local/share/nvim/site/pack/packer/start/packer.nvim &> /dev/null
+bootstrap_nvim() {
+  echo "\n -- bootstrap nvim -- \n"
 
-  echo "\n -- installing packer plugins -- \n"
   nvim --headless \
-   -c 'autocmd User PackerComplete quitall' -c 'PackerSync' &> /dev/null
-
-  #echo "\n -- updating treesitter -- \n"
-  #nvim --headless "+TSInstallSync all" -c q &> /dev/null
+    -c 'autocmd User PackerComplete quitall' \
+    -c 'PackerSync' \
+    -c 'MasonInstall' &> /dev/null
 }
 
 if [ $SPIN ]; then
@@ -113,5 +109,5 @@ if [ $SPIN ]; then
   stow_dirs
   setup_tmux
   setup_copilot
-  #bootstrap_nvim_packer
+  bootstrap_nvim
 fi

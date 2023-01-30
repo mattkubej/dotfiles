@@ -1,4 +1,7 @@
-require("zen-mode").setup {
+local ok, zenmode = pcall(require, 'zen-mode')
+if not ok then return end
+
+zenmode.setup {
     window = {
         width = 90,
         options = {
@@ -9,6 +12,6 @@ require("zen-mode").setup {
 }
 
 vim.keymap.set("n", "<leader>zz", function()
-    require("zen-mode").toggle()
+    zenmode.toggle()
     vim.wo.wrap = false
 end)

@@ -1,7 +1,10 @@
+local ok, ntree = pcall(require, 'nvim-tree')
+if not ok then return end
+
 local HEIGHT_RATIO = 0.8
 local WIDTH_RATIO = 0.5
 
-require('nvim-tree').setup({
+ntree.setup({
   auto_reload_on_write = false,
   git = {
     enable = false,

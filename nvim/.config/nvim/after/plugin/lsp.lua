@@ -1,4 +1,5 @@
-local lsp = require("lsp-zero")
+local ok, lsp = pcall(require, 'lsp-zero')
+if not ok then return end
 
 lsp.set_preferences({
   suggest_lsp_servers = true,
