@@ -99,8 +99,7 @@ bootstrap_nvim() {
 
   nvim --headless \
     -c 'autocmd User PackerComplete quitall' \
-    -c 'PackerSync' \
-    -c 'MasonInstall' &> /dev/null
+    -c 'PackerSync' &> /dev/null
 }
 
 if [ $SPIN ]; then
