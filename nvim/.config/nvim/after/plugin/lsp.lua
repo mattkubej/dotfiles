@@ -19,7 +19,7 @@ lsp.set_preferences({
 
 local servers = {
   'tsserver',
-  'sumneko_lua',
+  'lua_ls',
   'rust_analyzer',
   'graphql',
   'html',
