@@ -89,5 +89,6 @@ require("lazy").setup({
   'mattkubej/jest.nvim',
   'folke/zen-mode.nvim',
   'github/copilot.vim',
-  'mbbill/undotree'
+  'mbbill/undotree',
+  'folke/trouble.nvim',
 }, {})

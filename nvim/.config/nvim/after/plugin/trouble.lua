@@ -1,0 +1,6 @@
+vim.keymap.set("n", "<leader>xx", vim.cmd.TroubleToggle)
+vim.keymap.set("n", "<leader>xw", function() vim.cmd.TroubleToggle('workspace_diagnostics') end)
+vim.keymap.set("n", "<leader>xx", function() vim.cmd.TroubleToggle('document_diagnostics') end)
+vim.keymap.set("n", "<leader>xx", function() vim.cmd.TroubleToggle('loclist') end)
+vim.keymap.set("n", "<leader>xx", function() vim.cmd.TroubleToggle('quickfix') end)
+vim.keymap.set("n", "<leader>xx", function() vim.cmd.TroubleToggle('lsp_references') end)
