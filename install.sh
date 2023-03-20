@@ -94,19 +94,10 @@ setup_tmux() {
   ~/.tmux/plugins/tpm/scripts/install_plugins.sh
 }
 
-bootstrap_nvim() {
-  echo "\n -- bootstrap nvim -- \n"
-
-  nvim --headless \
-    -c 'autocmd User PackerComplete quitall' \
-    -c 'PackerSync' &> /dev/null
-}
-
 if [ $SPIN ]; then
   install_dependencies
   link_files
   stow_dirs
   setup_tmux
   setup_copilot
-  bootstrap_nvim
 fi
