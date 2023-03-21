@@ -3,7 +3,7 @@ if not ok then return end
 
 lualine.setup({
   options = {
-    -- theme = 'tokyonight',
+    theme = 'catppuccin',
     icons_enabled = false,
   },
   sections = {
