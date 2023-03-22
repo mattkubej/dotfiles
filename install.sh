@@ -81,6 +81,7 @@ stow_dirs() {
   stow -d ~/dotfiles git
   stow -d ~/dotfiles tmux
   stow -d ~/dotfiles scripts
+  stow -d ~/dotfiles spin
 }
 
 setup_tmux() {
