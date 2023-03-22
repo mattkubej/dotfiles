@@ -81,7 +81,10 @@ stow_dirs() {
   stow -d ~/dotfiles git
   stow -d ~/dotfiles tmux
   stow -d ~/dotfiles scripts
-  stow -d ~/dotfiles spin
+}
+
+setup_zsh() {
+  source ~/dotfiles/spin/aliases
 }
 
 setup_tmux() {
@@ -99,6 +102,7 @@ if [ $SPIN ]; then
   install_dependencies
   link_files
   stow_dirs
+  setup_zsh
   setup_tmux
   setup_copilot
 fi
