@@ -84,7 +84,8 @@ stow_dirs() {
 }
 
 setup_zsh() {
-  source ~/dotfiles/spin/aliases
+  # there is probably a cleaner way to do this
+  cat ~/dotfiles/spin/aliases >> ~/.zshrc
 }
 
 setup_tmux() {
