@@ -1,4 +1,4 @@
 alias flogs="systemctl list-units --type=service | grep server.service | grep proc-shopify \
              | sed 's/^.*--\(.*\)@.*$/\1/' \
              | fzf --height 10% \
-             | xargs journalctl -fu"
+             | xargs -I{} journalctl -fu \"proc-shopify--{}@server.service\""
