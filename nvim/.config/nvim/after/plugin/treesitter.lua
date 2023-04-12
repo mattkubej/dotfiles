@@ -3,7 +3,6 @@ if not ok then return end
 
 treesitter_configs.setup {
   ensure_installed = {
-    "help",
     "javascript",
     "typescript",
     "c",
