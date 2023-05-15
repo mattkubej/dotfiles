@@ -31,7 +31,7 @@ local servers = {
   'eslint',
 }
 
-vim.api.nvim_create_user_command("MasonInstallAll", function ()
+vim.api.nvim_create_user_command("MasonInstallAll", function()
   vim.cmd("MasonInstall " .. table.concat(servers, " "))
 end, {})
 
@@ -142,6 +142,9 @@ local null_ls = require('null-ls')
 null_ls.setup({
   debug = true,
   sources = {
+    null_ls.builtins.diagnostics.eslint.with({
+      prefer_local = 'node_modules/.bin',
+    }),
     null_ls.builtins.formatting.prettier.with({
       prefer_local = 'node_modules/.bin',
     }),
