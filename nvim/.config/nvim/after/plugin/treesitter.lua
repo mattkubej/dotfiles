@@ -21,6 +21,10 @@ treesitter_configs.setup {
     enable = true,
   },
 
+  matchup = {
+    enable = true,
+  },
+
   highlight = { enable = true, },
   autotag = { enable = true, },
   incremental_selection = {
