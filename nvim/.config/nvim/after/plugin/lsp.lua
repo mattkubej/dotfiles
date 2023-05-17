@@ -29,6 +29,7 @@ local servers = {
   'sorbet',
   'ruby_ls',
   'eslint',
+  'jsonls',
 }
 
 vim.api.nvim_create_user_command("MasonInstallAll", function()
