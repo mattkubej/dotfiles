@@ -115,7 +115,7 @@ lsp.on_attach(function(client, bufnr)
   end, '[W]orkspace [L]ist Folders')
 
   nmap('<leader>f', function()
-    vim.lsp.buf.format({ timeout_ms = 2000 })
+    vim.lsp.buf.format({ timeout_ms = 10000 })
   end, 'Format current buffer with LSP')
 
   if client.name == "tsserver" then
