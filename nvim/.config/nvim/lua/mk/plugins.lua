@@ -93,4 +93,10 @@ require("lazy").setup({
   'github/copilot.vim',
   'mbbill/undotree',
   'folke/trouble.nvim',
+  {
+    'mvllow/modes.nvim',
+    config = function()
+      require('modes').setup()
+    end,
+  }
 }, {})
