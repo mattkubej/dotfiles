@@ -65,8 +65,6 @@ require("lazy").setup({
 
       'jose-elias-alvarez/null-ls.nvim',
       'jayp0521/mason-null-ls.nvim',
-
-      'ray-x/lsp_signature.nvim'
     }
   },
   {

@@ -138,10 +138,6 @@ vim.diagnostic.config({
 
 require('fidget').setup()
 require('neodev').setup()
-require('lsp_signature').setup({
-  hint_enable = true,
-  floating_window = false,
-})
 
 local null_ls = require('null-ls')
 null_ls.setup({
