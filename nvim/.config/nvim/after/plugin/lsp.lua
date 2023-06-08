@@ -23,13 +23,14 @@ local servers = {
   'rust_analyzer',
   'graphql',
   'html',
-  'cssls',
+  -- 'cssls',
   'pylsp',
   'solargraph',
   'sorbet',
   'ruby_ls',
   'eslint',
   'jsonls',
+  'stylelint_lsp',
 }
 
 vim.api.nvim_create_user_command("MasonInstallAll", function()
