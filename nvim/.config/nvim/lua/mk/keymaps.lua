@@ -5,6 +5,8 @@ vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 vim.keymap.set("i", "<C-c>", "<esc>")
 
 vim.keymap.set("n", "<leader><leader>", "<c-^>")
+vim.keymap.set("n", "H", "<cmd>bprev<CR>")
+vim.keymap.set("n", "L", "<cmd>bnext<CR>")
 
 vim.keymap.set("n", "<leader>+", "<cmd>vertical resize +5<CR>")
 vim.keymap.set("n", "<leader>-", "<cmd>vertical resize -5<CR>")
