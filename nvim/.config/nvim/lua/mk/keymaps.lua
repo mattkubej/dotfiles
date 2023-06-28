@@ -5,8 +5,6 @@ vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 vim.keymap.set("i", "<C-c>", "<esc>")
 
 vim.keymap.set("n", "<leader><leader>", "<c-^>")
-vim.keymap.set("n", "H", "<cmd>bprev<CR>")
-vim.keymap.set("n", "L", "<cmd>bnext<CR>")
 
 vim.keymap.set("n", "<leader>+", "<cmd>vertical resize +5<CR>")
 vim.keymap.set("n", "<leader>-", "<cmd>vertical resize -5<CR>")
@@ -26,11 +24,6 @@ vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])
 vim.keymap.set("n", "<leader>Y", [["+Y]])
 
 vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]])
-
-vim.keymap.set("n", "<C-k>", "<cmd>cnext<CR>zz")
-vim.keymap.set("n", "<C-j>", "<cmd>cprev<CR>zz")
-vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz")
-vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz")
 
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 

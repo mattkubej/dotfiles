@@ -96,5 +96,7 @@ require("lazy").setup({
     config = function()
       require('modes').setup()
     end,
-  }
+  },
+  'tpope/vim-unimpaired',
+  'tpope/vim-repeat'
 }, {})
