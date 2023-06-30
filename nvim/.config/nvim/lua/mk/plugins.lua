@@ -60,7 +60,7 @@ require("lazy").setup({
       'L3MON4D3/LuaSnip',
       'rafamadriz/friendly-snippets',
 
-      {'j-hui/fidget.nvim', tag = 'legacy'},
+      { 'j-hui/fidget.nvim', tag = 'legacy' },
       'folke/neodev.nvim',
 
       'jose-elias-alvarez/null-ls.nvim',
@@ -98,5 +98,15 @@ require("lazy").setup({
     end,
   },
   'tpope/vim-unimpaired',
-  'tpope/vim-repeat'
+  'tpope/vim-repeat',
+  { "folke/neodev.nvim", opts = {} },
+  {
+    'nvim-neotest/neotest',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'nvim-treesitter/nvim-treesitter',
+      'antoinemadec/FixCursorHold.nvim',
+      'haydenmeade/neotest-jest'
+    },
+  }
 }, {})
