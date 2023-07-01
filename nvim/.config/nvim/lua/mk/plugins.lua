@@ -108,5 +108,17 @@ require("lazy").setup({
       'antoinemadec/FixCursorHold.nvim',
       'haydenmeade/neotest-jest'
     },
+  },
+  {
+    "jackMort/ChatGPT.nvim",
+    event = "VeryLazy",
+    config = function()
+      require("chatgpt").setup()
+    end,
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+      "nvim-lua/plenary.nvim",
+      "nvim-telescope/telescope.nvim"
+    }
   }
 }, {})
