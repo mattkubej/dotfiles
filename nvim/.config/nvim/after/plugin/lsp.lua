@@ -28,6 +28,7 @@ local servers = {
   'solargraph',
   'sorbet',
   'ruby_ls',
+  'rubocop',
   'eslint',
   'jsonls',
   'stylelint_lsp',
