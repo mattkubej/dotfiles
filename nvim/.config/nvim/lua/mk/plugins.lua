@@ -77,13 +77,10 @@ require("lazy").setup({
   'lewis6991/gitsigns.nvim',
   'tpope/vim-fugitive',
   'tpope/vim-rhubarb',
-  'lukas-reineke/indent-blankline.nvim',
-  'numToStr/Comment.nvim',
   'nvim-lualine/lualine.nvim',
   'tpope/vim-sleuth',
   'junegunn/vim-easy-align',
   'mattn/emmet-vim',
-  'tpope/vim-surround',
   'windwp/nvim-autopairs',
   'windwp/nvim-ts-autotag',
   'mattkubej/jest.nvim',
@@ -99,7 +96,7 @@ require("lazy").setup({
   },
   'tpope/vim-unimpaired',
   'tpope/vim-repeat',
-  { "folke/neodev.nvim", opts = {} },
+  { "folke/neodev.nvim",            opts = {} },
   {
     'nvim-neotest/neotest',
     dependencies = {
@@ -109,6 +106,39 @@ require("lazy").setup({
       'haydenmeade/neotest-jest'
     },
   },
+  { 'echasnovski/mini.surround',    version = false },
+  { 'echasnovski/mini.comment',     version = false },
+  { 'echasnovski/mini.pairs',       version = false },
+  -- { 'echasnovski/mini.indentscope', version = false },
+  {
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    opts = {},
+    -- stylua: ignore
+    keys = {
+      { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end,       desc = "Flash" },
+      { "S", mode = { "n", "o", "x" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+      { "r", mode = "o",               function() require("flash").remote() end,     desc = "Remote Flash" },
+      {
+        "R",
+        mode = { "o", "x" },
+        function() require("flash").treesitter_search() end,
+        desc =
+        "Treesitter Search"
+      },
+      {
+        "<c-s>",
+        mode = { "c" },
+        function() require("flash").toggle() end,
+        desc =
+        "Toggle Flash Search"
+      },
+    },
+  },
+  'lukas-reineke/indent-blankline.nvim',
+  -- 'windwp/nvim-autopairs',
+  -- 'numToStr/Comment.nvim',
+  -- 'tpope/vim-surround',
   -- {
   --   "jackMort/ChatGPT.nvim",
   --   event = "VeryLazy",
