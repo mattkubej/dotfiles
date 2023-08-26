@@ -85,7 +85,7 @@ require("lazy").setup({
   'windwp/nvim-ts-autotag',
   'mattkubej/jest.nvim',
   'folke/zen-mode.nvim',
-  'github/copilot.vim',
+  'zbirenbaum/copilot.lua',
   'mbbill/undotree',
   'folke/trouble.nvim',
   {
@@ -109,46 +109,5 @@ require("lazy").setup({
   { 'echasnovski/mini.surround',    version = false },
   { 'echasnovski/mini.comment',     version = false },
   { 'echasnovski/mini.pairs',       version = false },
-  -- { 'echasnovski/mini.indentscope', version = false },
-  {
-    "folke/flash.nvim",
-    event = "VeryLazy",
-    opts = {},
-    -- stylua: ignore
-    keys = {
-      { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end,       desc = "Flash" },
-      { "S", mode = { "n", "o", "x" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
-      { "r", mode = "o",               function() require("flash").remote() end,     desc = "Remote Flash" },
-      {
-        "R",
-        mode = { "o", "x" },
-        function() require("flash").treesitter_search() end,
-        desc =
-        "Treesitter Search"
-      },
-      {
-        "<c-s>",
-        mode = { "c" },
-        function() require("flash").toggle() end,
-        desc =
-        "Toggle Flash Search"
-      },
-    },
-  },
   'lukas-reineke/indent-blankline.nvim',
-  -- 'windwp/nvim-autopairs',
-  -- 'numToStr/Comment.nvim',
-  -- 'tpope/vim-surround',
-  -- {
-  --   "jackMort/ChatGPT.nvim",
-  --   event = "VeryLazy",
-  --   config = function()
-  --     require("chatgpt").setup()
-  --   end,
-  --   dependencies = {
-  --     "MunifTanjim/nui.nvim",
-  --     "nvim-lua/plenary.nvim",
-  --     "nvim-telescope/telescope.nvim"
-  --   }
-  -- }
 }, {})
