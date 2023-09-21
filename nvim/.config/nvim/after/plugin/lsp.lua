@@ -34,17 +34,25 @@ local servers = {
   'stylelint_lsp',
 }
 
-vim.api.nvim_create_user_command("MasonInstallAll", function()
-  vim.cmd("MasonInstall " .. table.concat(servers, " "))
-end, {})
+-- vim.api.nvim_create_user_command("MasonInstallAll", function()
+--   vim.cmd("MasonInstall " .. table.concat(servers, " "))
+-- end, {})
+--
+-- if os.getenv('SPIN') == '1' then
+--   lsp.skip_server_setup({ 'pylsp', 'solargraph' })
+-- else
+--   lsp.skip_server_setup({ 'sorbet', 'ruby_ls' })
+-- end
+--
+-- lsp.ensure_installed(servers)
 
-if os.getenv('SPIN') == '1' then
-  lsp.skip_server_setup({ 'pylsp', 'solargraph' })
-else
-  lsp.skip_server_setup({ 'sorbet', 'ruby_ls' })
-end
-
-lsp.ensure_installed(servers)
+require('mason').setup({})
+require('mason-lspconfig').setup({
+  ensure_installed = servers,
+  handlers = {
+    lsp.default_setup,
+  },
+})
 
 -- Fix Undefined global 'vim'
 lsp.configure('lua_ls', {
@@ -57,25 +65,49 @@ lsp.configure('lua_ls', {
   }
 })
 
+-- local cmp = require('cmp')
+-- local cmp_select = { behavior = cmp.SelectBehavior.Select }
+-- local cmp_mappings = lsp.defaults.cmp_mappings({
+--   ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
+--   ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
+--   ['<CR>'] = cmp.mapping.confirm({ select = false }),
+--   ['<C-Space>'] = cmp.mapping.complete(),
+--   ['<C-e>'] = cmp.mapping.abort(),
+--   ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+--   ['<C-f>'] = cmp.mapping.scroll_docs(4),
+-- })
+--
+-- -- disable completion with tab
+-- -- this helps with copilot setup
+-- cmp_mappings['<Tab>'] = nil
+-- cmp_mappings['<S-Tab>'] = nil
+--
+-- lsp.setup_nvim_cmp({
+--   mapping = cmp_mappings,
+--   preselect = cmp.PreselectMode.None,
+--   completion = {
+--     completeopt = 'menu,menuone,noinsert,noselect',
+--   },
+-- })
+
 local cmp = require('cmp')
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
-local cmp_mappings = lsp.defaults.cmp_mappings({
-  ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
-  ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
-  ['<CR>'] = cmp.mapping.confirm({ select = false }),
-  ['<C-Space>'] = cmp.mapping.complete(),
-  ['<C-e>'] = cmp.mapping.abort(),
-  ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-  ['<C-f>'] = cmp.mapping.scroll_docs(4),
-})
+local cmp_format = lsp.cmp_format()
 
--- disable completion with tab
--- this helps with copilot setup
-cmp_mappings['<Tab>'] = nil
-cmp_mappings['<S-Tab>'] = nil
-
-lsp.setup_nvim_cmp({
-  mapping = cmp_mappings,
+cmp.setup({
+  formatting = cmp_format,
+  mapping = cmp.mapping.preset.insert({
+    -- scroll up and down the documentation window
+    ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
+    ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
+    ['<CR>'] = cmp.mapping.confirm({ select = false }),
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-e>'] = cmp.mapping.abort(),
+    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<Tab>'] = nil,
+    ['<S-Tab>'] = nil,
+  }),
   preselect = cmp.PreselectMode.None,
   completion = {
     completeopt = 'menu,menuone,noinsert,noselect',
@@ -131,7 +163,7 @@ lsp.on_attach(function(client, bufnr)
   end
 end)
 
-lsp.nvim_workspace()
+-- lsp.nvim_workspace()
 lsp.setup()
 
 vim.diagnostic.config({
