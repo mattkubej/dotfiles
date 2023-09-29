@@ -1,7 +1,11 @@
-local ok, indent_blankline = pcall(require, 'indent_blankline')
+local ok, indent_blankline = pcall(require, 'ibl')
 if not ok then return end
 
 indent_blankline.setup {
-  char = '┊',
-  show_trailing_blankline_indent = false,
+  indent = {
+    char = '┊',
+  },
+  scope = {
+    enabled = true,
+  }
 }
