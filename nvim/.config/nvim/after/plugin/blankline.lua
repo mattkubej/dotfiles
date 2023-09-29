@@ -5,9 +5,4 @@ indent_blankline.setup {
   indent = {
     char = '┊',
   },
-  scope = {
-    enabled = true,
-    show_start = false,
-    highlight = { "Function", "Label" },
-  }
 }
