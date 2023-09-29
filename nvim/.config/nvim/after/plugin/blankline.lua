@@ -7,5 +7,7 @@ indent_blankline.setup {
   },
   scope = {
     enabled = true,
+    show_start = false,
+    highlight = { "Function", "Label" },
   }
 }
