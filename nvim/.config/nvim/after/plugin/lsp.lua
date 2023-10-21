@@ -92,10 +92,10 @@ lsp.configure('lua_ls', {
 
 local cmp = require('cmp')
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
-local cmp_format = lsp.cmp_format()
+-- local cmp_format = lsp.cmp_format()
 
 cmp.setup({
-  formatting = cmp_format,
+  -- formatting = cmp_format,
   mapping = cmp.mapping.preset.insert({
     -- scroll up and down the documentation window
     ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
@@ -125,7 +125,7 @@ lsp.set_preferences({
 })
 
 lsp.on_attach(function(client, bufnr)
-  lsp.default_keymaps({buffer = bufnr})
+  lsp.default_keymaps({ buffer = bufnr })
 
   local nmap = function(keys, func, desc)
     if desc then
