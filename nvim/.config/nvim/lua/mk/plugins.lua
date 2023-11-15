@@ -64,7 +64,7 @@ require("lazy").setup({
       { 'j-hui/fidget.nvim', tag = 'legacy' },
       'folke/neodev.nvim',
 
-      'jose-elias-alvarez/null-ls.nvim',
+      'nvimtools/none-ls.nvim',
       'jayp0521/mason-null-ls.nvim',
     }
   },
