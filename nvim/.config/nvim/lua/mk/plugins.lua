@@ -111,4 +111,5 @@ require("lazy").setup({
   { 'echasnovski/mini.comment',     version = false },
   { 'echasnovski/mini.pairs',       version = false },
   'lukas-reineke/indent-blankline.nvim',
+  'hedyhli/outline.nvim',
 }, {})
