@@ -124,7 +124,6 @@ lsp.on_attach(function(client, bufnr)
   end
 end)
 
--- lsp.nvim_workspace()
 lsp.setup()
 
 vim.diagnostic.config({
