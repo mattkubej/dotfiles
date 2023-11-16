@@ -9,8 +9,8 @@ lualine.setup({
   sections = {
     lualine_a = { 'mode' },
     lualine_b = { 'hostname' },
-    lualine_c = { 'branch', {'filename', path = 1 }, 'diff' },
-    lualine_x = { 'encoding', 'fileformat' }, -- filetype causes lag
+    lualine_c = { 'branch', {'filename', path = 1 }, 'aerial' },
+    lualine_x = { 'diff', 'encoding', 'fileformat' }, -- filetype causes lag
     lualine_y = { 'progress' },
     lualine_z = { 'location'  },
   },

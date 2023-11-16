@@ -1,6 +1,7 @@
 local ok, telescope = pcall(require, 'telescope')
 if not ok then return end
 
+telescope.load_extension('aerial')
 telescope.load_extension('fzf')
 
 local actions = require('telescope.actions')
@@ -22,7 +23,7 @@ telescope.setup{
     find_files = {
       find_command = {'rg', '--files', '--hidden', '-g', '!.git'},
     }
-  }
+  },
 }
 
 local builtin = require('telescope.builtin')
@@ -42,3 +43,6 @@ vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch curren
 vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
 vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
 vim.keymap.set('n', '<leader>ss', builtin.git_status, { desc = '[S]earch Git [S]tatus' })
+vim.keymap.set('n', '<leader>sa', function()
+  telescope.extensions.aerial.aerial()
+end, { desc = '[S]earch [A]erial' })
