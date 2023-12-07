@@ -112,6 +112,6 @@ require("lazy").setup({
   { 'echasnovski/mini.pairs',       version = false },
   'lukas-reineke/indent-blankline.nvim',
   'hedyhli/outline.nvim',
-  -- 'RRethy/vim-illuminate',
+  'RRethy/vim-illuminate',
   'stevearc/aerial.nvim',
 }, {})
