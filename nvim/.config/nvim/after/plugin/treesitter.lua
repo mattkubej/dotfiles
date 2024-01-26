@@ -8,7 +8,6 @@ treesitter_configs.setup {
     "c",
     "lua",
     "rust",
-    "python",
     "go",
     "python",
   },
