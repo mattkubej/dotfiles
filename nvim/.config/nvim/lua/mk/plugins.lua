@@ -39,9 +39,8 @@ require("lazy").setup({
       'nvim-treesitter/nvim-treesitter-textobjects',
       'andymass/vim-matchup',
     },
-    config = function()
-      local ts_update = require('nvim-treesitter.install').update({ with_sync = true })
-      ts_update()
+    build = function()
+        require("nvim-treesitter.install").update({ with_sync = true })()
     end,
   },
   {
