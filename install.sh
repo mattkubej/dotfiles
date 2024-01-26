@@ -107,5 +107,5 @@ if [ $SPIN ]; then
   setup_tmux
   setup_copilot
 
-  timeout 2m nvim --headless "+Lazy! sync" "+TSInstallSync javascript typescript, c lua rust go python" +qa || true
+  timeout 2m nvim --headless "+Lazy! sync" "+TSInstallSync javascript typescript c lua rust go python" +qa || true
 fi
