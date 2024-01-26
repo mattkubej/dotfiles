@@ -107,5 +107,5 @@ if [ $SPIN ]; then
   setup_tmux
   setup_copilot
 
-  timeout 2m nvim --headless "+Lazy! sync" +qa || true
+  timeout 2m nvim --headless "+Lazy! sync" "lua require(\"nvim-treesitter.install\").update({ with_sync = true })()" +qa || true
 fi
