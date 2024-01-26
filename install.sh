@@ -107,5 +107,5 @@ if [ $SPIN ]; then
   setup_tmux
   setup_copilot
 
-  timeout 2m nvim --headless "+Lazy! sync" "+TSInstall" "+TSUpdate" +qa || true
+  timeout 2m nvim --headless "+Lazy! sync" "+silent! +TSUpdateSync" +qa || true
 fi
