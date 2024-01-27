@@ -35,6 +35,9 @@ set -x PATH $PATH $HOME/bin
 # npm
 set -x PATH $PATH $HOME/.npm-global/bin
 
+# rust
+set -x PATH $PATH $HOME/.cargo/bin
+
 # fzf
 set -x FZF_DEFAULT_COMMAND 'fd --type f --hidden --follow --exclude .git'
 
