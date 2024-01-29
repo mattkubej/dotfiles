@@ -120,7 +120,7 @@ lsp.on_attach(function(client, bufnr)
     vim.lsp.buf.format({ timeout_ms = 10000 })
   end, 'Format current buffer with LSP')
 
-  if client.name == "typescript-tools" then
+  if client.name == "typescript-tools" or client.name == "tsserver" then
     client.server_capabilities.documentFormattingProvider = false
     client.server_capabilities.documentFormattingRangeProvider = false
   end
