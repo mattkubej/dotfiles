@@ -43,14 +43,23 @@ install_nvim_nightly() {
   /tmp/nvim.appimage --appimage-extract
 
   [ -d /squashfs-root ] || sudo mv squashfs-root /
-  [ -f /usr/local/bin/nvim ] || sudo ln -s /squashfs-root/usr/bin/nvim /usr/local/bin/nvim
+
+  sudo rm -f /usr/local/bin/nvim
+  sudo ln -s /squashfs-root/usr/bin/nvim /usr/local/bin/nvim
 }
 
-install_language_servers() {
-  echo "\n -- installing language servers -- \n"
-  sudo yarn global add typescript typescript-language-server --prefix /usr/local
-  sudo yarn global add vscode-langservers-extracted --prefix /usr/local
-  sudo yarn global add graphql-language-service-cli --prefix /usr/local
+install_treesitter() {
+  if [[ ! -f /usr/local/bin/tree-sitter ]]; then
+    mkdir -p $HOME/dotfiles/tmp
+    cd $HOME/dotfiles/tmp
+
+    # Install Tree-Sitter
+    TS_VERSION="v0.20.6"
+    wget "https://github.com/tree-sitter/tree-sitter/releases/download/${TS_VERSION}/tree-sitter-linux-x64.gz"
+    gunzip tree-sitter-linux-x64.gz
+    chmod u+x tree-sitter-linux-x64
+    sudo mv tree-sitter-linux-x64 /usr/local/bin/tree-sitter
+  fi
 }
 
 install_dependencies() {
@@ -59,7 +68,7 @@ install_dependencies() {
   install_eslint_d
 
   install_nvim_nightly
-  # install_language_servers
+  install_treesitter
 }
 
 link_files() {
