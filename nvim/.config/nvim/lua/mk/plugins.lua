@@ -40,7 +40,7 @@ require("lazy").setup({
       'andymass/vim-matchup',
     },
     build = function()
-        require("nvim-treesitter.install").update({ with_sync = true })()
+      require("nvim-treesitter.install").update({ with_sync = true })()
     end,
   },
   {
@@ -67,6 +67,17 @@ require("lazy").setup({
       'nvimtools/none-ls.nvim',
       'jayp0521/mason-null-ls.nvim',
     }
+  },
+  {
+    "pmizio/typescript-tools.nvim",
+    dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+    config = function()
+      require("typescript-tools").setup({
+        settings = {
+          tsserver_max_memory = 12288,
+        },
+      })
+    end,
   },
   {
     'nvim-tree/nvim-tree.lua',
@@ -97,7 +108,7 @@ require("lazy").setup({
   },
   'tpope/vim-unimpaired',
   'tpope/vim-repeat',
-  { "folke/neodev.nvim",            opts = {} },
+  { "folke/neodev.nvim",         opts = {} },
   {
     'nvim-neotest/neotest',
     dependencies = {
@@ -107,9 +118,9 @@ require("lazy").setup({
       'haydenmeade/neotest-jest'
     },
   },
-  { 'echasnovski/mini.surround',    version = false },
-  { 'echasnovski/mini.comment',     version = false },
-  { 'echasnovski/mini.pairs',       version = false },
+  { 'echasnovski/mini.surround', version = false },
+  { 'echasnovski/mini.comment',  version = false },
+  { 'echasnovski/mini.pairs',    version = false },
   'lukas-reineke/indent-blankline.nvim',
   'hedyhli/outline.nvim',
   'RRethy/vim-illuminate',

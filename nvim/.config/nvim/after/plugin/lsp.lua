@@ -1,3 +1,5 @@
+vim.g.lsp_zero_extend_lspconfig = 0
+
 local ok, lsp = pcall(require, 'lsp-zero')
 if not ok then return end
 
@@ -18,7 +20,7 @@ lsp.set_preferences({
 })
 
 local servers = {
-  'tsserver',
+  -- 'tsserver',
   'lua_ls',
   'rust_analyzer',
   'graphql',
@@ -118,10 +120,10 @@ lsp.on_attach(function(client, bufnr)
     vim.lsp.buf.format({ timeout_ms = 10000 })
   end, 'Format current buffer with LSP')
 
-  if client.name == "tsserver" then
-    client.server_capabilities.documentFormattingProvider = false
-    client.server_capabilities.documentFormattingRangeProvider = false
-  end
+  -- if client.name == "tsserver" then
+  --   client.server_capabilities.documentFormattingProvider = false
+  --   client.server_capabilities.documentFormattingRangeProvider = false
+  -- end
 end)
 
 lsp.setup()
