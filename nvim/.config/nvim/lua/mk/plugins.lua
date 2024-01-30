@@ -74,7 +74,7 @@ require("lazy").setup({
     config = function()
       require("typescript-tools").setup({
         settings = {
-          tsserver_max_memory = 16384,
+          tsserver_max_memory = 8192,
         },
       })
     end,
