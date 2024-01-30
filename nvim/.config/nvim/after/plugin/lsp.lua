@@ -3,6 +3,8 @@ vim.g.lsp_zero_extend_lspconfig = 0
 local ok, lsp = pcall(require, 'lsp-zero')
 if not ok then return end
 
+local util = require 'nvim_lsp/util'
+
 lsp.set_preferences({
   suggest_lsp_servers = true,
   setup_servers_on_start = true,
@@ -20,7 +22,7 @@ lsp.set_preferences({
 })
 
 local servers = {
-  -- 'tsserver',
+  'tsserver',
   'lua_ls',
   'rust_analyzer',
   'graphql',
@@ -40,6 +42,16 @@ require('mason-lspconfig').setup({
   ensure_installed = servers,
   handlers = {
     lsp.default_setup,
+    tsserver = function()
+      require('lspconfig').tsserver.setup({
+        cmd = { "typescript-language-server", "--noGetErrOnBackgroundUpdate", "--validateDefaultNpmLocation",
+          "--useNodeIpc", "--stdio" },
+        root_dir = util.root_pattern("package.json"),
+        initializationOptions = {
+          maxTsServerMemory = 8192,
+        },
+      })
+    end,
   },
 })
 

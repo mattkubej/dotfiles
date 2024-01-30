@@ -68,17 +68,17 @@ require("lazy").setup({
       'jayp0521/mason-null-ls.nvim',
     }
   },
-  {
-    "pmizio/typescript-tools.nvim",
-    dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
-    config = function()
-      require("typescript-tools").setup({
-        settings = {
-          tsserver_max_memory = 8192,
-        },
-      })
-    end,
-  },
+  -- {
+  --   "pmizio/typescript-tools.nvim",
+  --   dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+  --   config = function()
+  --     require("typescript-tools").setup({
+  --       settings = {
+  --         tsserver_max_memory = 8192,
+  --       },
+  --     })
+  --   end,
+  -- },
   {
     'nvim-tree/nvim-tree.lua',
     dependencies = {
