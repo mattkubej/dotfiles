@@ -42,9 +42,7 @@ require('mason-lspconfig').setup({
     lsp.default_setup,
     tsserver = function()
       require('lspconfig').tsserver.setup({
-        cmd = { "typescript-language-server", "--useInferredProjectPerProjectRoot",
-          "--disableAutomaticTypingAcquisition", "--noGetErrOnBackgroundUpdate", "--validateDefaultNpmLocation",
-          "--useNodeIpc", "--stdio" },
+        cmd = { "typescript-language-server", "--stdio" },
         initializationOptions = {
           maxTsServerMemory = 8192,
         },
