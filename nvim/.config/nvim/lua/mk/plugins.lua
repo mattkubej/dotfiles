@@ -74,6 +74,7 @@ require("lazy").setup({
     config = function()
       require("typescript-tools").setup({
         settings = {
+          separate_diagnostic_server = true,
           tsserver_max_memory = 4096,
         },
       })
