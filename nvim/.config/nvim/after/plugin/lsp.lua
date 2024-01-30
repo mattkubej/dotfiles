@@ -20,7 +20,7 @@ lsp.set_preferences({
 })
 
 local servers = {
-  'tsserver',
+  -- 'tsserver',
   'lua_ls',
   'rust_analyzer',
   'graphql',
@@ -40,14 +40,14 @@ require('mason-lspconfig').setup({
   ensure_installed = servers,
   handlers = {
     lsp.default_setup,
-    tsserver = function()
-      require('lspconfig').tsserver.setup({
-        cmd = { "typescript-language-server", "--stdio" },
-        initializationOptions = {
-          maxTsServerMemory = 8192,
-        },
-      })
-    end,
+    -- tsserver = function()
+    --   require('lspconfig').tsserver.setup({
+    --     cmd = { "typescript-language-server", "--stdio" },
+    --     initializationOptions = {
+    --       maxTsServerMemory = 8192,
+    --     },
+    --   })
+    -- end,
   },
 })
 
