@@ -60,6 +60,7 @@ require("lazy").setup({
         config = function()
           local nvim_lsp = require('lspconfig')
           require('typescript-tools').setup({
+            single_file_support = os.getenv("SPIN") ~= nil,
             settings = {
               separate_diagnostic_server = os.getenv("SPIN") == nil,
               tsserver_max_memory = 10240,
