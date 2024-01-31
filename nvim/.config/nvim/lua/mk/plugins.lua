@@ -52,7 +52,7 @@ require("lazy").setup({
       'hrsh7th/cmp-nvim-lsp',
       'nvimtools/none-ls.nvim',
       'jay-babu/mason-null-ls.nvim',
-      'j-hui/fidget.nvim',
+      { 'j-hui/fidget.nvim', tag = 'legacy' },
       'folke/neodev.nvim',
       {
         "pmizio/typescript-tools.nvim",
