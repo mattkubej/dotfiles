@@ -21,7 +21,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     nmap('gD', vim.lsp.buf.declaration, 'Go to declaration')
     nmap('gi', vim.lsp.buf.implementation, 'Go to implementation')
     nmap('go', vim.lsp.buf.type_definition, 'Go to type definition')
-    nmap('gr', vim.lsp.buf.references, 'Go to references')
+    nmap('gr', require('telescope.builtin').lsp_references, 'Go to references')
     nmap('gs', vim.lsp.buf.signature_help, 'Signature documentation')
 
     nmap('<leader>rn', vim.lsp.buf.rename, 'Rename')
