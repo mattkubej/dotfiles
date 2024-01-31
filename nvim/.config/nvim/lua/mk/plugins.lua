@@ -54,6 +54,18 @@ require("lazy").setup({
       'jay-babu/mason-null-ls.nvim',
       'j-hui/fidget.nvim',
       'folke/neodev.nvim',
+      {
+        "pmizio/typescript-tools.nvim",
+        dependencies = { "nvim-lua/plenary.nvim" },
+        config = function()
+          require('typescript-tools').setup({
+            on_attach = function(client)
+              client.server_capabilities.documentFormattingProvider = false
+              client.server_capabilities.documentFormattingRangeProvider = false
+            end,
+          })
+        end,
+      }
     },
   },
   -- {
