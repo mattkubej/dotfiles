@@ -68,7 +68,7 @@ install_dependencies() {
   install_eslint_d
 
   install_nvim_nightly
-  install_treesitter
+  # install_treesitter
 }
 
 link_files() {
