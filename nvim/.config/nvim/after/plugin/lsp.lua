@@ -132,3 +132,6 @@ cmp.setup({
     completeopt = 'menu,menuone,noinsert,noselect',
   },
 })
+
+require('fidget').setup()
+require('neodev').setup()

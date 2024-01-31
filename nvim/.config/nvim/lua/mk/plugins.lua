@@ -52,6 +52,8 @@ require("lazy").setup({
       'hrsh7th/cmp-nvim-lsp',
       'nvimtools/none-ls.nvim',
       'jay-babu/mason-null-ls.nvim',
+      'j-hui/fidget.nvim',
+      'folke/neodev.nvim',
     },
   },
   -- {
