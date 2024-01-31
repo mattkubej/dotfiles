@@ -64,10 +64,10 @@ install_treesitter() {
 
 install_dependencies() {
   install_delta
-  install_prettier
-  install_eslint_d
+  # install_prettier
+  # install_eslint_d
 
-  install_nvim_nightly
+  # install_nvim_nightly
   # install_treesitter
 }
 
