@@ -67,8 +67,8 @@ install_dependencies() {
   # install_prettier
   # install_eslint_d
 
-  # install_nvim_nightly
-  # install_treesitter
+  install_nvim_nightly
+  install_treesitter
 }
 
 link_files() {
