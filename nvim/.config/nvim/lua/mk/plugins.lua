@@ -58,7 +58,13 @@ require("lazy").setup({
         "pmizio/typescript-tools.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
         config = function()
+          local nvim_lsp = require('lspconfig')
           require('typescript-tools').setup({
+            settings = {
+              separate_diagnostic_server = os.getenv("SPIN") == nil,
+              tsserver_max_memory = 10240,
+              root_dir = nvim_lsp.util.root_pattern("package.json"),
+            },
             on_attach = function(client)
               client.server_capabilities.documentFormattingProvider = false
               client.server_capabilities.documentFormattingRangeProvider = false
