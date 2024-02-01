@@ -169,4 +169,13 @@ require("lazy").setup({
   'hedyhli/outline.nvim',
   'RRethy/vim-illuminate',
   'stevearc/aerial.nvim',
+  {
+    "kdheepak/lazygit.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    config = function()
+      vim.keymap.set('n', '<leader>gg', vim.cmd.LazyGit, { desc = 'LazyGit' })
+    end
+  }
 }, {})
