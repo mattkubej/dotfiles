@@ -10,6 +10,8 @@ treesitter_configs.setup {
     "rust",
     "go",
     "python",
+    "gitcommit",
+    "tsx",
   },
 
   sync_install = false,
