@@ -37,7 +37,7 @@ require("lazy").setup({
     dependencies = {
       'nvim-treesitter/nvim-treesitter-context',
       'nvim-treesitter/nvim-treesitter-textobjects',
-      'andymass/vim-matchup',
+      -- 'andymass/vim-matchup',
     },
     build = function()
       require("nvim-treesitter.install").update({ with_sync = true })()
