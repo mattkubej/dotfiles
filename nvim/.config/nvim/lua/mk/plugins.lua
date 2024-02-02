@@ -84,45 +84,6 @@ require("lazy").setup({
       }
     },
   },
-  -- {
-  --   'VonHeikemen/lsp-zero.nvim',
-  --   branch = 'v3.x',
-  --   dependencies = {
-  --     'neovim/nvim-lspconfig',
-  --     'williamboman/mason.nvim',
-  --     'williamboman/mason-lspconfig.nvim',
-  --
-  --     'hrsh7th/nvim-cmp',
-  --     'hrsh7th/cmp-buffer',
-  --     'hrsh7th/cmp-path',
-  --     -- 'saadparwaiz1/cmp_luasnip',
-  --     'hrsh7th/cmp-nvim-lsp',
-  --     'hrsh7th/cmp-nvim-lua',
-  --
-  --     -- 'L3MON4D3/LuaSnip',
-  --     -- 'rafamadriz/friendly-snippets',
-  --
-  --     { 'j-hui/fidget.nvim', tag = 'legacy' },
-  --     'folke/neodev.nvim',
-  --
-  --     'nvimtools/none-ls.nvim',
-  --     'jayp0521/mason-null-ls.nvim',
-  --   }
-  -- },
-  -- {
-  --   "pmizio/typescript-tools.nvim",
-  --   dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
-  --   config = function()
-  --     local nvim_lsp = require('lspconfig')
-  --     require("typescript-tools").setup({
-  --       settings = {
-  --         separate_diagnostic_server = true,
-  --         tsserver_max_memory = 8192,
-  --         root_dir = nvim_lsp.util.root_pattern("package.json"),
-  --       },
-  --     })
-  --   end,
-  -- },
   {
     'nvim-tree/nvim-tree.lua',
     dependencies = {
