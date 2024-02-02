@@ -106,6 +106,7 @@ null_ls.setup({
 
 local cmp = require('cmp')
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
+local lspkind = require('lspkind')
 
 cmp.setup({
   window = {
@@ -119,6 +120,9 @@ cmp.setup({
   },
   sources = {
     { name = 'nvim_lsp' },
+    { name = 'luasnip' },
+    { name = 'buffer' },
+    { name = 'path' },
   },
   mapping = cmp.mapping.preset.insert({
     ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
@@ -135,7 +139,18 @@ cmp.setup({
   completion = {
     completeopt = 'menu,menuone,noinsert,noselect',
   },
+  formatting = {
+    format = lspkind.cmp_format({
+      mode = 'symbol_text',
+      menu = ({
+        buffer = "[Buffer]",
+        nvim_lsp = "[LSP]",
+        luasnip = "[LuaSnip]",
+        nvim_lua = "[Lua]",
+      })
+    })
+  }
 })
 
-require('fidget').setup()
+require('fidget').setup({})
 require('neodev').setup()
