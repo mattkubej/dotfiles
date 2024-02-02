@@ -3,7 +3,7 @@ if not ok then return end
 
 zenmode.setup {
     window = {
-        width = 90,
+        width = 120,
         options = {
             number = true,
             relativenumber = true,
