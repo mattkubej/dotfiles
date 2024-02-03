@@ -174,12 +174,12 @@ return {
     'echasnovski/mini.surround',
     opts = {
       mappings = {
-        add = "gsa",        -- Add surrounding in Normal and Visual modes
-        delete = "gsd",     -- Delete surrounding
-        find = "gsf",       -- Find surrounding (to the right)
-        find_left = "gsF",  -- Find surrounding (to the left)
-        highlight = "gsh",  -- Highlight surrounding
-        replace = "gsr",    -- Replace surrounding
+        add = "gsa",            -- Add surrounding in Normal and Visual modes
+        delete = "gsd",         -- Delete surrounding
+        find = "gsf",           -- Find surrounding (to the right)
+        find_left = "gsF",      -- Find surrounding (to the left)
+        highlight = "gsh",      -- Highlight surrounding
+        replace = "gsr",        -- Replace surrounding
         update_n_lines = "gsn", -- Update `n_lines`
       },
     },
@@ -202,7 +202,18 @@ return {
       }
     }
   },
-  'hedyhli/outline.nvim',
+  {
+    'hedyhli/outline.nvim',
+    opts = {
+      outline_window = {
+        show_numbers = true,
+        show_relative_numbers = true,
+      },
+    },
+    keys = {
+      { '<leader>tt', '<cmd>Outline<CR>', desc = "Toggle outline" }
+    },
+  },
   {
     'RRethy/vim-illuminate',
     config = function()
