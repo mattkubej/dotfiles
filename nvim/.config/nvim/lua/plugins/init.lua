@@ -160,7 +160,7 @@ return {
   },
   'tpope/vim-unimpaired',
   'tpope/vim-repeat',
-  { "folke/neodev.nvim",         opts = {} },
+  { "folke/neodev.nvim",        opts = {} },
   {
     'nvim-neotest/neotest',
     dependencies = {
@@ -170,9 +170,23 @@ return {
       'haydenmeade/neotest-jest'
     },
   },
-  { 'echasnovski/mini.surround', version = false },
-  { 'echasnovski/mini.comment',  version = false },
-  { 'echasnovski/mini.pairs',    version = false },
+  {
+    'echasnovski/mini.surround',
+    opts = {
+      mappings = {
+        add = "gsa",        -- Add surrounding in Normal and Visual modes
+        delete = "gsd",     -- Delete surrounding
+        find = "gsf",       -- Find surrounding (to the right)
+        find_left = "gsF",  -- Find surrounding (to the left)
+        highlight = "gsh",  -- Highlight surrounding
+        replace = "gsr",    -- Replace surrounding
+        update_n_lines = "gsn", -- Update `n_lines`
+      },
+    },
+    version = false
+  },
+  { 'echasnovski/mini.comment', version = false },
+  { 'echasnovski/mini.pairs',   version = false },
   {
     'lukas-reineke/indent-blankline.nvim',
     main = "ibl",
