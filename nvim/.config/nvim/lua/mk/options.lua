@@ -23,7 +23,7 @@ opt.tabstop     = 2
 
 opt.laststatus = 2
 
-opt.undodir    = vim.fn.expand('$HOME/.vimdid//')
+vim.o.undodir  = os.getenv("HOME") .. "/.vimdid"
 opt.undofile   = true
 opt.swapfile   = false
 opt.inccommand = 'split'
