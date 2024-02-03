@@ -172,6 +172,3 @@ cmp.setup.cmdline(':', {
     }
   })
 })
-
-require('fidget').setup({})
-require('neodev').setup()

@@ -182,7 +182,7 @@ return {
           },
         }
       },
-      'folke/neodev.nvim',
+      { 'folke/neodev.nvim', opts = {} },
       {
         "pmizio/typescript-tools.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
