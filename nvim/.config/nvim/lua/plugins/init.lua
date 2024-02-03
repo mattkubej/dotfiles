@@ -259,8 +259,8 @@ return {
     },
     version = false
   },
-  { 'echasnovski/mini.comment', version = false },
-  { 'echasnovski/mini.pairs',   version = false },
+  { 'echasnovski/mini.comment', opts = {}, version = false },
+  { 'echasnovski/mini.pairs',   opts = {}, version = false },
   {
     'lukas-reineke/indent-blankline.nvim',
     main = "ibl",
