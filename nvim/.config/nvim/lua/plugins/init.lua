@@ -95,7 +95,17 @@ return {
   'windwp/nvim-ts-autotag',
   'mattkubej/jest.nvim',
   'folke/zen-mode.nvim',
-  'zbirenbaum/copilot.lua',
+  {
+    'zbirenbaum/copilot.lua',
+    opts = {
+      suggestion = {
+        auto_trigger = true,
+        keymap = {
+          accept = "<C-j>",
+        }
+      },
+    }
+  },
   'mbbill/undotree',
   'folke/trouble.nvim',
   {
