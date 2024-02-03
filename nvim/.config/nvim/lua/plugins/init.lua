@@ -89,7 +89,13 @@ return {
   'tpope/vim-rhubarb',
   'nvim-lualine/lualine.nvim',
   'tpope/vim-sleuth',
-  'junegunn/vim-easy-align',
+  {
+    'junegunn/vim-easy-align',
+    keys = {
+      {'ga', '<Plug>(EasyAlign)', mode = 'x', desc = 'Easy align'},
+      {'ga', '<Plug>(EasyAlign)', mode = 'n', desc = 'Easy align'},
+    }
+  },
   'mattn/emmet-vim',
   'windwp/nvim-autopairs',
   'windwp/nvim-ts-autotag',
@@ -159,7 +165,7 @@ return {
       },
     },
     keys = {
-      { "<leader>co", "<cmd>AerialToggle!<CR>", "Toggle Aerial" }
+      { "<leader>co", "<cmd>AerialToggle!<CR>", desc = "Toggle Aerial" }
     }
   },
   {
