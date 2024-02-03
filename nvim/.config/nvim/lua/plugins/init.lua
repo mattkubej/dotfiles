@@ -122,7 +122,22 @@ return {
   'lukas-reineke/indent-blankline.nvim',
   'hedyhli/outline.nvim',
   'RRethy/vim-illuminate',
-  'stevearc/aerial.nvim',
+  {
+    'stevearc/aerial.nvim',
+    opts = {
+      on_attach = function(bufnr)
+        vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr })
+        vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr })
+      end,
+      layout = {
+        min_width = 0.1,
+        max_width = 0.2,
+      },
+    },
+    keys = {
+      {"<leader>co", "<cmd>AerialToggle!<CR>", "Toggle Aerial"}
+    }
+  },
   {
     "kdheepak/lazygit.nvim",
     dependencies = {
