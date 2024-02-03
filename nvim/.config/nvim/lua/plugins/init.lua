@@ -172,7 +172,19 @@ return {
     }
   },
   'hedyhli/outline.nvim',
-  'RRethy/vim-illuminate',
+  {
+    'RRethy/vim-illuminate',
+    config = function()
+      require('illuminate').configure({
+        providers = { 'lsp', 'treesitter' },
+        delay = 200,
+        large_file_cutoff = 2000,
+        large_file_overrides = {
+          providers = { 'lsp' },
+        }
+      })
+    end,
+  },
   {
     'stevearc/aerial.nvim',
     opts = {
