@@ -85,15 +85,21 @@ return {
     tag = 'nightly'
   },
   'lewis6991/gitsigns.nvim',
-  'tpope/vim-fugitive',
+  {
+    'tpope/vim-fugitive',
+    keys = {
+      { '<leader>gs', vim.cmd.Git,                        desc = '[G]it [S]tatus' },
+      { '<leader>gp', function() vim.cmd.Git('push') end, desc = '[G]it [P]ush' },
+    }
+  },
   'tpope/vim-rhubarb',
   'nvim-lualine/lualine.nvim',
   'tpope/vim-sleuth',
   {
     'junegunn/vim-easy-align',
     keys = {
-      {'ga', '<Plug>(EasyAlign)', mode = 'x', desc = 'Easy align'},
-      {'ga', '<Plug>(EasyAlign)', mode = 'n', desc = 'Easy align'},
+      { 'ga', '<Plug>(EasyAlign)', mode = 'x', desc = 'Easy align' },
+      { 'ga', '<Plug>(EasyAlign)', mode = 'n', desc = 'Easy align' },
     }
   },
   'mattn/emmet-vim',
