@@ -119,7 +119,21 @@ return {
   { 'echasnovski/mini.surround', version = false },
   { 'echasnovski/mini.comment',  version = false },
   { 'echasnovski/mini.pairs',    version = false },
-  'lukas-reineke/indent-blankline.nvim',
+  {
+    'lukas-reineke/indent-blankline.nvim',
+    main = "ibl",
+    opts = {
+      indent = {
+        char = '┊',
+      },
+      scope = {
+        enabled = true,
+        show_start = false,
+        highlight = { "Function", "Label" },
+        priority = 500,
+      }
+    }
+  },
   'hedyhli/outline.nvim',
   'RRethy/vim-illuminate',
   {
@@ -135,7 +149,7 @@ return {
       },
     },
     keys = {
-      {"<leader>co", "<cmd>AerialToggle!<CR>", "Toggle Aerial"}
+      { "<leader>co", "<cmd>AerialToggle!<CR>", "Toggle Aerial" }
     }
   },
   {
