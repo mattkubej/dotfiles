@@ -177,7 +177,22 @@ return {
   'windwp/nvim-autopairs',
   'windwp/nvim-ts-autotag',
   'mattkubej/jest.nvim',
-  'folke/zen-mode.nvim',
+  {
+    'folke/zen-mode.nvim',
+    opts = {
+      window = {
+        width = 120,
+        options = {
+          number = true,
+          relativenumber = true,
+        }
+      },
+    },
+    cmd = "ZenMode",
+    keys = {
+      {"<leader>zz", vim.cmd.ZenMode, desc = "Toggle Zen Mode" },
+    },
+  },
   {
     'zbirenbaum/copilot.lua',
     opts = {
@@ -189,18 +204,29 @@ return {
       },
     }
   },
-  'mbbill/undotree',
-  { 'folke/trouble.nvim', opts = {
+  {
+    'mbbill/undotree',
+    cmd = "UndotreeToggle",
+    opts = {
+      keys = {
+        { "<leader>u", vim.cmd.UndotreeToggle },
+      },
+    },
+  },
+  {
+    'folke/trouble.nvim',
+    opts = {
 
-    keys = {
-      {"<leader>xx", vim.cmd.TroubleToggle},
-      {"<leader>xw", function() vim.cmd.TroubleToggle('workspace_diagnostics') end},
-      {"<leader>xd", function() vim.cmd.TroubleToggle('document_diagnostics') end},
-      {"<leader>xl", function() vim.cmd.TroubleToggle('loclist') end},
-      {"<leader>xq", function() vim.cmd.TroubleToggle('quickfix') end},
-      {"<leader>xr", function() vim.cmd.TroubleToggle('lsp_references') end},
-    }
-  }, },
+      keys = {
+        { "<leader>xx", vim.cmd.TroubleToggle },
+        { "<leader>xw", function() vim.cmd.TroubleToggle('workspace_diagnostics') end },
+        { "<leader>xd", function() vim.cmd.TroubleToggle('document_diagnostics') end },
+        { "<leader>xl", function() vim.cmd.TroubleToggle('loclist') end },
+        { "<leader>xq", function() vim.cmd.TroubleToggle('quickfix') end },
+        { "<leader>xr", function() vim.cmd.TroubleToggle('lsp_references') end },
+      }
+    },
+  },
   {
     'mvllow/modes.nvim',
     config = function()
