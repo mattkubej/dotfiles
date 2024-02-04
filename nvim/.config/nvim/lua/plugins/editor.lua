@@ -144,7 +144,7 @@ return {
     dependencies = { "nvim-lua/plenary.nvim" },
     config = function()
       local harpoon = require("harpoon")
-      harpoon:setup()
+      harpoon:setup({})
     end,
     keys = {
       {
@@ -162,6 +162,14 @@ return {
           harpoon:list():append()
         end,
         desc = "Add current file to Harpoon"
+      },
+      {
+        "<leader>hc",
+        function()
+          local harpoon = require('harpoon')
+          harpoon:list():clear()
+        end,
+        desc = "Clear Harpoon list"
       },
       {
         "<leader>1",
@@ -194,6 +202,14 @@ return {
           harpoon:list():select(4)
         end,
         desc = "Harpoon select 4"
+      },
+      {
+        "<leader>5",
+        function()
+          local harpoon = require('harpoon')
+          harpoon:list():select(5)
+        end,
+        desc = "Harpoon select 5"
       },
       {
         "<leader>hn",
