@@ -52,7 +52,7 @@ return {
             vim.keymap.set('n', keys, func, { buffer = event.buf, desc = desc })
           end
 
-          nmap('<space>e', vim.diagnostic.open_float, 'Open diagnostic float')
+          nmap('<leader>d', vim.diagnostic.open_float, 'Open diagnostic float')
           nmap('[d', vim.diagnostic.goto_prev, 'Go to previous diagnostic')
           nmap(']d', vim.diagnostic.goto_next, 'Go to next diagnostic')
 

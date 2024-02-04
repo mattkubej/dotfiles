@@ -45,6 +45,21 @@ return {
       { "<leader>n", vim.cmd.NvimTreeFindFile },
     },
   },
+  {
+    'stevearc/oil.nvim',
+    cmd = "Oil",
+    keys = {
+      { "<leader>e", function() require('oil').toggle_float() end, desc = "Open oil in parent directory" },
+      {
+        "<C-e>",
+        function()
+          local oil = require('oil')
+          oil.toggle_float(oil.get_current_dir())
+        end,
+        desc = "Open oil in current directory"
+      }
+    }
+  },
   'tpope/vim-rhubarb',
   'tpope/vim-sleuth',
   {
@@ -66,16 +81,14 @@ return {
   },
   {
     'folke/trouble.nvim',
-    opts = {
-
-      keys = {
-        { "<leader>xx", vim.cmd.TroubleToggle },
-        { "<leader>xw", function() vim.cmd.TroubleToggle('workspace_diagnostics') end },
-        { "<leader>xd", function() vim.cmd.TroubleToggle('document_diagnostics') end },
-        { "<leader>xl", function() vim.cmd.TroubleToggle('loclist') end },
-        { "<leader>xq", function() vim.cmd.TroubleToggle('quickfix') end },
-        { "<leader>xr", function() vim.cmd.TroubleToggle('lsp_references') end },
-      }
+    opts = {},
+    keys = {
+      { "<leader>xx", vim.cmd.TroubleToggle },
+      { "<leader>xw", function() vim.cmd.TroubleToggle('workspace_diagnostics') end },
+      { "<leader>xd", function() vim.cmd.TroubleToggle('document_diagnostics') end },
+      { "<leader>xl", function() vim.cmd.TroubleToggle('loclist') end },
+      { "<leader>xq", function() vim.cmd.TroubleToggle('quickfix') end },
+      { "<leader>xr", function() vim.cmd.TroubleToggle('lsp_references') end },
     },
   },
   'tpope/vim-unimpaired',
