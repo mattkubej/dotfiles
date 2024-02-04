@@ -1,3 +1,3 @@
 require("mk.options");
 require("mk.keymaps");
-require("mk.plugins");
+require("mk.lazy");
