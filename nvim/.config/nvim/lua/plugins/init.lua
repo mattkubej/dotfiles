@@ -46,24 +46,6 @@ return {
     },
   },
   'tpope/vim-rhubarb',
-  {
-    'nvim-lualine/lualine.nvim',
-    opts = {
-      options = {
-        theme = 'catppuccin',
-        icons_enabled = false,
-      },
-      sections = {
-        lualine_a = { 'mode' },
-        lualine_b = { 'hostname' },
-        lualine_c = { 'branch', { 'filename', path = 1 }, 'aerial' },
-        lualine_x = { 'diff', 'encoding', 'fileformat' }, -- filetype causes lag
-        lualine_y = { 'progress' },
-        lualine_z = { 'location' },
-      },
-      extensions = { 'fugitive', 'fzf' }
-    }
-  },
   'tpope/vim-sleuth',
   {
     'junegunn/vim-easy-align',
@@ -75,33 +57,6 @@ return {
   'mattn/emmet-vim',
   'windwp/nvim-autopairs',
   'windwp/nvim-ts-autotag',
-  {
-    'folke/zen-mode.nvim',
-    opts = {
-      window = {
-        width = 120,
-        options = {
-          number = true,
-          relativenumber = true,
-        }
-      },
-    },
-    cmd = "ZenMode",
-    keys = {
-      { "<leader>zz", vim.cmd.ZenMode, desc = "Toggle Zen Mode" },
-    },
-  },
-  {
-    'zbirenbaum/copilot.lua',
-    opts = {
-      suggestion = {
-        auto_trigger = true,
-        keymap = {
-          accept = "<C-j>",
-        }
-      },
-    }
-  },
   {
     'mbbill/undotree',
     cmd = "UndotreeToggle",
@@ -125,12 +80,6 @@ return {
       }
     },
   },
-  {
-    'mvllow/modes.nvim',
-    config = function()
-      require('modes').setup()
-    end,
-  },
   'tpope/vim-unimpaired',
   'tpope/vim-repeat',
   {
@@ -151,21 +100,6 @@ return {
   { 'echasnovski/mini.comment', opts = {}, version = false },
   { 'echasnovski/mini.pairs',   opts = {}, version = false },
   {
-    'lukas-reineke/indent-blankline.nvim',
-    main = "ibl",
-    opts = {
-      indent = {
-        char = '┊',
-      },
-      scope = {
-        enabled = true,
-        show_start = false,
-        highlight = { "Function", "Label" },
-        priority = 500,
-      }
-    }
-  },
-  {
     'hedyhli/outline.nvim',
     opts = {
       outline_window = {
@@ -176,19 +110,6 @@ return {
     keys = {
       { '<leader>tt', '<cmd>Outline<CR>', desc = "Toggle outline" }
     },
-  },
-  {
-    'RRethy/vim-illuminate',
-    config = function()
-      require('illuminate').configure({
-        providers = { 'lsp', 'treesitter' },
-        delay = 200,
-        large_file_cutoff = 2000,
-        large_file_overrides = {
-          providers = { 'lsp' },
-        }
-      })
-    end,
   },
   {
     'stevearc/aerial.nvim',
