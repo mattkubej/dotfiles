@@ -47,6 +47,7 @@ return {
   },
   {
     'stevearc/oil.nvim',
+    opts = {},
     cmd = "Oil",
     keys = {
       { "<leader>e", function() require('oil').toggle_float() end, desc = "Open oil in parent directory" },
