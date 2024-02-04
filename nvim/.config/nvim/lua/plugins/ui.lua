@@ -4,16 +4,25 @@ return {
     name = 'catppuccin',
     config = function()
       require('catppuccin').setup({
+        aerial = true,
         cmp = true,
+        fidget = true,
         gitsigns = true,
-        illuminate = true,
+        illuminate = {
+          enabled = true,
+          lsp = false
+        },
         indent_blankline = {
           enabled = false,
           scope_color = "sapphire",
           colored_indent_levels = false,
         },
         mason = true,
+        mini = {
+          enabled = true,
+        },
         native_lsp = { enabled = true },
+        neotest = true,
         nvimtree = true,
         telescope = true,
         treesitter = true,
