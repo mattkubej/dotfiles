@@ -26,9 +26,9 @@ return {
         },
         sources = {
           { name = 'nvim_lsp', max_item_count = 5 },
-          { name = 'luasnip', max_item_count = 3 },
-          { name = 'buffer', max_item_count = 3 },
-          { name = 'path', max_item_count = 3 },
+          { name = 'buffer',   max_item_count = 3 },
+          { name = 'path',     max_item_count = 3 },
+          { name = 'luasnip',  max_item_count = 3 },
         },
         mapping = cmp.mapping.preset.insert({
           ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
