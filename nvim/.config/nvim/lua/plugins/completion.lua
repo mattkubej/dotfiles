@@ -46,6 +46,8 @@ return {
           completeopt = 'menu,menuone,noinsert,noselect',
         },
         formatting = {
+          expandable_indicator = false,
+          fields = { cmp.ItemField.Abbr, cmp.ItemField.Kind, cmp.ItemField.Menu },
           format = lspkind.cmp_format({
             mode = 'symbol_text',
             menu = ({
