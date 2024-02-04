@@ -164,6 +164,14 @@ return {
         desc = "Add current file to Harpoon"
       },
       {
+        "<leader>hr",
+        function()
+          local harpoon = require('harpoon')
+          harpoon:list():remove()
+        end,
+        desc = "Remove file from Harpoon"
+      },
+      {
         "<leader>hc",
         function()
           local harpoon = require('harpoon')
