@@ -173,17 +173,6 @@ return {
       'nvimtools/none-ls.nvim',
       'jay-babu/mason-null-ls.nvim',
       {
-        'j-hui/fidget.nvim',
-        opts = {
-          integration = {
-            ["nvim-tree"] = {
-              enable = false,
-            },
-          },
-        }
-      },
-      { 'folke/neodev.nvim', opts = {} },
-      {
         "pmizio/typescript-tools.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
         config = function()
@@ -204,6 +193,17 @@ return {
       }
     },
   },
+  {
+    'j-hui/fidget.nvim',
+    opts = {
+      integration = {
+        ["nvim-tree"] = {
+          enable = false,
+        },
+      },
+    }
+  },
+  { 'folke/neodev.nvim', opts = {} },
   {
     'nvim-tree/nvim-tree.lua',
     dependencies = {
@@ -362,7 +362,7 @@ return {
   },
   'tpope/vim-unimpaired',
   'tpope/vim-repeat',
-  { "folke/neodev.nvim",        opts = {} },
+  { "folke/neodev.nvim", opts = {} },
   {
     'nvim-neotest/neotest',
     dependencies = {
