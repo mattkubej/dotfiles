@@ -5,6 +5,13 @@ return {
       'nvim-treesitter/nvim-treesitter-context',
       'nvim-treesitter/nvim-treesitter-textobjects',
       'windwp/nvim-ts-autotag',
+      {
+        'windwp/nvim-autopairs',
+        event = "InsertEnter",
+        opts = {
+          check_ts = true,
+        }
+      },
     },
     build = function()
       require("nvim-treesitter.install").update({ with_sync = true })()
@@ -88,14 +95,4 @@ return {
       require("nvim-treesitter.configs").setup(opts)
     end,
   },
-  {
-    'windwp/nvim-autopairs',
-    event = "InsertEnter",
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter',
-    },
-    opts = {
-      check_ts = true,
-    }
-  }
 }
