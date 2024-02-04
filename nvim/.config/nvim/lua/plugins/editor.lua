@@ -1,4 +1,42 @@
 return {
+  'tpope/vim-rhubarb',
+  'tpope/vim-sleuth',
+  'tpope/vim-unimpaired',
+  'tpope/vim-repeat',
+  'mattn/emmet-vim',
+  { 'echasnovski/mini.comment', opts = {}, version = false },
+  { 'echasnovski/mini.pairs',   opts = {}, version = false },
+  {
+    'echasnovski/mini.surround',
+    opts = {
+      mappings = {
+        add = "gsa",            -- Add surrounding in Normal and Visual modes
+        delete = "gsd",         -- Delete surrounding
+        find = "gsf",           -- Find surrounding (to the right)
+        find_left = "gsF",      -- Find surrounding (to the left)
+        highlight = "gsh",      -- Highlight surrounding
+        replace = "gsr",        -- Replace surrounding
+        update_n_lines = "gsn", -- Update `n_lines`
+      },
+    },
+    version = false
+  },
+  {
+    'junegunn/vim-easy-align',
+    keys = {
+      { 'ga', '<Plug>(EasyAlign)', mode = 'x', desc = 'Easy align' },
+      { 'ga', '<Plug>(EasyAlign)', mode = 'n', desc = 'Easy align' },
+    }
+  },
+  {
+    'mbbill/undotree',
+    cmd = "UndotreeToggle",
+    opts = {
+      keys = {
+        { "<leader>u", vim.cmd.UndotreeToggle },
+      },
+    },
+  },
   {
     'nvim-tree/nvim-tree.lua',
     dependencies = {
@@ -61,25 +99,6 @@ return {
       }
     }
   },
-  'tpope/vim-rhubarb',
-  'tpope/vim-sleuth',
-  {
-    'junegunn/vim-easy-align',
-    keys = {
-      { 'ga', '<Plug>(EasyAlign)', mode = 'x', desc = 'Easy align' },
-      { 'ga', '<Plug>(EasyAlign)', mode = 'n', desc = 'Easy align' },
-    }
-  },
-  'mattn/emmet-vim',
-  {
-    'mbbill/undotree',
-    cmd = "UndotreeToggle",
-    opts = {
-      keys = {
-        { "<leader>u", vim.cmd.UndotreeToggle },
-      },
-    },
-  },
   {
     'folke/trouble.nvim',
     opts = {},
@@ -92,25 +111,6 @@ return {
       { "<leader>xr", function() vim.cmd.TroubleToggle('lsp_references') end },
     },
   },
-  'tpope/vim-unimpaired',
-  'tpope/vim-repeat',
-  {
-    'echasnovski/mini.surround',
-    opts = {
-      mappings = {
-        add = "gsa",            -- Add surrounding in Normal and Visual modes
-        delete = "gsd",         -- Delete surrounding
-        find = "gsf",           -- Find surrounding (to the right)
-        find_left = "gsF",      -- Find surrounding (to the left)
-        highlight = "gsh",      -- Highlight surrounding
-        replace = "gsr",        -- Replace surrounding
-        update_n_lines = "gsn", -- Update `n_lines`
-      },
-    },
-    version = false
-  },
-  { 'echasnovski/mini.comment', opts = {}, version = false },
-  { 'echasnovski/mini.pairs',   opts = {}, version = false },
   {
     'hedyhli/outline.nvim',
     opts = {
