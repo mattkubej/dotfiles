@@ -390,7 +390,6 @@ return {
   },
   'tpope/vim-unimpaired',
   'tpope/vim-repeat',
-  { "folke/neodev.nvim",        opts = {} },
   {
     'echasnovski/mini.surround',
     opts = {
