@@ -1,12 +1,5 @@
 return {
   {
-    'catppuccin/nvim',
-    name = 'catppuccin',
-    config = function()
-      vim.cmd('colorscheme catppuccin-frappe')
-    end
-  },
-  {
     'nvim-tree/nvim-tree.lua',
     dependencies = {
       'nvim-tree/nvim-web-devicons',
