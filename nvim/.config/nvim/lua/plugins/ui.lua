@@ -3,8 +3,29 @@ return {
     'catppuccin/nvim',
     name = 'catppuccin',
     config = function()
+      require('catppuccin').setup({
+        cmp = true,
+        gitsigns = true,
+        illuminate = true,
+        indent_blankline = {
+          enabled = false,
+          scope_color = "sapphire",
+          colored_indent_levels = false,
+        },
+        mason = true,
+        native_lsp = { enabled = true },
+        nvimtree = true,
+        telescope = true,
+        treesitter = true,
+        treesitter_context = true,
+      })
+
       vim.cmd('colorscheme catppuccin-frappe')
     end
+  },
+  {
+    'stevearc/dressing.nvim',
+    opts = {},
   },
   {
     'nvim-lualine/lualine.nvim',
