@@ -109,7 +109,6 @@ return {
           'graphql',
           'html',
           'pylsp',
-          'solargraph',
           'sorbet',
           'ruby_ls',
           'rubocop',
