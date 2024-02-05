@@ -88,7 +88,7 @@ return {
     opts = {},
     cmd = "Oil",
     keys = {
-      { "<leader>e", function() require('oil').toggle_float() end, desc = "Open oil in parent directory" },
+      { "<leader>e", function() require('oil').toggle_float(vim.fn.getcwd()) end, desc = "Open oil in parent directory" },
       {
         "<C-e>",
         function()
