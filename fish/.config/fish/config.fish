@@ -8,7 +8,7 @@ alias tam='tat -c ~/ -s main'
 
 function fish_user_key_bindings
     for mode in insert default visual
-        bind -M $mode \cj forward-char
+        bind -M $mode \cf forward-char
     end
 end
 
