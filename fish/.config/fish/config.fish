@@ -24,6 +24,9 @@ else
   abbr -a lll 'ls -la'
 end
 
+# brew
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
 # pyenv
 set -Ux PYENV_ROOT $HOME/.pyenv
 set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
