@@ -3,6 +3,15 @@
 autoload -U colors
 colors
 
+install_difftastic() {
+  if ! command -v difftastic &> /dev/null; then
+    DFT_VERSION="v0.56.1"
+    wget "https://github.com/Wilfred/difftastic/releases/download/${DFT_VERSION}/difft-x86_64-unknown-linux-gnu.tar.gz"
+    tar xf difft-x86_64-unknown-linux-gnu.tar.gz difft
+    sudo mv difft /usr/local/bin/difft
+  fi
+}
+
 install_delta() {
   if ! command -v delta &> /dev/null; then
     echo "\n  -- installing delta -- \n"
@@ -73,6 +82,7 @@ install_dependencies() {
   install_delta
   install_prettier
   install_lazygit
+  install_difftastic
   # install_eslint_d
 
   install_nvim_nightly
