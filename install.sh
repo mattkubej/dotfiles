@@ -13,8 +13,8 @@ install_difftastic() {
 }
 
 install_delta() {
-  if ! command -v delta &> /dev/null; then
     echo "\n  -- installing delta -- \n"
+    if ! command -v delta &> /dev/null; then
 
     delta_pkg_src="https://github.com/dandavison/delta/releases/download/0.15.1/git-delta_0.15.1_amd64.deb"
     delta_pkg_dest="/tmp/$(basename $delta_pkg_src)"
