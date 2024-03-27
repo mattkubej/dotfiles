@@ -6,8 +6,8 @@ colors
 install_difftastic() {
   if ! command -v difftastic &> /dev/null; then
     DFT_VERSION="0.56.1"
-    wget "https://github.com/Wilfred/difftastic/releases/download/${DFT_VERSION}/difft-x86_64-linux-gnu.tar.gz"
-    tar xf difft-x86_64-linux-gnu.tar.gz difft
+    wget "https://github.com/Wilfred/difftastic/releases/download/${DFT_VERSION}/difft-x86_64-unknown-linux-gnu.tar.gz"
+    tar xf difft-x86_64-unknown-linux-gnu.tar.gz difft
     sudo mv difft /usr/local/bin/difft
   fi
 }
@@ -66,8 +66,8 @@ install_treesitter() {
 install_lazygit() {
   LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
   curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
-  tar xf lazygit.tar.gz lazygit
-  sudo install lazygit /usr/local/bin
+  tar xf lazygit.tar.gz -C /tmp lazygit
+  sudo install /tmp/lazygit /usr/local/bin
 }
 
 install_dependencies() {
