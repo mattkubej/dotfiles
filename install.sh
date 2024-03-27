@@ -108,6 +108,7 @@ stow_dirs() {
   stow -d ~/dotfiles git
   stow -d ~/dotfiles tmux
   stow -d ~/dotfiles scripts
+  stow -d ~/dotfiles lazygit
 }
 
 setup_zsh() {
