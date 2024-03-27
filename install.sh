@@ -119,12 +119,12 @@ setup_tmux() {
 }
 
 if [ $SPIN ]; then
-  install_dependencies
-  link_files
-  stow_dirs
-  setup_zsh
-  setup_tmux
-  setup_copilot
+  install_dependencies || true
+  link_files || true
+  stow_dirs || true
+  setup_zsh || true
+  setup_tmux || true
+  setup_copilot || true
 
   timeout 2m nvim --headless "+Lazy! sync" +qa || true
 fi
