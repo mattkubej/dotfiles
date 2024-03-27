@@ -1,1 +1,2 @@
 disableStartupPopups: true
+promptToReturnFromSubprocess: false
