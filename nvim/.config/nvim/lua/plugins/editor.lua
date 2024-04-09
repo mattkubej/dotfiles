@@ -4,7 +4,6 @@ return {
   'tpope/vim-unimpaired',
   'tpope/vim-repeat',
   'mattn/emmet-vim',
-  { 'echasnovski/mini.comment', opts = {}, version = false },
   { 'echasnovski/mini.pairs',   opts = {}, version = false },
   {
     'echasnovski/mini.surround',
