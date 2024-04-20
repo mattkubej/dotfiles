@@ -110,7 +110,7 @@ return {
           'html',
           'pylsp',
           'sorbet',
-          'ruby_ls',
+          'ruby_lsp',
           'eslint',
           'jsonls',
           'stylelint_lsp',
