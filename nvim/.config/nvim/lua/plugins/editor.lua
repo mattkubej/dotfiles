@@ -41,7 +41,6 @@ return {
     dependencies = {
       'nvim-tree/nvim-web-devicons',
     },
-    tag = 'nightly',
     opts = {
       auto_reload_on_write = false,
       git = {

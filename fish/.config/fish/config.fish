@@ -56,3 +56,10 @@ end
 set -g fish_term24bit 1
 
 starship init fish | source
+
+# pnpm
+set -gx PNPM_HOME "/Users/mattkubej/Library/pnpm"
+if not string match -q -- $PNPM_HOME $PATH
+  set -gx PATH "$PNPM_HOME" $PATH
+end
+# pnpm end
