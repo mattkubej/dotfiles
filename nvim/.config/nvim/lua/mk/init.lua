@@ -1,3 +1,6 @@
 require("mk.options");
 require("mk.keymaps");
-require("mk.lazy");
+
+if not vim.g.vscode then
+  require("mk.lazy");
+end
