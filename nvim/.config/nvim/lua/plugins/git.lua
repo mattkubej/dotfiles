@@ -11,6 +11,22 @@ return {
           vim.keymap.set(mode, l, r, opts)
         end
 
+        map('n', ']h', function()
+          if vim.wo.diff then
+            vim.cmd.normal({']h', bang = true})
+          else
+            gs.nav_hunk('next')
+          end
+        end)
+
+        map('n', '[h', function()
+          if vim.wo.diff then
+            vim.cmd.normal({'[h', bang = true})
+          else
+            gs.nav_hunk('prev')
+          end
+        end)
+
         map('n', '<leader>gb', function() gs.blame_line { full = true } end)
       end
     }
