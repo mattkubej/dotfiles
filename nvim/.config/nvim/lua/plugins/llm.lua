@@ -9,20 +9,18 @@ return {
       local llm = require('llm')
 
       local function anthropic_help()
-        llm.invoke_llm_and_stream_into_editor({
+        llm.invoke_llm_with_token({
           url = 'LLM_PROXY',
           model = 'anthropic:claude-3-5-sonnet',
-          api_key_name = 'ANTHROPIC_TOKEN',
           system_prompt = helpful_prompt,
           replace = false,
         }, llm.make_spec_curl_args, llm.handle_spec_data)
       end
 
       local function anthropic_replace()
-        llm.invoke_llm_and_stream_into_editor({
+        llm.invoke_llm_with_token({
           url = 'LLM_PROXY',
           model = 'anthropic:claude-3-5-sonnet',
-          api_key_name = 'ANTHROPIC_TOKEN',
           system_prompt = system_prompt,
           replace = true,
         }, llm.make_spec_curl_args, llm.handle_spec_data)

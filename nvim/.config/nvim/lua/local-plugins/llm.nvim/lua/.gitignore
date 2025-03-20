@@ -1,0 +1,2 @@
+# Ignore the actual token provider implementation
+token_provider.lua
