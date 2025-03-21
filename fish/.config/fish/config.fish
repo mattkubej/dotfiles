@@ -35,6 +35,9 @@ pyenv init - | source
 # local scripts
 set -x PATH $PATH $HOME/bin
 
+# private scripts
+set -x PATH $PATH $HOME/.private/bin
+
 # npm
 set -x PATH $PATH $HOME/.npm-global/bin
 
@@ -63,3 +66,5 @@ if not string match -q -- $PNPM_HOME $PATH
   set -gx PATH "$PNPM_HOME" $PATH
 end
 # pnpm end
+
+refresh_openai_key

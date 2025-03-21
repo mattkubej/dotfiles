@@ -1,21 +1,6 @@
 local M = {}
 local Job = require 'plenary.job'
 
--- Load token provider
-local ok, token_provider = pcall(require, 'token_provider')
-if not ok then
-  vim.notify("Failed to load token provider.", vim.log.levels.ERROR)
-  token_provider = {
-    get_token = function(callback)
-      vim.schedule(function()
-        vim.notify("Token provider not implemented", vim.log.levels.ERROR)
-      end)
-      callback(nil)
-    end
-  }
-end
-
--- Original LLM functionality
 function M.get_lines_until_cursor()
   local current_buffer = vim.api.nvim_get_current_buf()
   local current_window = vim.api.nvim_get_current_win()
@@ -56,8 +41,7 @@ function M.get_visual_selection()
       scol, ecol = ecol, scol
     end
     for i = srow, erow do
-      table.insert(lines,
-        vim.api.nvim_buf_get_text(0, i - 1, math.min(scol - 1, ecol), i - 1, math.max(scol - 1, ecol), {})[1])
+      table.insert(lines, vim.api.nvim_buf_get_text(0, i - 1, math.min(scol - 1, ecol), i - 1, math.max(scol - 1, ecol), {})[1])
     end
     return lines
   end
@@ -65,7 +49,7 @@ end
 
 function M.make_spec_curl_args(opts, prompt, system_prompt)
   local url = opts.url and os.getenv(opts.url)
-  local api_key = opts.api_key or (opts.api_key_name and os.getenv(opts.api_key_name))
+  local api_key = opts.api_key_name and os.getenv(opts.api_key_name)
   local data = {
     messages = { { role = 'system', content = system_prompt }, { role = 'user', content = prompt } },
     model = opts.model,
@@ -133,9 +117,7 @@ local group = vim.api.nvim_create_augroup('LLM_AutoGroup', { clear = true })
 local active_job = nil
 
 function M.invoke_llm_and_stream_into_editor(opts, make_curl_args_fn, handle_data_fn)
-  vim.schedule(function()
-    vim.api.nvim_clear_autocmds { group = group }
-  end)
+  vim.api.nvim_clear_autocmds { group = group }
   local prompt = get_prompt(opts)
   local system_prompt = opts.system_prompt or 'Yell at me for not setting my configuration for my llm plugin correctly'
   local args = make_curl_args_fn(opts, prompt, system_prompt)
@@ -172,95 +154,19 @@ function M.invoke_llm_and_stream_into_editor(opts, make_curl_args_fn, handle_dat
 
   active_job:start()
 
-  vim.schedule(function()
-    vim.api.nvim_create_autocmd('User', {
-      group = group,
-      pattern = 'LLM_Escape',
-      callback = function()
-        if active_job then
-          active_job:shutdown()
-          print 'LLM streaming cancelled'
-          active_job = nil
-        end
-      end,
-    })
-
-    vim.api.nvim_set_keymap('n', '<Esc>', ':doautocmd User LLM_Escape<CR>', { noremap = true, silent = true })
-  end)
-
-  return active_job
-end
-
--- New function that uses the token manager
-function M.invoke_llm_with_token(opts, make_curl_args_fn, handle_data_fn)
-  vim.schedule(function()
-    vim.api.nvim_clear_autocmds { group = group }
-  end)
-  local prompt = get_prompt(opts)
-  local system_prompt = opts.system_prompt or 'Yell at me for not setting my configuration for my llm plugin correctly'
-
-  token_provider.get_token(function(token)
-    if not token then
-      vim.schedule(function()
-        vim.notify("Failed to get LLM token", vim.log.levels.ERROR)
-      end)
-      return
-    end
-
-    -- Set the token in opts
-    opts.api_key = token
-
-    local args = make_curl_args_fn(opts, prompt, system_prompt)
-    local curr_event_state = nil
-
-    local function parse_and_call(line)
-      local event = line:match '^event: (.+)$'
-      if event then
-        curr_event_state = event
-        return
-      end
-      local data_match = line:match '^data: (.+)$'
-      if data_match then
-        handle_data_fn(data_match, curr_event_state)
-      end
-    end
-
-    if active_job then
-      active_job:shutdown()
-      active_job = nil
-    end
-
-    active_job = Job:new {
-      command = 'curl',
-      args = args,
-      on_stdout = function(_, out)
-        parse_and_call(out)
-      end,
-      on_stderr = function(_, _) end,
-      on_exit = function()
+  vim.api.nvim_create_autocmd('User', {
+    group = group,
+    pattern = 'LLM_Escape',
+    callback = function()
+      if active_job then
+        active_job:shutdown()
+        print 'LLM streaming cancelled'
         active_job = nil
-      end,
-    }
+      end
+    end,
+  })
 
-    active_job:start()
-
-    vim.schedule(function()
-      vim.api.nvim_create_autocmd('User', {
-        group = group,
-        pattern = 'LLM_Escape',
-        callback = function()
-          if active_job then
-            active_job:shutdown()
-            print 'LLM streaming cancelled'
-            active_job = nil
-          end
-        end,
-      })
-
-      vim.api.nvim_set_keymap('n', '<Esc>', ':doautocmd User LLM_Escape<CR>', { noremap = true, silent = true })
-    end)
-  end)
-
+  vim.api.nvim_set_keymap('n', '<Esc>', ':doautocmd User LLM_Escape<CR>', { noremap = true, silent = true })
   return active_job
 end
 
