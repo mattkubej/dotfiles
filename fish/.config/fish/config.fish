@@ -67,4 +67,6 @@ if not string match -q -- $PNPM_HOME $PATH
 end
 # pnpm end
 
-refresh_openai_key
+if type -q refresh_openai_key
+  refresh_openai_key
+end
