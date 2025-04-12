@@ -48,9 +48,14 @@ local default_config = {
 
   -- Keymappings
   keymaps = {
-    toggle = "<leader>cc", -- Toggle Claude popup visibility
-    submit = "<C-s>",      -- Submit a message in insert mode
-    clear = "<C-l>",       -- Clear the chat history
+    toggle = "<leader>cc",          -- Toggle Claude popup visibility
+    submit = "<C-s>",               -- Submit a message in insert mode
+    clear = "<C-l>",                -- Clear the chat history
+    ask_buffer = "<leader>ca",      -- Ask about current buffer (adds buffer context)
+    ask_selection = "<leader>cs",   -- Ask about selected code (adds selection context)
+    improve_selection = "<leader>ci", -- Ask Claude to improve selected code
+    explain_selection = "<leader>ce", -- Ask Claude to explain selected code
+    implement_comment = "<leader>cp", -- Ask Claude to implement code from comment selection
   },
 
   -- Chat behavior
@@ -58,6 +63,15 @@ local default_config = {
     save_history = true,                                             -- Whether to save chat history between sessions
     history_file = vim.fn.stdpath("data") .. "/claude_history.json", -- Chat history location
     initial_message = "Hello! I'm Claude. How can I help you with your code today?",
+  },
+  
+  -- Code interaction prompts
+  code_prompts = {
+    -- Predefined prompts for different code interactions
+    improve = "Please improve this code. Consider performance, readability, error handling, and best practices:",
+    explain = "Please explain what this code does in detail:",
+    implement = "Please implement code based on this comment/specification:",
+    analyze = "Please analyze this code for potential issues, bugs, or improvements:",
   },
 }
 
@@ -72,15 +86,51 @@ function M.setup(user_config)
   -- Setup commands
   vim.api.nvim_create_user_command("ClaudeToggle", M.toggle_popup, {})
   vim.api.nvim_create_user_command("ClaudeClear", M.clear_chat, {})
+  vim.api.nvim_create_user_command("ClaudeAskBuffer", M.ask_buffer, {})
+  
+  -- Commands that work with selection need to allow range
+  vim.api.nvim_create_user_command("ClaudeAskSelection", M.ask_selection, { range = true })
+  vim.api.nvim_create_user_command("ClaudeImproveSelection", M.code_action("improve"), { range = true })
+  vim.api.nvim_create_user_command("ClaudeExplainSelection", M.code_action("explain"), { range = true })
+  vim.api.nvim_create_user_command("ClaudeImplementComment", M.code_action("implement"), { range = true })
+  vim.api.nvim_create_user_command("ClaudeAnalyzeSelection", M.code_action("analyze"), { range = true })
 
   -- Setup keymappings
-  if config.keymaps.toggle then
-    vim.api.nvim_set_keymap(
-      "n",
-      config.keymaps.toggle,
-      ":ClaudeToggle<CR>",
-      { noremap = true, silent = true, desc = "Toggle Claude AI popup" }
-    )
+  local keymaps = {
+    toggle = { mode = "n", cmd = ":ClaudeToggle<CR>", desc = "Toggle Claude AI popup" },
+    ask_buffer = { mode = "n", cmd = ":ClaudeAskBuffer<CR>", desc = "Ask Claude about current buffer" },
+  }
+
+  -- Set up visual mode mappings with special handling
+  local visual_keymaps = {
+    ask_selection = { cmd = "ClaudeAskSelection", desc = "Ask Claude about selection" },
+    improve_selection = { cmd = "ClaudeImproveSelection", desc = "Ask Claude to improve selection" },
+    explain_selection = { cmd = "ClaudeExplainSelection", desc = "Ask Claude to explain selection" },
+    implement_comment = { cmd = "ClaudeImplementComment", desc = "Ask Claude to implement from comment" },
+  }
+
+  -- Apply normal mode keymaps
+  for key, keymap_info in pairs(keymaps) do
+    if config.keymaps[key] then
+      vim.api.nvim_set_keymap(
+        keymap_info.mode,
+        config.keymaps[key],
+        keymap_info.cmd,
+        { noremap = true, silent = true, desc = keymap_info.desc }
+      )
+    end
+  end
+  
+  -- Set up visual mode mappings
+  for key, keymap_info in pairs(visual_keymaps) do
+    if config.keymaps[key] then
+      -- Use standard visual range notation to pass the selection
+      vim.cmd(string.format(
+        "xnoremap <silent> %s :'<,'>%s<CR>",
+        config.keymaps[key],
+        keymap_info.cmd
+      ))
+    end
   end
 
   -- Initialize UI state
@@ -191,22 +241,35 @@ function M.send_to_claude(messages, callback)
     messages = formatted_messages,
   }
 
-  -- Convert request data to JSON
+  -- Convert request data to JSON and ensure it's properly escaped
   local json_data = vim.fn.json_encode(request_data)
-
+  
+  -- Create a temporary file for the request data
+  local request_file = os.tmpname()
+  local file = io.open(request_file, "w")
+  if not file then
+    hide_status()
+    vim.notify("Failed to create temporary file for request", vim.log.levels.ERROR)
+    return
+  end
+  
+  -- Write the JSON data to the file
+  file:write(json_data)
+  file:close()
+  
   -- Create a temporary file for curl output
   local temp_file = os.tmpname()
 
-  -- Create the curl command
+  -- Create the curl command using --data-binary @file to avoid escaping issues
   local cmd = string.format(
     "curl -s -X POST %s " ..
     "-H 'x-api-key: %s' " ..
     "-H 'anthropic-version: 2023-06-01' " ..
     "-H 'content-type: application/json' " ..
-    "-d '%s' > %s",
+    "--data-binary @%s > %s",
     config.api.endpoint,
     api_key,
-    json_data:gsub("'", "'\\''"), -- Escape single quotes
+    request_file,
     temp_file
   )
 
@@ -282,6 +345,401 @@ function M.format_messages_for_api(messages)
   end
 
   return formatted
+end
+
+-- ============================================================================
+-- Code Context Helper Functions
+-- ============================================================================
+
+-- Get the content of the current buffer
+function M.get_buffer_content()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+  return table.concat(lines, "\n")
+end
+
+-- Get the filetype of the current buffer
+function M.get_current_filetype()
+  return vim.bo.filetype
+end
+
+-- Get the visual selection text - works even after visual mode is exited
+function M.get_visual_selection()
+  -- Get the line numbers of the selection
+  local start_line = vim.fn.line("'<")
+  local end_line = vim.fn.line("'>")
+  
+  -- Safety check for valid selection
+  if start_line <= 0 or end_line <= 0 then
+    vim.notify("No valid selection marks found", vim.log.levels.WARN)
+    return ""
+  end
+  
+  -- Get the columns of the selection 
+  local start_col = vim.fn.col("'<")
+  local end_col = vim.fn.col("'>")
+  
+  -- Get the selection mode that was used
+  local mode = vim.fn.visualmode()
+  
+  -- Get the selected lines from the buffer
+  local lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
+  
+  -- Nothing was selected
+  if #lines == 0 then
+    return ""
+  end
+  
+  -- If it's just one line, extract the substring
+  if #lines == 1 and mode == 'v' then
+    lines[1] = string.sub(lines[1], start_col, end_col)
+  elseif mode == 'v' and #lines > 1 then
+    -- For multi-line character-wise selection
+    -- Adjust first and last line
+    lines[1] = string.sub(lines[1], start_col)
+    lines[#lines] = string.sub(lines[#lines], 1, end_col)
+  end
+  
+  -- Line-wise (V) and block-wise (^V) modes will just use the full lines
+  
+  -- Join the lines and return
+  return table.concat(lines, '\n')
+end
+
+-- Format code with its filetype for better context
+function M.format_code_context(code, filetype)
+  return string.format("```%s\n%s\n```", filetype or "", code)
+end
+
+-- Fill a prompt and optionally submit immediately
+function M.fill_prompt_and_submit(prompt, auto_submit)
+  -- Set the prompt in the input buffer
+  vim.api.nvim_buf_set_lines(M.state.input_buf_id, 0, -1, false, vim.split(prompt, "\n"))
+  
+  if auto_submit then
+    -- Submit immediately
+    vim.defer_fn(function()
+      M.submit_message()
+    end, 100) -- Small delay to ensure UI updates
+  else
+    -- Focus the input window for editing
+    vim.api.nvim_set_current_win(M.state.input_win_id)
+    -- Place cursor at the beginning for easy editing
+    vim.api.nvim_win_set_cursor(M.state.input_win_id, {1, 0})
+    vim.cmd("startinsert")
+  end
+end
+
+-- Ask about the current buffer
+function M.ask_buffer()
+  -- First ensure the popup is open
+  if not M.state.is_visible then
+    M.create_popup()
+  end
+  
+  -- Get the buffer content and filetype
+  local content = M.get_buffer_content()
+  local filetype = M.get_current_filetype()
+  
+  -- Format as a prompt with code context
+  local prompt = "Please help me understand this " .. filetype .. " file:\n\n" .. 
+                 M.format_code_context(content, filetype)
+  
+  -- Fill the prompt but don't submit automatically
+  M.fill_prompt_and_submit(prompt, false)
+end
+
+-- Get selection from line range (for commands called with range)
+function M.get_selection_from_range(start_line, end_line)
+  -- Get the selected lines from the buffer
+  local lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
+  
+  -- Join the lines with newlines
+  return table.concat(lines, '\n')
+end
+
+-- Ask about the current selection (supports range)
+function M.ask_selection(opts)
+  local selection = ""
+  
+  -- Get the selection either from the range or visual selection marks
+  if opts.range > 0 then
+    selection = M.get_selection_from_range(opts.line1, opts.line2)
+  else
+    selection = M.get_visual_selection()
+  end
+  
+  -- Check if we have a valid selection
+  if selection == "" then
+    vim.notify("No text selected. Please select some code first.", vim.log.levels.WARN)
+    return
+  end
+  
+  -- Get filetype
+  local filetype = M.get_current_filetype()
+  
+  -- Ensure the popup is open
+  if not M.state.is_visible then
+    M.create_popup()
+  end
+  
+  -- Format as a prompt with code context
+  local prompt = "Please help me understand this code:\n\n" .. 
+                 M.format_code_context(selection, filetype)
+  
+  -- Fill the prompt but don't submit automatically
+  M.fill_prompt_and_submit(prompt, false)
+  
+  -- Notify the user
+  vim.notify("Selection added to Claude prompt", vim.log.levels.INFO)
+end
+
+-- Direct API call without using the popup UI
+function M.call_claude_api_directly(system_prompt, user_prompt, callback)
+  -- Format messages for Claude API
+  local messages = {
+    { role = "system", content = system_prompt },
+    { role = "user", content = user_prompt }
+  }
+  
+  -- Show a thinking/progress indicator
+  local spinner = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
+  local spinner_idx = 1
+  local spinner_timer
+  
+  local status_buf = vim.api.nvim_create_buf(false, true)
+  local status_win
+  
+  local function show_status()
+    -- Calculate window dimensions
+    local width = 30
+    local height = 3
+    local win_opts = {
+      relative = "editor",
+      width = width,
+      height = height,
+      row = math.floor((vim.o.lines - height) / 2),
+      col = math.floor((vim.o.columns - width) / 2),
+      style = "minimal",
+      border = "rounded",
+      title = " Claude Thinking... "
+    }
+    
+    status_win = vim.api.nvim_open_win(status_buf, false, win_opts)
+    
+    -- Set content
+    vim.api.nvim_buf_set_lines(status_buf, 0, -1, false, {
+      "",
+      "  " .. spinner[spinner_idx] .. " Processing request..."
+    })
+    
+    -- Start spinner animation
+    spinner_timer = vim.loop.new_timer()
+    spinner_timer:start(0, 100, vim.schedule_wrap(function()
+      spinner_idx = (spinner_idx % #spinner) + 1
+      if status_buf and vim.api.nvim_buf_is_valid(status_buf) then
+        vim.api.nvim_buf_set_lines(status_buf, 1, 2, false, {
+          "  " .. spinner[spinner_idx] .. " Processing request..."
+        })
+      else
+        if spinner_timer then
+          spinner_timer:stop()
+          spinner_timer:close()
+          spinner_timer = nil
+        end
+      end
+    end))
+  end
+  
+  local function hide_status()
+    if spinner_timer then
+      spinner_timer:stop()
+      spinner_timer:close()
+      spinner_timer = nil
+    end
+    
+    if status_win and vim.api.nvim_win_is_valid(status_win) then
+      vim.api.nvim_win_close(status_win, true)
+      status_win = nil
+    end
+    
+    if status_buf and vim.api.nvim_buf_is_valid(status_buf) then
+      vim.api.nvim_buf_delete(status_buf, { force = true })
+      status_buf = nil
+    end
+  end
+  
+  -- Show the thinking status window
+  show_status()
+  
+  -- Get API key (reusing the existing function)
+  local api_key = M.get_api_key()
+  if not api_key then
+    hide_status()
+    vim.notify("API key not found", vim.log.levels.ERROR)
+    return
+  end
+  
+  -- Format the messages
+  local formatted_messages = M.format_messages_for_api(messages)
+  
+  -- Prepare the request data
+  local request_data = {
+    model = config.api.model,
+    max_tokens = config.api.max_tokens,
+    temperature = config.api.temperature,
+    messages = formatted_messages,
+  }
+  
+  -- Convert request data to JSON
+  local json_data = vim.fn.json_encode(request_data)
+  
+  -- Create a temporary file for curl output
+  local temp_file = os.tmpname()
+  
+  -- Create the curl command
+  local cmd = string.format(
+    "curl -s -X POST %s " ..
+    "-H 'x-api-key: %s' " ..
+    "-H 'anthropic-version: 2023-06-01' " ..
+    "-H 'content-type: application/json' " ..
+    "-d '%s' > %s",
+    config.api.endpoint,
+    api_key,
+    json_data:gsub("'", "'\\''"), -- Escape single quotes
+    temp_file
+  )
+  
+  -- Run the curl command in the background
+  vim.fn.jobstart(cmd, {
+    on_exit = function(_, exit_code)
+      hide_status()
+      
+      if exit_code ~= 0 then
+        vim.notify("API request failed with exit code: " .. exit_code, vim.log.levels.ERROR)
+        return
+      end
+      
+      -- Read response from temp file
+      local file = io.open(temp_file, "r")
+      if not file then
+        vim.notify("Failed to read API response", vim.log.levels.ERROR)
+        return
+      end
+      
+      local response = file:read("*all")
+      file:close()
+      os.remove(temp_file)
+      
+      -- Parse JSON response
+      local ok, parsed = pcall(vim.fn.json_decode, response)
+      if not ok or not parsed then
+        vim.notify("Failed to parse API response", vim.log.levels.ERROR)
+        return
+      end
+      
+      -- Check for API errors
+      if parsed.error then
+        vim.notify("API error: " .. (parsed.error.message or "Unknown error"), vim.log.levels.ERROR)
+        return
+      end
+      
+      -- Extract response content
+      local content = parsed.content or {}
+      local response_text = ""
+      
+      -- Get text from all text blocks
+      for _, part in ipairs(content) do
+        if part.type == "text" then
+          response_text = response_text .. part.text
+        end
+      end
+      
+      -- Call the callback with the response
+      if callback then
+        callback(response_text)
+      end
+    end
+  })
+end
+
+-- Replace code in buffer with Claude's output
+function M.inline_code_replacement(start_line, end_line, selection, filetype, action_type)
+  -- Define system prompts for different actions
+  local system_prompts = {
+    improve = "You are an expert programmer tasked with improving code. Focus on readability, performance, and best practices. Maintain the same functionality. Return ONLY the improved code WITHOUT explanations, comments about changes, markdown formatting, or code block indicators. The output should be plain code that can be directly inserted into the file.",
+    
+    implement = "You are an expert programmer tasked with implementing code based on comments or specifications. Write clean, efficient code following best practices. Return ONLY the implemented code WITHOUT explanations, markdown formatting, or code block indicators. The output should be plain code that can be directly inserted into the file."
+  }
+  
+  -- Create user prompt
+  local user_prompt = "Here is " .. filetype .. " code to " .. action_type .. ". Return ONLY the " .. 
+                     action_type .. "d code without any explanations, just the plain code:\n\n" .. selection
+  
+  -- Call Claude API directly
+  M.call_claude_api_directly(system_prompts[action_type], user_prompt, function(response)
+    -- Clean any potential code block formatting from the response
+    response = response:gsub("^```[%w_]*\n", ""):gsub("\n```$", "")
+    
+    -- Replace the code in the buffer
+    vim.api.nvim_buf_set_lines(0, start_line - 1, end_line, false, vim.split(response, "\n"))
+    
+    -- Notify the user of success
+    vim.notify("Code successfully " .. action_type .. "d", vim.log.levels.INFO)
+  end)
+end
+
+-- Perform a specific code action on the selection
+function M.code_action(action_type)
+  return function(opts)
+    local selection = ""
+    local start_line, end_line = 0, 0
+    
+    -- Get the selection either from the range or visual selection marks
+    if opts.range > 0 then
+      selection = M.get_selection_from_range(opts.line1, opts.line2)
+      start_line = opts.line1
+      end_line = opts.line2
+    else
+      -- Fallback to visual marks if range not provided
+      start_line = vim.fn.line("'<")
+      end_line = vim.fn.line("'>")
+      selection = M.get_visual_selection()
+    end
+    
+    -- Check if we have a valid selection
+    if selection == "" then
+      vim.notify("No text selected. Please select some code first.", vim.log.levels.WARN)
+      return
+    end
+    
+    -- Get filetype
+    local filetype = M.get_current_filetype()
+    
+    -- For explain and analyze actions, use the popup
+    if action_type == "explain" or action_type == "analyze" then
+      -- Ensure the popup is open
+      if not M.state.is_visible then
+        M.create_popup()
+      end
+      
+      -- Get the appropriate prompt for this action
+      local action_prompt = config.code_prompts[action_type] or "Please help with this code:"
+      
+      -- Format the complete prompt
+      local prompt = action_prompt .. "\n\n" .. M.format_code_context(selection, filetype)
+      
+      -- Fill the prompt and submit automatically for code actions
+      M.fill_prompt_and_submit(prompt, true)
+      
+      -- Notify the user
+      vim.notify("Asking Claude to " .. action_type .. " the selected code", vim.log.levels.INFO)
+    else
+      -- For improve and implement actions, replace the code inline
+      vim.notify("Processing " .. action_type .. " request...", vim.log.levels.INFO)
+      M.inline_code_replacement(start_line, end_line, selection, filetype, action_type)
+    end
+  end
 end
 
 -- ============================================================================

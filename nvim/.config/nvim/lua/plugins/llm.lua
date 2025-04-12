@@ -38,9 +38,14 @@ return {
     config = function()
       require('claude-popup').setup({
         keymaps = {
-          toggle = "<leader>cc",  -- Toggle Claude popup visibility
-          submit = "<C-s>",       -- Submit a message in insert mode
-          clear = "<C-l>",        -- Clear the chat history
+          toggle = "<leader>cc",         -- Toggle Claude popup visibility
+          submit = "<C-s>",              -- Submit a message in insert mode
+          clear = "<C-l>",               -- Clear the chat history
+          ask_buffer = "<leader>ca",     -- Ask about current buffer
+          ask_selection = "<leader>cs",  -- Ask about selected code
+          improve_selection = "<leader>ci", -- Ask Claude to improve selected code
+          explain_selection = "<leader>ce",  -- Ask Claude to explain selected code
+          implement_comment = "<leader>cp", -- Ask Claude to implement code from comment
         },
         ui = {
           width = 0.7,           -- Width as percentage of screen
@@ -50,7 +55,13 @@ return {
         },
         chat = {
           save_history = true,   -- Save chat history between sessions
-          initial_message = "Hello! I'm Claude. Here's how to use this chat:\n\n• Type your message and press Enter in normal mode to submit\n• Use C-s in insert mode to submit\n• Press Esc to exit insert mode, then use <leader>cc to toggle the window",
+          initial_message = "Hello! I'm Claude. Here's how to use this chat:\n\n• Type your message and press Enter in normal mode to submit\n• Use C-s in insert mode to submit\n• Press Esc to exit insert mode, then use <leader>cc to toggle the window\n• Use <leader>cs in visual mode to send selected code\n• Use <leader>ce to explain selected code\n• Use <leader>ci to improve selected code\n• Use <leader>cp to implement code from comments",
+        },
+        code_prompts = {
+          improve = "Please improve this code. Consider performance, readability, error handling, and best practices:",
+          explain = "Please explain what this code does in detail:",
+          implement = "Please implement code based on this comment/specification:",
+          analyze = "Please analyze this code for potential issues, bugs, or improvements:",
         }
       })
     end
