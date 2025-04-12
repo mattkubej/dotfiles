@@ -4,8 +4,9 @@ return {
     dependencies = { 'nvim-lua/plenary.nvim' },
     config = function()
       local system_prompt =
-        'You should replace the code that you are sent, only following the comments. Do not talk at all. Only output valid code. Do not provide any backticks that surround the code. Never ever output backticks like this ```. Any comment that is asking you for something should be removed after you satisfy them. Other comments should left alone. Do not output backticks'
-      local helpful_prompt = 'You are a helpful assistant. What I have sent are my notes so far. You are very curt, yet helpful.'
+      'You should replace the code that you are sent, only following the comments. Do not talk at all. Only output valid code. Do not provide any backticks that surround the code. Never ever output backticks like this ```. Any comment that is asking you for something should be removed after you satisfy them. Other comments should left alone. Do not output backticks'
+      local helpful_prompt =
+      'You are a helpful assistant. What I have sent are my notes so far. You are very curt, yet helpful.'
       local llm = require('llm')
 
       local function anthropic_help()
@@ -32,4 +33,27 @@ return {
       vim.keymap.set({ 'n', 'v' }, '<leader>l', anthropic_replace, { desc = 'llm anthropic' })
     end,
   },
+  {
+    dir = '~/.config/nvim/lua/local-plugins/claude-popup.nvim',
+    config = function()
+      require('claude-popup').setup({
+        keymaps = {
+          toggle = "<leader>cc",  -- Toggle Claude popup visibility
+          submit = "<C-CR>",      -- Submit a message (for config, actual bindings are hardcoded)
+          close = "q",            -- Close the popup
+          clear = "<C-l>",        -- Clear the chat history
+        },
+        ui = {
+          width = 0.7,           -- Width as percentage of screen
+          height = 0.6,          -- Height as percentage of screen
+          border = "rounded",    -- Border style
+          title = " Claude AI (Enter=submit, Esc/q=close) ",  -- Remind user how to use
+        },
+        chat = {
+          save_history = true,   -- Save chat history between sessions
+          initial_message = "Hello! I'm Claude. Here's how to use this chat:\n\n• Type your message and press Enter in normal mode to submit\n• Use C-c C-c in insert mode to submit\n• Press Esc, q, <leader>cc, or C-q (insert mode) to close",
+        }
+      })
+    end
+  }
 }
