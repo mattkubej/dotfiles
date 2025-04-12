@@ -49,8 +49,7 @@ local default_config = {
   -- Keymappings
   keymaps = {
     toggle = "<leader>cc", -- Toggle Claude popup visibility
-    submit = "<C-CR>",     -- Submit a message
-    close = "q",           -- Close the popup
+    submit = "<C-s>",      -- Submit a message in insert mode
     clear = "<C-l>",       -- Clear the chat history
   },
 
@@ -353,11 +352,10 @@ function M.create_popup()
 
   -- Set local keymaps for both the main window and input window
   local buffer_maps = {
-    [config.keymaps.close] = "lua require('claude-popup').close_popup()",
     [config.keymaps.clear] = "lua require('claude-popup').clear_chat()",
-    ["<Esc>"] = "lua require('claude-popup').close_popup()",
-    ["<C-[>"] = "lua require('claude-popup').close_popup()",
-    ["<leader>cc"] = "lua require('claude-popup').close_popup()",
+    ["<Esc>"] = "lua require('claude-popup').toggle_popup()",
+    ["<C-[>"] = "lua require('claude-popup').toggle_popup()",
+    [config.keymaps.toggle] = "lua require('claude-popup').toggle_popup()",
   }
 
   -- Apply keymaps to both windows
@@ -371,19 +369,19 @@ function M.create_popup()
     end
   end
 
-  -- Special case for Escape in insert mode - we want it to go to normal mode first
+  -- Simple escape to normal mode for insert mode
   vim.api.nvim_buf_set_keymap(
     M.state.input_buf_id,
     "i",
     "<C-q>",
-    "<Esc>:lua require('claude-popup').close_popup()<CR>",
+    "<Esc>",
     { noremap = true, silent = true }
   )
 
   -- Set keymaps for the input buffer
   -- Simple, ergonomic keymappings:
   -- 1. Enter in normal mode to submit
-  -- 2. Ctrl+Enter in insert mode to submit
+  -- 2. Ctrl+c in insert mode to submit (single press)
 
   -- Enter key in normal mode - the primary submission method
   vim.api.nvim_buf_set_keymap(
@@ -404,11 +402,11 @@ function M.create_popup()
     { noremap = true, silent = true }
   )
 
-  -- Alternative for insert mode - more likely to work in all terminals
+  -- More ergonomic alternative for insert mode - single key press
   vim.api.nvim_buf_set_keymap(
     M.state.input_buf_id,
     "i",
-    "<C-c><C-c>",
+    "<C-s>",
     "<Esc>:lua require('claude-popup').submit_message()<CR>",
     { noremap = true, silent = true }
   )

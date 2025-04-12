@@ -39,19 +39,18 @@ return {
       require('claude-popup').setup({
         keymaps = {
           toggle = "<leader>cc",  -- Toggle Claude popup visibility
-          submit = "<C-CR>",      -- Submit a message (for config, actual bindings are hardcoded)
-          close = "q",            -- Close the popup
+          submit = "<C-s>",       -- Submit a message in insert mode
           clear = "<C-l>",        -- Clear the chat history
         },
         ui = {
           width = 0.7,           -- Width as percentage of screen
           height = 0.6,          -- Height as percentage of screen
           border = "rounded",    -- Border style
-          title = " Claude AI (Enter=submit, Esc/q=close) ",  -- Remind user how to use
+          title = " Claude AI (Enter=submit in normal mode, C-s=submit in insert) ",  -- Remind user how to use
         },
         chat = {
           save_history = true,   -- Save chat history between sessions
-          initial_message = "Hello! I'm Claude. Here's how to use this chat:\n\n• Type your message and press Enter in normal mode to submit\n• Use C-c C-c in insert mode to submit\n• Press Esc, q, <leader>cc, or C-q (insert mode) to close",
+          initial_message = "Hello! I'm Claude. Here's how to use this chat:\n\n• Type your message and press Enter in normal mode to submit\n• Use C-s in insert mode to submit\n• Press Esc to exit insert mode, then use <leader>cc to toggle the window",
         }
       })
     end
