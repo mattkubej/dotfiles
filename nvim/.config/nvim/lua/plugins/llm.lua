@@ -41,7 +41,7 @@ return {
           toggle = "<leader>cc",         -- Toggle Claude popup visibility
           submit = "<C-s>",              -- Submit a message in insert mode
           clear = "<C-l>",               -- Clear the chat history
-          ask_buffer = "<leader>ca",     -- Ask about current buffer
+          ask_buffer = "<leader>cb",     -- Ask about current buffer
           ask_selection = "<leader>cs",  -- Ask about selected code
           improve_selection = "<leader>ci", -- Ask Claude to improve selected code
           explain_selection = "<leader>ce",  -- Ask Claude to explain selected code

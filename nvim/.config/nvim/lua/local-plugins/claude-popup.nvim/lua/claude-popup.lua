@@ -49,11 +49,11 @@ local default_config = {
 
   -- Keymappings
   keymaps = {
-    toggle = "<leader>cc",          -- Toggle Claude popup visibility
-    submit = "<C-s>",               -- Submit a message in insert mode
-    clear = "<C-l>",                -- Clear the chat history
-    ask_buffer = "<leader>cb",      -- Ask about current buffer (adds buffer context)
-    ask_selection = "<leader>cs",   -- Ask about selected code (adds selection context)
+    toggle = "<leader>cc",            -- Toggle Claude popup visibility
+    submit = "<C-s>",                 -- Submit a message in insert mode
+    clear = "<C-l>",                  -- Clear the chat history
+    ask_buffer = "<leader>cb",        -- Ask about current buffer (adds buffer context)
+    ask_selection = "<leader>cs",     -- Ask about selected code (adds selection context)
     improve_selection = "<leader>ci", -- Ask Claude to improve selected code
     explain_selection = "<leader>ce", -- Ask Claude to explain selected code
     implement_comment = "<leader>cp", -- Ask Claude to implement code from comment selection
@@ -65,38 +65,45 @@ local default_config = {
     history_file = vim.fn.stdpath("data") .. "/claude_history.json", -- Chat history location
     initial_message = "Hello! I'm Claude. How can I help you with your code today?",
   },
-  
+
   -- Code interaction prompts
   code_prompts = {
     -- Predefined prompts for different code interactions (detail is hidden from UI)
     improve = {
       summary = "Improving selected code...",
-      prompt = "As an expert programmer, please improve this code. Focus on:\n- Performance optimization\n- Better readability and code organization\n- Proper error handling and edge cases\n- Following language-specific best practices and idioms\n- Maintaining the original functionality\n\nProvide only the improved code without explanations unless there's something critical I should know:",
+      prompt =
+      "As an expert programmer, please improve this code. Focus on:\n- Performance optimization\n- Better readability and code organization\n- Proper error handling and edge cases\n- Following language-specific best practices and idioms\n- Maintaining the original functionality\n\nProvide only the improved code without explanations unless there's something critical I should know:",
     },
     explain = {
       summary = "Explaining selected code...",
-      prompt = "Please explain this code comprehensively:\n- Overall purpose and functionality\n- How each part contributes to the whole\n- Key algorithms or patterns used\n- Any non-obvious techniques or optimizations\n- Potential edge cases or limitations\n- Context of how this would fit into a larger system\n\nFormat your explanation clearly with sections and bullet points where appropriate:",
+      prompt =
+      "Please explain this code comprehensively:\n- Overall purpose and functionality\n- How each part contributes to the whole\n- Key algorithms or patterns used\n- Any non-obvious techniques or optimizations\n- Potential edge cases or limitations\n- Context of how this would fit into a larger system\n\nFormat your explanation clearly with sections and bullet points where appropriate:",
     },
     implement = {
       summary = "Implementing code from comments...",
-      prompt = "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:",
+      prompt =
+      "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:",
     },
     -- Add alias for implement_comment
     implement_comment = {
       summary = "Implementing code from comments...",
-      prompt = "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:",
+      prompt =
+      "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:",
     },
     analyze = {
       summary = "Analyzing code for issues and improvements...",
-      prompt = "Please analyze this code for:\n- Potential bugs or edge cases\n- Performance bottlenecks\n- Security vulnerabilities\n- Code smells or maintenance issues\n- Opportunities for simplification\n- Adherence to best practices\n\nOrganize your analysis by priority, focusing on the most important issues first:",
+      prompt =
+      "Please analyze this code for:\n- Potential bugs or edge cases\n- Performance bottlenecks\n- Security vulnerabilities\n- Code smells or maintenance issues\n- Opportunities for simplification\n- Adherence to best practices\n\nOrganize your analysis by priority, focusing on the most important issues first:",
     },
     buffer = {
       summary = "Analyzing current file...",
-      prompt = "Please help me understand this file. I'd like you to:\n- Summarize the overall purpose and functionality\n- Identify key components, classes, or functions\n- Explain the relationships between different parts\n- Note any interesting patterns or techniques used\n- Highlight potential issues or areas for improvement\n\nPlease be thorough but prioritize the most important aspects:",
+      prompt =
+      "Please help me understand this file. I'd like you to:\n- Summarize the overall purpose and functionality\n- Identify key components, classes, or functions\n- Explain the relationships between different parts\n- Note any interesting patterns or techniques used\n- Highlight potential issues or areas for improvement\n\nPlease be thorough but prioritize the most important aspects:",
     },
     custom = {
       summary = "Discussing selected code...",
-      prompt = "I've selected some code and would like your insights on it. Please help me understand or improve this code based on our conversation.",
+      prompt =
+      "I've selected some code and would like your insights on it. Please help me understand or improve this code based on our conversation.",
     },
   },
 }
@@ -113,7 +120,7 @@ function M.setup(user_config)
   vim.api.nvim_create_user_command("ClaudeToggle", M.toggle_popup, {})
   vim.api.nvim_create_user_command("ClaudeClear", M.clear_chat, {})
   vim.api.nvim_create_user_command("ClaudeAskBuffer", M.ask_buffer, {})
-  
+
   -- Commands that work with selection need to allow range
   vim.api.nvim_create_user_command("ClaudeAskSelection", M.ask_selection, { range = true })
   vim.api.nvim_create_user_command("ClaudeImproveSelection", M.code_action("improve"), { range = true })
@@ -146,7 +153,7 @@ function M.setup(user_config)
       )
     end
   end
-  
+
   -- Set up visual mode mappings
   for key, keymap_info in pairs(visual_keymaps) do
     if config.keymaps[key] then
@@ -170,16 +177,16 @@ end
 -- Initialize plugin state
 function M.init_state()
   M.state = {
-    buf_id = nil,             -- Buffer ID for the popup
-    win_id = nil,             -- Window ID for the popup
-    input_buf_id = nil,       -- Buffer ID for the input field
-    input_win_id = nil,       -- Window ID for the input field
-    is_visible = false,       -- Whether the popup is currently visible
-    waiting_response = false, -- Whether we're waiting for a response
-    chat_history = {},        -- Chat history
-    message_marks = {},       -- Marks for each message in history
-    selected_code = nil,      -- Selected code for custom queries
-    stored_custom_prompt = nil, -- Stored prompt template for custom queries
+    buf_id = nil,                      -- Buffer ID for the popup
+    win_id = nil,                      -- Window ID for the popup
+    input_buf_id = nil,                -- Buffer ID for the input field
+    input_win_id = nil,                -- Window ID for the input field
+    is_visible = false,                -- Whether the popup is currently visible
+    waiting_response = false,          -- Whether we're waiting for a response
+    chat_history = {},                 -- Chat history
+    message_marks = {},                -- Marks for each message in history
+    selected_code = nil,               -- Selected code for custom queries
+    stored_custom_prompt = nil,        -- Stored prompt template for custom queries
     thinking_indicator_active = false, -- Whether a thinking indicator is currently showing
     original_assistant_message = nil,  -- Original content of assistant message before adding thinking indicator
   }
@@ -273,7 +280,7 @@ function M.send_to_claude(messages, callback)
 
   -- Convert request data to JSON and ensure it's properly escaped
   local json_data = vim.fn.json_encode(request_data)
-  
+
   -- Create a temporary file for the request data
   local request_file = os.tmpname()
   local file = io.open(request_file, "w")
@@ -282,11 +289,11 @@ function M.send_to_claude(messages, callback)
     vim.notify("Failed to create temporary file for request", vim.log.levels.ERROR)
     return
   end
-  
+
   -- Write the JSON data to the file
   file:write(json_data)
   file:close()
-  
+
   -- Create a temporary file for curl output
   local temp_file = os.tmpname()
 
@@ -308,7 +315,7 @@ function M.send_to_claude(messages, callback)
 
   -- Show thinking indicator
   M.add_thinking_indicator()
-  
+
   -- Keep focus in the input window while waiting for response
   if M.state.input_win_id and vim.api.nvim_win_is_valid(M.state.input_win_id) then
     vim.api.nvim_set_current_win(M.state.input_win_id)
@@ -386,12 +393,29 @@ end
 -- Code Context Helper Functions
 -- ============================================================================
 
--- Get the content of the current buffer
+-- Modified function to properly get buffer content
 function M.get_buffer_content()
+  -- Get the buffer number of the current buffer
   local bufnr = vim.api.nvim_get_current_buf()
+
+  -- Get file path to confirm which buffer we're using (for debugging)
+  local file_path = vim.api.nvim_buf_get_name(bufnr)
+
+  -- Get buffer lines
   local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-  return table.concat(lines, "\n")
+  local content = table.concat(lines, "\n")
+
+  -- Log information for debugging
+  vim.notify("Reading buffer #" .. bufnr .. " (" .. file_path .. ") with " .. #lines .. " lines", vim.log.levels.INFO)
+
+  -- If content is empty, notify to help diagnose the issue
+  if content == "" then
+    vim.notify("Warning: Buffer content appears to be empty", vim.log.levels.WARN)
+  end
+
+  return content
 end
+
 
 -- Get the filetype of the current buffer
 function M.get_current_filetype()
@@ -403,28 +427,28 @@ function M.get_visual_selection()
   -- Get the line numbers of the selection
   local start_line = vim.fn.line("'<")
   local end_line = vim.fn.line("'>")
-  
+
   -- Safety check for valid selection
   if start_line <= 0 or end_line <= 0 then
     vim.notify("No valid selection marks found", vim.log.levels.WARN)
     return ""
   end
-  
-  -- Get the columns of the selection 
+
+  -- Get the columns of the selection
   local start_col = vim.fn.col("'<")
   local end_col = vim.fn.col("'>")
-  
+
   -- Get the selection mode that was used
   local mode = vim.fn.visualmode()
-  
+
   -- Get the selected lines from the buffer
   local lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
-  
+
   -- Nothing was selected
   if #lines == 0 then
     return ""
   end
-  
+
   -- If it's just one line, extract the substring
   if #lines == 1 and mode == 'v' then
     lines[1] = string.sub(lines[1], start_col, end_col)
@@ -434,9 +458,9 @@ function M.get_visual_selection()
     lines[1] = string.sub(lines[1], start_col)
     lines[#lines] = string.sub(lines[#lines], 1, end_col)
   end
-  
+
   -- Line-wise (V) and block-wise (^V) modes will just use the full lines
-  
+
   -- Join the lines and return
   return table.concat(lines, '\n')
 end
@@ -450,7 +474,7 @@ end
 function M.fill_prompt_and_submit(prompt, auto_submit)
   -- Set the prompt in the input buffer
   vim.api.nvim_buf_set_lines(M.state.input_buf_id, 0, -1, false, vim.split(prompt, "\n"))
-  
+
   if auto_submit then
     -- Submit immediately
     vim.defer_fn(function()
@@ -460,7 +484,7 @@ function M.fill_prompt_and_submit(prompt, auto_submit)
     -- Focus the input window for editing
     vim.api.nvim_set_current_win(M.state.input_win_id)
     -- Place cursor at the beginning for easy editing
-    vim.api.nvim_win_set_cursor(M.state.input_win_id, {1, 0})
+    vim.api.nvim_win_set_cursor(M.state.input_win_id, { 1, 0 })
     vim.cmd("startinsert")
   end
 end
@@ -470,69 +494,82 @@ end
 function M.fill_prompt_and_submit_with_hidden_prompt(display_prompt, full_prompt)
   -- Set the display prompt in the input buffer (what user sees)
   vim.api.nvim_buf_set_lines(M.state.input_buf_id, 0, -1, false, vim.split(display_prompt, "\n"))
-  
+
   -- Submit with delay to ensure UI updates
   vim.defer_fn(function()
     -- Store original message to display
     local display_message = table.concat(vim.api.nvim_buf_get_lines(M.state.input_buf_id, 0, -1, false), "\n")
-    
+
     -- Replace with the full prompt before submission
     vim.api.nvim_buf_set_lines(M.state.input_buf_id, 0, -1, false, vim.split(full_prompt, "\n"))
-    
+
     -- Custom submit that preserves display message
     M.submit_message_with_display(display_message)
   end, 100)
 end
 
--- Ask about the current buffer
 function M.ask_buffer()
+  -- Store the original buffer number before opening popup
+  local original_bufnr = vim.api.nvim_get_current_buf()
+  local original_file = vim.api.nvim_buf_get_name(original_bufnr)
+
   -- First ensure the popup is open
   if not M.state.is_visible then
     M.create_popup()
   end
-  
-  -- Clear existing chat history for focused interaction
-  M.clear_chat(true) -- silent clear
-  
-  -- Get the buffer content and filetype
-  local content = M.get_buffer_content()
-  local filetype = M.get_current_filetype()
-  
-  -- Get the buffer prompt and add the code content
-  local summary = config.code_prompts.buffer.summary
-  local full_prompt = config.code_prompts.buffer.prompt .. "\n\n" ..
-                     M.format_code_context(content, filetype)
-  
-  -- Show summary in chat
-  M.add_message("assistant", summary)
-  
-  -- Show thinking indicator
-  M.add_thinking_indicator()
-  
-  -- Send directly to API without displaying user prompt
-  M.send_to_claude_silently(full_prompt, function(response)
-    -- Remove thinking indicator
-    M.remove_thinking_indicator()
-    
-    -- Add response to chat
-    M.add_message("assistant", response)
-    
-    -- Notify user when response is ready
-    vim.notify("Claude has responded!", vim.log.levels.INFO)
-    
-    -- Focus the input window again
-    if M.state.input_win_id and vim.api.nvim_win_is_valid(M.state.input_win_id) then
-      vim.api.nvim_set_current_win(M.state.input_win_id)
-      vim.cmd("startinsert")
+
+  -- Make sure we get content from the original buffer, not the popup
+  local content = ""
+  -- Check if original buffer is still valid
+  if vim.api.nvim_buf_is_valid(original_bufnr) then
+    -- Get the buffer content directly from the original buffer
+    local lines = vim.api.nvim_buf_get_lines(original_bufnr, 0, -1, false)
+    content = table.concat(lines, "\n")
+
+    -- Get the filetype of the original buffer
+    local filetype = vim.api.nvim_buf_get_option(original_bufnr, "filetype")
+
+    -- Clear existing chat history for focused interaction (optional)
+    M.clear_chat(true) -- silent clear
+
+    -- If content is empty, show warning instead of proceeding
+    if content == "" or content:match("^%s*$") then
+      M.add_message("assistant",
+        "The buffer appears to be empty. Please make sure you're in a buffer with content when using this command.")
+      return
     end
-  end)
+
+    -- Store a reference to the buffer content for message formatting
+    M.state.selected_code = M.format_code_context(content, filetype)
+    
+    -- Store the prompt template (hidden from UI)
+    local full_prompt = config.code_prompts.buffer.prompt
+    M.state.stored_custom_prompt = full_prompt
+
+    -- Show a user-friendly message in chat
+    M.add_message("assistant", "I'm ready to answer questions about this buffer. What would you like to know?")
+
+    -- For custom queries, we show a helpful placeholder in the input box
+    vim.api.nvim_buf_set_option(M.state.input_buf_id, "modifiable", true)
+    vim.api.nvim_buf_set_lines(M.state.input_buf_id, 0, -1, false, { "" })
+
+    -- Focus the input window for editing
+    vim.api.nvim_set_current_win(M.state.input_win_id)
+    vim.cmd("startinsert")
+
+    -- Notify the user
+    vim.notify("Buffer content ready. Type your question about this file.", vim.log.levels.INFO)
+  else
+    -- Handle case where original buffer is no longer valid
+    M.add_message("assistant", "Unable to retrieve buffer content. The original buffer may have been closed.")
+  end
 end
 
 -- Get selection from line range (for commands called with range)
 function M.get_selection_from_range(start_line, end_line)
   -- Get the selected lines from the buffer
   local lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
-  
+
   -- Join the lines with newlines
   return table.concat(lines, '\n')
 end
@@ -540,43 +577,43 @@ end
 -- Ask about the current selection (supports range)
 function M.ask_selection(opts)
   local selection = ""
-  
+
   -- Get the selection either from the range or visual selection marks
   if opts.range > 0 then
     selection = M.get_selection_from_range(opts.line1, opts.line2)
   else
     selection = M.get_visual_selection()
   end
-  
+
   -- Check if we have a valid selection
   if selection == "" then
     vim.notify("No text selected. Please select some code first.", vim.log.levels.WARN)
     return
   end
-  
+
   -- Get filetype
   local filetype = M.get_current_filetype()
-  
+
   -- Ensure the popup is open
   if not M.state.is_visible then
     M.create_popup()
   end
-  
+
   -- Clear existing chat history for focused interaction
   M.clear_chat(true) -- silent clear
-  
+
   -- Format as a prompt with code context
   local summary = config.code_prompts.custom.summary
-  local full_prompt = config.code_prompts.custom.prompt .. "\n\n" .. 
-                     M.format_code_context(selection, filetype)
-  
+  local full_prompt = config.code_prompts.custom.prompt .. "\n\n" ..
+      M.format_code_context(selection, filetype)
+
   -- Show summary in chat
   M.add_message("assistant", summary)
-  
+
   -- For custom queries, we show a helpful placeholder in the input box
   vim.api.nvim_buf_set_option(M.state.input_buf_id, "modifiable", true)
   vim.api.nvim_buf_set_lines(M.state.input_buf_id, 0, -1, false, { "" })
-  
+
   -- Set a placeholder that will be cleared when the user starts typing
   vim.fn.prompt_setprompt(M.state.input_buf_id, "")
   if vim.fn.exists("*setbuflinepre") == 1 then
@@ -586,19 +623,20 @@ function M.ask_selection(opts)
     -- Older Neovim version
     vim.api.nvim_buf_set_option(M.state.input_buf_id, "buftype", "prompt")
   end
-  
+
   -- Display selected code as part of Claude's message
-  M.state.chat_history[#M.state.chat_history].content = M.state.chat_history[#M.state.chat_history].content .. "\n\n" .. M.format_code_context(selection, filetype)
+  M.state.chat_history[#M.state.chat_history].content = M.state.chat_history[#M.state.chat_history].content ..
+  "\n\n" .. M.format_code_context(selection, filetype)
   M.display_chat_history()
-  
+
   -- Focus the input window for editing
   vim.api.nvim_set_current_win(M.state.input_win_id)
   vim.cmd("startinsert")
-  
+
   -- Store a reference to the selected code for message formatting
   M.state.selected_code = M.format_code_context(selection, filetype)
   M.state.stored_custom_prompt = config.code_prompts.custom.prompt
-  
+
   -- Notify the user
   vim.notify("Code selection ready. Type your question or press Enter to analyze.", vim.log.levels.INFO)
 end
@@ -609,10 +647,10 @@ function M.call_claude_api_directly(system_prompt, user_prompt, callback)
   local spinner = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
   local spinner_idx = 1
   local spinner_timer
-  
+
   local status_buf = vim.api.nvim_create_buf(false, true)
   local status_win
-  
+
   local function show_status()
     -- Calculate window dimensions
     local width = 30
@@ -627,15 +665,15 @@ function M.call_claude_api_directly(system_prompt, user_prompt, callback)
       border = "rounded",
       title = " Claude Thinking... "
     }
-    
+
     status_win = vim.api.nvim_open_win(status_buf, false, win_opts)
-    
+
     -- Set content
     vim.api.nvim_buf_set_lines(status_buf, 0, -1, false, {
       "",
       "  " .. spinner[spinner_idx] .. " Processing request..."
     })
-    
+
     -- Start spinner animation
     spinner_timer = vim.loop.new_timer()
     spinner_timer:start(0, 100, vim.schedule_wrap(function()
@@ -653,28 +691,28 @@ function M.call_claude_api_directly(system_prompt, user_prompt, callback)
       end
     end))
   end
-  
+
   local function hide_status()
     if spinner_timer then
       spinner_timer:stop()
       spinner_timer:close()
       spinner_timer = nil
     end
-    
+
     if status_win and vim.api.nvim_win_is_valid(status_win) then
       vim.api.nvim_win_close(status_win, true)
       status_win = nil
     end
-    
+
     if status_buf and vim.api.nvim_buf_is_valid(status_buf) then
       vim.api.nvim_buf_delete(status_buf, { force = true })
       status_buf = nil
     end
   end
-  
+
   -- Show the thinking status window
   show_status()
-  
+
   -- Get API key (reusing the existing function)
   local api_key = M.get_api_key()
   if not api_key then
@@ -682,12 +720,12 @@ function M.call_claude_api_directly(system_prompt, user_prompt, callback)
     vim.notify("API key not found", vim.log.levels.ERROR)
     return
   end
-  
+
   -- Format messages for Claude API - use system as top-level parameter
   local formatted_messages = {
     { role = "user", content = user_prompt }
   }
-  
+
   -- Prepare the request data
   local request_data = {
     model = config.api.model,
@@ -696,13 +734,13 @@ function M.call_claude_api_directly(system_prompt, user_prompt, callback)
     system = system_prompt,
     messages = formatted_messages,
   }
-  
+
   -- Convert request data to JSON
   local json_data = vim.fn.json_encode(request_data)
-  
+
   -- Create a temporary file for curl output
   local temp_file = os.tmpname()
-  
+
   -- Create the curl command
   local cmd = string.format(
     "curl -s -X POST %s " ..
@@ -715,52 +753,52 @@ function M.call_claude_api_directly(system_prompt, user_prompt, callback)
     json_data:gsub("'", "'\\''"), -- Escape single quotes
     temp_file
   )
-  
+
   -- Run the curl command in the background
   vim.fn.jobstart(cmd, {
     on_exit = function(_, exit_code)
       hide_status()
-      
+
       if exit_code ~= 0 then
         vim.notify("API request failed with exit code: " .. exit_code, vim.log.levels.ERROR)
         return
       end
-      
+
       -- Read response from temp file
       local file = io.open(temp_file, "r")
       if not file then
         vim.notify("Failed to read API response", vim.log.levels.ERROR)
         return
       end
-      
+
       local response = file:read("*all")
       file:close()
       os.remove(temp_file)
-      
+
       -- Parse JSON response
       local ok, parsed = pcall(vim.fn.json_decode, response)
       if not ok or not parsed then
         vim.notify("Failed to parse API response", vim.log.levels.ERROR)
         return
       end
-      
+
       -- Check for API errors
       if parsed.error then
         vim.notify("API error: " .. (parsed.error.message or "Unknown error"), vim.log.levels.ERROR)
         return
       end
-      
+
       -- Extract response content
       local content = parsed.content or {}
       local response_text = ""
-      
+
       -- Get text from all text blocks
       for _, part in ipairs(content) do
         if part.type == "text" then
           response_text = response_text .. part.text
         end
       end
-      
+
       -- Call the callback with the response
       if callback then
         callback(response_text)
@@ -773,44 +811,48 @@ end
 function M.inline_code_replacement(start_line, end_line, selection, filetype, action_type, custom_prompt)
   -- Define fallback system prompts for all action types
   local fallback_system_prompts = {
-    improve = "You are an expert programmer tasked with improving code. Focus on readability, performance, and best practices. Maintain the same functionality. Return ONLY the improved code WITHOUT explanations, comments about changes, markdown formatting, or code block indicators. The output should be plain code that can be directly inserted into the file.",
-    
-    implement = "You are an expert programmer tasked with implementing code based on comments or specifications. Write clean, efficient code following best practices. Return ONLY the implemented code WITHOUT explanations, markdown formatting, or code block indicators. The output should be plain code that can be directly inserted into the file.",
-    
-    implement_comment = "You are an expert programmer tasked with implementing code based on comments or specifications. Write clean, efficient code following best practices. Return ONLY the implemented code WITHOUT explanations, markdown formatting, or code block indicators. The output should be plain code that can be directly inserted into the file."
+    improve =
+    "You are an expert programmer tasked with improving code. Focus on readability, performance, and best practices. Maintain the same functionality. Return ONLY the improved code WITHOUT explanations, comments about changes, markdown formatting, or code block indicators. The output should be plain code that can be directly inserted into the file.",
+
+    implement =
+    "You are an expert programmer tasked with implementing code based on comments or specifications. Write clean, efficient code following best practices. Return ONLY the implemented code WITHOUT explanations, markdown formatting, or code block indicators. The output should be plain code that can be directly inserted into the file.",
+
+    implement_comment =
+    "You are an expert programmer tasked with implementing code based on comments or specifications. Write clean, efficient code following best practices. Return ONLY the implemented code WITHOUT explanations, markdown formatting, or code block indicators. The output should be plain code that can be directly inserted into the file."
   }
-  
+
   -- Get appropriate system prompt with fallback
   local system_prompt = fallback_system_prompts[action_type]
-  
+
   if not system_prompt then
     -- Default system prompt for any action type
-    system_prompt = "You are an expert programmer tasked with modifying code. Return ONLY the code without any explanations, markdown formatting, or code block indicators. The output should be plain code that can be directly inserted into the file."
+    system_prompt =
+    "You are an expert programmer tasked with modifying code. Return ONLY the code without any explanations, markdown formatting, or code block indicators. The output should be plain code that can be directly inserted into the file."
   end
-  
+
   -- Create user prompt
   local user_prompt
-  
+
   if custom_prompt then
     -- Use the enhanced prompt if provided
-    user_prompt = custom_prompt .. "\n\nHere is the " .. filetype .. " code:\n\n" .. selection .. 
-                 "\n\nReturn ONLY the code without explanations, markdown formatting or code block backticks."
+    user_prompt = custom_prompt .. "\n\nHere is the " .. filetype .. " code:\n\n" .. selection ..
+        "\n\nReturn ONLY the code without explanations, markdown formatting or code block backticks."
   else
     -- Fallback to basic prompt
-    user_prompt = "Here is " .. filetype .. " code to " .. action_type .. ". Return ONLY the " .. 
-                  action_type .. "d code without any explanations, just the plain code:\n\n" .. selection
+    user_prompt = "Here is " .. filetype .. " code to " .. action_type .. ". Return ONLY the " ..
+        action_type .. "d code without any explanations, just the plain code:\n\n" .. selection
   end
-  
+
   -- We already have a valid system prompt from our fallbacks
-  
+
   -- Call Claude API directly with the selected system prompt
   M.call_claude_api_directly(system_prompt, user_prompt, function(response)
     -- Clean any potential code block formatting from the response
     response = response:gsub("^```[%w_]*\n", ""):gsub("\n```$", "")
-    
+
     -- Replace the code in the buffer
     vim.api.nvim_buf_set_lines(0, start_line - 1, end_line, false, vim.split(response, "\n"))
-    
+
     -- Notify the user of success
     vim.notify("Code successfully " .. action_type .. "d", vim.log.levels.INFO)
   end)
@@ -821,7 +863,7 @@ function M.code_action(action_type)
   return function(opts)
     local selection = ""
     local start_line, end_line = 0, 0
-    
+
     -- Get the selection either from the range or visual selection marks
     if opts.range > 0 then
       selection = M.get_selection_from_range(opts.line1, opts.line2)
@@ -833,134 +875,141 @@ function M.code_action(action_type)
       end_line = vim.fn.line("'>")
       selection = M.get_visual_selection()
     end
-    
+
     -- Check if we have a valid selection
     if selection == "" then
       vim.notify("No text selected. Please select some code first.", vim.log.levels.WARN)
       return
     end
-    
+
     -- Get filetype
     local filetype = M.get_current_filetype()
-    
+
     -- For explain and analyze actions, use the popup with enhanced prompts
     if action_type == "explain" or action_type == "analyze" then
       -- Ensure the popup is open
       if not M.state.is_visible then
         M.create_popup()
       end
-      
+
       -- Clear existing chat history for focused interaction
       M.clear_chat(true) -- silent clear
-      
+
       -- Define emergency fallback prompts for common actions
       local fallback_prompts = {
         explain = {
           summary = "Explaining selected code...",
-          prompt = "Please explain this code comprehensively:\n- Overall purpose and functionality\n- How each part contributes to the whole\n- Key algorithms or patterns used\n- Any non-obvious techniques or optimizations\n- Potential edge cases or limitations\n\nFormat your explanation clearly with sections and bullet points where appropriate:"
+          prompt =
+          "Please explain this code comprehensively:\n- Overall purpose and functionality\n- How each part contributes to the whole\n- Key algorithms or patterns used\n- Any non-obvious techniques or optimizations\n- Potential edge cases or limitations\n\nFormat your explanation clearly with sections and bullet points where appropriate:"
         },
         analyze = {
           summary = "Analyzing code for issues and improvements...",
-          prompt = "Please analyze this code for:\n- Potential bugs or edge cases\n- Performance bottlenecks\n- Security vulnerabilities\n- Code smells or maintenance issues\n- Opportunities for simplification\n- Adherence to best practices\n\nOrganize your analysis by priority, focusing on the most important issues first:"
+          prompt =
+          "Please analyze this code for:\n- Potential bugs or edge cases\n- Performance bottlenecks\n- Security vulnerabilities\n- Code smells or maintenance issues\n- Opportunities for simplification\n- Adherence to best practices\n\nOrganize your analysis by priority, focusing on the most important issues first:"
         },
         improve = {
           summary = "Improving selected code...",
-          prompt = "As an expert programmer, please improve this code. Focus on:\n- Performance optimization\n- Better readability and code organization\n- Proper error handling and edge cases\n- Following language-specific best practices and idioms\n- Maintaining the original functionality\n\nProvide only the improved code without explanations unless there's something critical I should know:"
+          prompt =
+          "As an expert programmer, please improve this code. Focus on:\n- Performance optimization\n- Better readability and code organization\n- Proper error handling and edge cases\n- Following language-specific best practices and idioms\n- Maintaining the original functionality\n\nProvide only the improved code without explanations unless there's something critical I should know:"
         },
         implement = {
           summary = "Implementing code from comments...",
-          prompt = "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:"
+          prompt =
+          "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:"
         },
         implement_comment = {
           summary = "Implementing code from comments...",
-          prompt = "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:"
+          prompt =
+          "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:"
         }
       }
-      
+
       -- Get the appropriate prompt using the fallback if needed
       local prompt_info = fallback_prompts[action_type]
-      
+
       -- If it's available in config, use that instead
-      if config.code_prompts and config.code_prompts[action_type] and 
-         type(config.code_prompts[action_type]) == "table" and
-         config.code_prompts[action_type].summary and 
-         config.code_prompts[action_type].prompt then
-         prompt_info = config.code_prompts[action_type]
+      if config.code_prompts and config.code_prompts[action_type] and
+          type(config.code_prompts[action_type]) == "table" and
+          config.code_prompts[action_type].summary and
+          config.code_prompts[action_type].prompt then
+        prompt_info = config.code_prompts[action_type]
       end
-      
+
       -- Make sure we have valid prompt info
       if not prompt_info then
         vim.notify("Error: No valid prompt for action type '" .. action_type .. "'", vim.log.levels.ERROR)
         return
       end
-      
+
       -- Show summary in chat first
       M.add_message("assistant", prompt_info.summary)
-      
+
       -- Format the complete prompt (for sending to API)
       local full_prompt = prompt_info.prompt .. "\n\n" .. M.format_code_context(selection, filetype)
-      
+
       -- For specialized commands, we'll skip displaying user input and just send to API
-      
+
       -- Show thinking indicator
       M.add_thinking_indicator()
-      
+
       -- Send directly to API without displaying user prompt
       M.send_to_claude_silently(full_prompt, function(response)
         -- Remove thinking indicator
         M.remove_thinking_indicator()
-        
+
         -- Add response to chat
         M.add_message("assistant", response)
-        
+
         -- Notify user when response is ready
         vim.notify("Claude has responded!", vim.log.levels.INFO)
-        
+
         -- Focus the input window again
         if M.state.input_win_id and vim.api.nvim_win_is_valid(M.state.input_win_id) then
           vim.api.nvim_set_current_win(M.state.input_win_id)
           vim.cmd("startinsert")
         end
       end)
-      
     else
       -- For improve and implement actions, replace the code inline
       -- Define fallback prompts for inline replacements
       local fallback_prompts = {
         improve = {
           summary = "Improving selected code...",
-          prompt = "As an expert programmer, please improve this code. Focus on:\n- Performance optimization\n- Better readability and code organization\n- Proper error handling and edge cases\n- Following language-specific best practices and idioms\n- Maintaining the original functionality\n\nProvide only the improved code without explanations unless there's something critical I should know:"
+          prompt =
+          "As an expert programmer, please improve this code. Focus on:\n- Performance optimization\n- Better readability and code organization\n- Proper error handling and edge cases\n- Following language-specific best practices and idioms\n- Maintaining the original functionality\n\nProvide only the improved code without explanations unless there's something critical I should know:"
         },
         implement = {
           summary = "Implementing code from comments...",
-          prompt = "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:"
+          prompt =
+          "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:"
         },
         implement_comment = {
           summary = "Implementing code from comments...",
-          prompt = "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:"
+          prompt =
+          "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:"
         }
       }
-      
+
       -- Get prompt info with fallback
       local prompt_info = fallback_prompts[action_type]
-      
+
       -- If it's available in config, use that instead
-      if config.code_prompts and config.code_prompts[action_type] and 
-         type(config.code_prompts[action_type]) == "table" and
-         config.code_prompts[action_type].summary and 
-         config.code_prompts[action_type].prompt then
-         prompt_info = config.code_prompts[action_type]
+      if config.code_prompts and config.code_prompts[action_type] and
+          type(config.code_prompts[action_type]) == "table" and
+          config.code_prompts[action_type].summary and
+          config.code_prompts[action_type].prompt then
+        prompt_info = config.code_prompts[action_type]
       end
-      
+
       -- Make sure we have valid prompt info
       if not prompt_info then
         vim.notify("Error: No valid prompt for action type '" .. action_type .. "'", vim.log.levels.ERROR)
         return
       end
-      
+
       -- Notify the user with a better message
       vim.notify(prompt_info.summary, vim.log.levels.INFO)
-      
+
       -- Use enhanced prompts for better results
       M.inline_code_replacement(start_line, end_line, selection, filetype, action_type, prompt_info.prompt)
     end
@@ -976,12 +1025,12 @@ function M.create_popup()
   -- Calculate base dimensions
   local width = math.floor(vim.o.columns * config.ui.width)
   local total_height = math.floor(vim.o.lines * config.ui.height)
-  
+
   -- Calculate content height with padding
   local content_height = math.floor(total_height * 0.8) -- Use 80% of height for content
   local input_height = 3
-  local padding = 1 -- Add a line of padding between windows
-  
+  local padding = 1                                     -- Add a line of padding between windows
+
   -- Calculate window positions
   local total_used_height = content_height + padding + input_height + 2 -- +2 for both borders
   local row = math.floor((vim.o.lines - total_used_height) / 2)
@@ -998,13 +1047,13 @@ function M.create_popup()
     vim.api.nvim_buf_set_option(M.state.buf_id, "filetype", "markdown")
     vim.api.nvim_buf_set_option(M.state.buf_id, "modifiable", false)
     vim.api.nvim_buf_set_option(M.state.buf_id, "readonly", true)
-    
+
     -- Enable syntax highlighting
     vim.cmd("syntax enable")
   end
 
   -- Use the content height, input height, and padding calculated above
-  
+
   -- Create window for the popup content
   M.state.win_id = vim.api.nvim_open_win(M.state.buf_id, true, {
     relative = "editor",
@@ -1022,7 +1071,7 @@ function M.create_popup()
   for option, value in pairs(config.ui.win_options) do
     vim.api.nvim_win_set_option(M.state.win_id, option, value)
   end
-  
+
   -- Enable mouse support for scrolling
   vim.api.nvim_win_set_option(M.state.win_id, "mouse", "a")
 
@@ -1072,7 +1121,7 @@ function M.create_popup()
     ["G"] = "G",
     ["gg"] = "gg",
   }
-  
+
   -- Set keymaps for the input window
   local input_window_maps = {
     [config.keymaps.clear] = "lua require('claude-popup').clear_chat()",
@@ -1096,9 +1145,9 @@ function M.create_popup()
   for key, cmd in pairs(content_window_maps) do
     if key then
       -- For movement commands, map them directly without wrapping in command mode
-      if cmd == "j" or cmd == "k" or cmd == "G" or cmd == "gg" or 
-         cmd == "<C-d>" or cmd == "<C-u>" or cmd == "<C-f>" or cmd == "<C-b>" or
-         cmd == "v" or cmd == "V" then
+      if cmd == "j" or cmd == "k" or cmd == "G" or cmd == "gg" or
+          cmd == "<C-d>" or cmd == "<C-u>" or cmd == "<C-f>" or cmd == "<C-b>" or
+          cmd == "v" or cmd == "V" then
         vim.api.nvim_buf_set_keymap(M.state.buf_id, "n", key, cmd, { noremap = true, silent = true })
       else
         -- For functions calls, use command mode
@@ -1106,7 +1155,7 @@ function M.create_popup()
       end
     end
   end
-  
+
   -- Apply keymaps to input window
   for key, cmd in pairs(input_window_maps) do
     if key then
@@ -1118,11 +1167,13 @@ function M.create_popup()
         vim.api.nvim_buf_set_keymap(M.state.input_buf_id, "i", key, cmd, { noremap = true, silent = true })
       else
         -- Input window (normal mode)
-        vim.api.nvim_buf_set_keymap(M.state.input_buf_id, "n", key, ":" .. cmd .. "<CR>", { noremap = true, silent = true })
-        
+        vim.api.nvim_buf_set_keymap(M.state.input_buf_id, "n", key, ":" .. cmd .. "<CR>",
+          { noremap = true, silent = true })
+
         -- Also make scrolling commands available in insert mode
         if key:match("^<C%-%a>$") or key:match("^<C%-[dfubkj]>$") or key:match("^<C%-g>") then
-          vim.api.nvim_buf_set_keymap(M.state.input_buf_id, "i", key, "<Esc>:" .. cmd .. "<CR>a", { noremap = true, silent = true })
+          vim.api.nvim_buf_set_keymap(M.state.input_buf_id, "i", key, "<Esc>:" .. cmd .. "<CR>a",
+            { noremap = true, silent = true })
         end
       end
     end
@@ -1240,21 +1291,21 @@ function M.submit_message()
 
   -- Add the display message to the chat
   M.add_message("user", display_message)
-  
+
   -- Determine the actual message to send to the API
   local api_message = display_message
-  
+
   -- If we have selected code and custom prompt (from ask_selection), format a complete prompt
   if M.state.selected_code and M.state.stored_custom_prompt then
     -- Format a complete prompt with the selected code and custom question
-    api_message = M.state.stored_custom_prompt .. "\n\n" .. 
-                   M.state.selected_code .. "\n\n"
-    
-    -- Only add user question if they actually wrote something              
+    api_message = M.state.stored_custom_prompt .. "\n\n" ..
+        M.state.selected_code .. "\n\n"
+
+    -- Only add user question if they actually wrote something
     if display_message and display_message:match("%S") then
       api_message = api_message .. "User question: " .. display_message
     end
-                   
+
     -- Clear stored values so we don't reuse them
     M.state.selected_code = nil
     M.state.stored_custom_prompt = nil
@@ -1286,12 +1337,12 @@ function M.submit_message()
 
   -- Prepare messages for the API - with special handling for the last user message
   local api_messages = {}
-  
+
   -- Copy all but the last message
   for i = 1, #M.state.chat_history - 1 do
     table.insert(api_messages, M.state.chat_history[i])
   end
-  
+
   -- Add the real API message instead of what's displayed
   table.insert(api_messages, {
     role = "user",
@@ -1365,12 +1416,12 @@ function M.submit_message_with_display(display_message)
 
   -- Prepare messages for the API - replace the last user message
   local api_messages = {}
-  
+
   -- Copy all but the last message
   for i = 1, #M.state.chat_history - 1 do
     table.insert(api_messages, M.state.chat_history[i])
   end
-  
+
   -- Add the real API message instead of the display message
   table.insert(api_messages, {
     role = "user",
@@ -1400,29 +1451,29 @@ function M.send_to_claude_silently(prompt, callback)
     vim.notify("Claude is still thinking...", vim.log.levels.INFO)
     return
   end
-  
+
   -- Create a message for the API without displaying it in UI
   local user_message = {
     role = "user",
     content = prompt
   }
-  
+
   -- Prepare messages for the API (all previous messages plus the hidden one)
   local api_messages = {}
-  
+
   -- Add all existing messages
   for _, msg in ipairs(M.state.chat_history) do
     table.insert(api_messages, msg)
   end
-  
+
   -- Add the hidden user message
   table.insert(api_messages, user_message)
-  
+
   -- Keep focus in the input window while waiting for response
   if M.state.input_win_id and vim.api.nvim_win_is_valid(M.state.input_win_id) then
     vim.api.nvim_set_current_win(M.state.input_win_id)
   end
-  
+
   -- Send to Claude API
   M.send_to_claude(api_messages, callback)
 end
@@ -1434,12 +1485,12 @@ function M.add_message(role, content)
     vim.notify("Error: role is nil in add_message", vim.log.levels.ERROR)
     role = "assistant"
   end
-  
+
   if not content then
     vim.notify("Error: content is nil in add_message", vim.log.levels.ERROR)
     content = "[No content provided]"
   end
-  
+
   -- Add to the chat history
   table.insert(M.state.chat_history, {
     role = role,
@@ -1482,7 +1533,7 @@ function M.display_chat_history()
     if msg.content == nil then
       msg.content = "[No content]"
     end
-    
+
     local content_lines = vim.split(tostring(msg.content), "\n")
     for _, line in ipairs(content_lines) do
       table.insert(display_lines, line)
@@ -1506,13 +1557,13 @@ function M.display_chat_history()
 
   -- Apply highlighting
   M.apply_highlighting()
-  
+
   -- Apply Markdown syntax highlighting
   vim.api.nvim_buf_set_option(M.state.buf_id, "syntax", "markdown")
-  
+
   -- Make sure code blocks are highlighted properly
   local ns_id = vim.api.nvim_create_namespace("claude_popup_syntax")
-  
+
   -- Refresh the highlighting without changing the buffer
   vim.api.nvim_buf_set_option(M.state.buf_id, "syntax", "")
   vim.api.nvim_buf_set_option(M.state.buf_id, "syntax", "markdown")
@@ -1526,7 +1577,7 @@ function M.display_chat_history()
       -- Don't center with zz to enable scrolling through history
     end
   end
-  
+
   -- Return focus to input window if we were waiting for a response
   if M.state.waiting_response and M.state.input_win_id and vim.api.nvim_win_is_valid(M.state.input_win_id) then
     vim.api.nvim_set_current_win(M.state.input_win_id)
@@ -1562,21 +1613,21 @@ function M.add_thinking_indicator()
   if M.state.thinking_indicator_active then
     return
   end
-  
+
   -- Mark that a thinking indicator is active
   M.state.thinking_indicator_active = true
-  
+
   -- Check if we have a last assistant message to update
   local last_index = #M.state.chat_history
-  
+
   if last_index > 0 and M.state.chat_history[last_index].role == "assistant" then
     -- Store original content for later restoration
     local original_content = M.state.chat_history[last_index].content
     M.state.original_assistant_message = original_content
-    
+
     -- Update the message to show thinking status
     M.state.chat_history[last_index].content = original_content .. "\n\n*Thinking...*"
-    
+
     -- Redisplay with updated content which will apply markdown syntax
     M.display_chat_history()
   else
@@ -1597,7 +1648,7 @@ function M.add_thinking_indicator()
     -- Highlight the thinking text
     local ns_id = vim.api.nvim_create_namespace("claude_popup_thinking")
     vim.api.nvim_buf_add_highlight(M.state.buf_id, ns_id, config.ui.colors.thinking, #lines - 1, 0, -1)
-    
+
     -- Ensure syntax highlighting is applied
     vim.api.nvim_buf_set_option(M.state.buf_id, "syntax", "markdown")
 
@@ -1616,17 +1667,17 @@ function M.remove_thinking_indicator()
 
   -- Reset the thinking indicator flag
   M.state.thinking_indicator_active = false
-  
+
   -- Restore original message if we modified one
   if M.state.original_assistant_message then
     -- Find the last assistant message
     local last_index = #M.state.chat_history
-    
+
     if last_index > 0 and M.state.chat_history[last_index].role == "assistant" then
       -- Restore original content
       M.state.chat_history[last_index].content = M.state.original_assistant_message
     end
-    
+
     -- Clear the stored message
     M.state.original_assistant_message = nil
   end
@@ -1694,7 +1745,7 @@ function M.return_to_input()
     vim.api.nvim_win_set_option(M.state.win_id, "cursorline", false)
     vim.api.nvim_win_set_option(M.state.win_id, "statusline", "")
   end
-  
+
   -- Focus input window and enter insert mode
   if M.state.input_win_id and vim.api.nvim_win_is_valid(M.state.input_win_id) then
     vim.api.nvim_set_current_win(M.state.input_win_id)
@@ -1707,13 +1758,13 @@ function M.scroll_content(direction)
   if not M.state.win_id or not vim.api.nvim_win_is_valid(M.state.win_id) then
     return
   end
-  
+
   -- Store current window to restore focus
   local current_win = vim.api.nvim_get_current_win()
-  
+
   -- Focus content window temporarily
   vim.api.nvim_set_current_win(M.state.win_id)
-  
+
   -- Perform scroll action based on direction
   if direction == "up" then
     vim.cmd("normal! 3k")
@@ -1732,10 +1783,10 @@ function M.scroll_content(direction)
   elseif direction == "bottom" then
     vim.cmd("normal! G")
   end
-  
+
   -- Restore focus to original window
   vim.api.nvim_set_current_win(current_win)
-  
+
   -- Maintain insert mode if we were in it
   if current_win == M.state.input_win_id and vim.api.nvim_get_mode().mode:match("^i") then
     vim.cmd("startinsert")
