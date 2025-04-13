@@ -416,7 +416,6 @@ function M.get_buffer_content()
   return content
 end
 
-
 -- Get the filetype of the current buffer
 function M.get_current_filetype()
   return vim.bo.filetype
@@ -541,7 +540,7 @@ function M.ask_buffer()
 
     -- Store a reference to the buffer content for message formatting
     M.state.selected_code = M.format_code_context(content, filetype)
-    
+
     -- Store the prompt template (hidden from UI)
     local full_prompt = config.code_prompts.buffer.prompt
     M.state.stored_custom_prompt = full_prompt
@@ -626,7 +625,7 @@ function M.ask_selection(opts)
 
   -- Display selected code as part of Claude's message
   M.state.chat_history[#M.state.chat_history].content = M.state.chat_history[#M.state.chat_history].content ..
-  "\n\n" .. M.format_code_context(selection, filetype)
+      "\n\n" .. M.format_code_context(selection, filetype)
   M.display_chat_history()
 
   -- Focus the input window for editing
