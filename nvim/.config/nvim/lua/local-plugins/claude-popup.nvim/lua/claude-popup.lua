@@ -1590,16 +1590,14 @@ function M.apply_highlighting()
     return
   end
 
-  -- Clear existing highlighting
-  vim.api.nvim_buf_clear_namespace(M.state.buf_id, 0, 0, -1)
+  -- Clear existing role highlighting only (not syntax highlighting)
+  local highlight_ns = vim.api.nvim_create_namespace("claude_popup_role_highlights")
+  vim.api.nvim_buf_clear_namespace(M.state.buf_id, highlight_ns, 0, -1)
 
-  -- Apply highlighting for each message
+  -- Apply role highlighting for each message
   for _, mark in ipairs(M.state.message_marks) do
-    local ns_id = vim.api.nvim_create_namespace("claude_popup_" .. mark.role)
-
-    for line = mark.start_line, mark.end_line do
-      vim.api.nvim_buf_add_highlight(M.state.buf_id, ns_id, mark.color, line - 1, 0, -1)
-    end
+    -- Only highlight the role prefix line
+    vim.api.nvim_buf_add_highlight(M.state.buf_id, highlight_ns, mark.color, mark.start_line - 1, 0, -1)
   end
 end
 
