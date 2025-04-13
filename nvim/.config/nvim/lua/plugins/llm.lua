@@ -37,25 +37,36 @@ return {
     dir = '~/.config/nvim/lua/local-plugins/claude-popup.nvim',
     config = function()
       require('claude-popup').setup({
+        api = {
+          model = "claude-3-7-sonnet-20250219", -- The Claude model to use
+          api_key_env = "ANTHROPIC_API_KEY",    -- Environment variable for direct API key
+
+          -- Proxy configuration (set proxy_enabled to true to use corporate proxy)
+          proxy_enabled = true,                        -- Set to true to use corporate proxy instead of direct API
+          proxy_url_env = "LLM_PROXY",                 -- Environment variable for proxy URL
+          proxy_model = "anthropic:claude-3-7-sonnet", -- Model name when using proxy
+          proxy_api_key_env = "OPENAI_API_KEY",        -- API key env var for proxy
+        },
         keymaps = {
-          toggle = "<leader>cc",         -- Toggle Claude popup visibility
-          submit = "<C-s>",              -- Submit a message in insert mode
-          clear = "<C-l>",               -- Clear the chat history
-          ask_buffer = "<leader>cb",     -- Ask about current buffer
-          ask_selection = "<leader>cs",  -- Ask about selected code
+          toggle = "<leader>cc",            -- Toggle Claude popup visibility
+          submit = "<C-s>",                 -- Submit a message in insert mode
+          clear = "<C-l>",                  -- Clear the chat history
+          ask_buffer = "<leader>cb",        -- Ask about current buffer
+          ask_selection = "<leader>cs",     -- Ask about selected code
           improve_selection = "<leader>ci", -- Ask Claude to improve selected code
-          explain_selection = "<leader>ce",  -- Ask Claude to explain selected code
+          explain_selection = "<leader>ce", -- Ask Claude to explain selected code
           implement_comment = "<leader>cp", -- Ask Claude to implement code from comment
         },
         ui = {
-          width = 0.7,           -- Width as percentage of screen
-          height = 0.6,          -- Height as percentage of screen
-          border = "rounded",    -- Border style
-          title = " Claude AI (Enter=submit in normal mode, C-s=submit in insert) ",  -- Remind user how to use
+          width = 0.7,                                                               -- Width as percentage of screen
+          height = 0.6,                                                              -- Height as percentage of screen
+          border = "rounded",                                                        -- Border style
+          title = " Claude AI (Enter=submit in normal mode, C-s=submit in insert) ", -- Remind user how to use
         },
         chat = {
-          save_history = true,   -- Save chat history between sessions
-          initial_message = "Hello! I'm Claude. Here's how to use this chat:\n\n• Type your message and press Enter in normal mode to submit\n• Use C-s in insert mode to submit\n• Press Esc to exit insert mode, then use <leader>cc to toggle the window\n• Use <leader>cs in visual mode to send selected code\n• Use <leader>ce to explain selected code\n• Use <leader>ci to improve selected code\n• Use <leader>cp to implement code from comments",
+          save_history = true, -- Save chat history between sessions
+          initial_message =
+          "Hello! I'm Claude. Here's how to use this chat:\n\n• Type your message and press Enter in normal mode to submit\n• Use C-s in insert mode to submit\n• Press Esc to exit insert mode, then use <leader>cc to toggle the window\n• Use <leader>cs in visual mode to send selected code\n• Use <leader>ce to explain selected code\n• Use <leader>ci to improve selected code\n• Use <leader>cp to implement code from comments",
         },
         code_prompts = {
           improve = "Please improve this code. Consider performance, readability, error handling, and best practices:",

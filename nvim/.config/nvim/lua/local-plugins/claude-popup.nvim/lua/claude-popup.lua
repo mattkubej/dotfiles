@@ -15,12 +15,16 @@ local M = {}
 local default_config = {
   -- API configuration
   api = {
-    model = "claude-3-7-sonnet-20250219", -- The Claude model to use
-    api_key = nil,                        -- Set your API key here or use env var
-    api_key_env = "ANTHROPIC_API_KEY",    -- Environment variable for API key
-    endpoint = "https://api.anthropic.com/v1/messages",
-    max_tokens = 2000,                    -- Max tokens to generate
-    temperature = 0.7,                    -- Controls randomness (0.0-1.0)
+    model = "claude-3-7-sonnet-20250219",               -- The Claude model to use
+    api_key = nil,                                      -- Set your API key here or use env var
+    api_key_env = "ANTHROPIC_API_KEY",                  -- Environment variable for API key
+    endpoint = "https://api.anthropic.com/v1/messages", -- Direct Claude API endpoint
+    proxy_enabled = false,                              -- Whether to use corporate proxy
+    proxy_url_env = "LLM_PROXY",                        -- Environment variable for proxy URL
+    proxy_model = "anthropic:claude-3-7-sonnet",        -- Model name when using proxy
+    proxy_api_key_env = "OPENAI_API_KEY",               -- API key env var for proxy
+    max_tokens = 2000,                                  -- Max tokens to generate
+    temperature = 0.7,                                  -- Controls randomness (0.0-1.0)
   },
 
   -- UI configuration
@@ -244,25 +248,32 @@ end
 -- ============================================================================
 
 -- Get API key from config or environment variable
-function M.get_api_key()
+function M.get_api_key(use_proxy)
+  -- Determine which API key to use based on proxy setting
+  local key_env = use_proxy and config.api.proxy_api_key_env or config.api.api_key_env
+
   -- First check if API key is set in config
-  if config.api.api_key then
+  if not use_proxy and config.api.api_key then
     return config.api.api_key
   end
 
   -- Otherwise try to get it from environment variable
-  local api_key = os.getenv(config.api.api_key_env)
+  local api_key = os.getenv(key_env)
   if not api_key or api_key == "" then
-    M.show_error("API key not found. Please set it in config or " .. config.api.api_key_env .. " environment variable.")
+    M.show_error("API key not found. Please set it in config or " .. key_env .. " environment variable.")
     return nil
   end
 
   return api_key
 end
 
--- Send a message to the Claude API
+-- Send a message to the Claude API (directly or via proxy)
 function M.send_to_claude(messages, callback)
-  local api_key = M.get_api_key()
+  -- Determine whether to use proxy based on config
+  local use_proxy = config.api.proxy_enabled
+
+  -- Get appropriate API key
+  local api_key = M.get_api_key(use_proxy)
   if not api_key then
     return
   end
@@ -270,7 +281,33 @@ function M.send_to_claude(messages, callback)
   -- Format the messages for Claude's API
   local formatted_messages = M.format_messages_for_api(messages)
 
-  -- Prepare the request data
+  -- Create a temporary file for curl output
+  local temp_file = os.tmpname()
+
+  -- Set the waiting flag
+  M.state.waiting_response = true
+
+  -- Show thinking indicator
+  M.add_thinking_indicator()
+
+  -- Keep focus in the input window while waiting for response
+  if M.state.input_win_id and vim.api.nvim_win_is_valid(M.state.input_win_id) then
+    vim.api.nvim_set_current_win(M.state.input_win_id)
+  end
+
+  -- Choose appropriate API endpoint and parameters
+  if use_proxy then
+    -- Use proxy API
+    M.send_via_proxy(formatted_messages, api_key, temp_file, callback)
+  else
+    -- Use direct Claude API
+    M.send_via_direct_api(formatted_messages, api_key, temp_file, callback)
+  end
+end
+
+-- Send request directly to Claude API
+function M.send_via_direct_api(formatted_messages, api_key, temp_file, callback)
+  -- Prepare the request data for direct Claude API
   local request_data = {
     model = config.api.model,
     max_tokens = config.api.max_tokens,
@@ -278,14 +315,15 @@ function M.send_to_claude(messages, callback)
     messages = formatted_messages,
   }
 
-  -- Convert request data to JSON and ensure it's properly escaped
+  -- Convert request data to JSON
   local json_data = vim.fn.json_encode(request_data)
 
   -- Create a temporary file for the request data
   local request_file = os.tmpname()
   local file = io.open(request_file, "w")
   if not file then
-    hide_status()
+    M.state.waiting_response = false
+    M.remove_thinking_indicator()
     vim.notify("Failed to create temporary file for request", vim.log.levels.ERROR)
     return
   end
@@ -293,9 +331,6 @@ function M.send_to_claude(messages, callback)
   -- Write the JSON data to the file
   file:write(json_data)
   file:close()
-
-  -- Create a temporary file for curl output
-  local temp_file = os.tmpname()
 
   -- Create the curl command using --data-binary @file to avoid escaping issues
   local cmd = string.format(
@@ -310,69 +345,193 @@ function M.send_to_claude(messages, callback)
     temp_file
   )
 
-  -- Set the waiting flag
-  M.state.waiting_response = true
+  -- Run the curl command in the background
+  vim.fn.jobstart(cmd, {
+    on_exit = function(_, exit_code)
+      os.remove(request_file) -- Clean up request file
+      M.handle_api_response(exit_code, temp_file, callback)
+    end
+  })
+end
 
-  -- Show thinking indicator
-  M.add_thinking_indicator()
-
-  -- Keep focus in the input window while waiting for response
-  if M.state.input_win_id and vim.api.nvim_win_is_valid(M.state.input_win_id) then
-    vim.api.nvim_set_current_win(M.state.input_win_id)
+-- Send request via corporate proxy
+function M.send_via_proxy(formatted_messages, api_key, temp_file, callback)
+  -- Get proxy URL from environment
+  local proxy_url = os.getenv(config.api.proxy_url_env)
+  if not proxy_url or proxy_url == "" then
+    M.state.waiting_response = false
+    M.remove_thinking_indicator()
+    M.show_error("Proxy URL not found. Please set " .. config.api.proxy_url_env .. " environment variable.")
+    return
   end
+
+  -- Extract system message if it exists (first message with role 'system')
+  local system_prompt = ""
+  local user_messages = {}
+
+  for _, msg in ipairs(formatted_messages) do
+    if msg.role == "system" then
+      system_prompt = msg.content
+    else
+      table.insert(user_messages, msg)
+    end
+  end
+
+  -- If no system message found, use a default one
+  if system_prompt == "" then
+    system_prompt = "You are a helpful assistant."
+  end
+
+  -- Prepare the request data for proxy
+  local request_data = {
+    messages = user_messages,
+    model = config.api.proxy_model,
+    stream = false,
+    system = system_prompt,
+  }
+
+  -- Convert request data to JSON
+  local json_data = vim.fn.json_encode(request_data)
+
+  -- Create a temporary file for the request data
+  local request_file = os.tmpname()
+  local file = io.open(request_file, "w")
+  if not file then
+    M.state.waiting_response = false
+    M.remove_thinking_indicator()
+    vim.notify("Failed to create temporary file for request", vim.log.levels.ERROR)
+    return
+  end
+
+  -- Write the JSON data to the file
+  file:write(json_data)
+  file:close()
+
+  -- Create the curl command using --data-binary @file to avoid escaping issues
+  local cmd = string.format(
+    "curl -s -X POST %s " ..
+    "-H 'Authorization: Bearer %s' " ..
+    "-H 'content-type: application/json' " ..
+    "--data-binary @%s > %s",
+    proxy_url,
+    api_key,
+    request_file,
+    temp_file
+  )
 
   -- Run the curl command in the background
   vim.fn.jobstart(cmd, {
     on_exit = function(_, exit_code)
-      M.state.waiting_response = false
-      M.remove_thinking_indicator()
-
-      if exit_code ~= 0 then
-        M.show_error("API request failed with exit code: " .. exit_code)
-        return
-      end
-
-      -- Read response from temp file
-      local file = io.open(temp_file, "r")
-      if not file then
-        M.show_error("Failed to read API response")
-        return
-      end
-
-      local response = file:read("*all")
-      file:close()
-      os.remove(temp_file)
-
-      -- Parse JSON response
-      local ok, parsed = pcall(vim.fn.json_decode, response)
-      if not ok or not parsed then
-        M.show_error("Failed to parse API response")
-        return
-      end
-
-      -- Check for API errors
-      if parsed.error then
-        M.show_error("API error: " .. (parsed.error.message or "Unknown error"))
-        return
-      end
-
-      -- Extract response content
-      local content = parsed.content or {}
-      local response_text = ""
-
-      -- Get text from all text blocks
-      for _, part in ipairs(content) do
-        if part.type == "text" then
-          response_text = response_text .. part.text
-        end
-      end
-
-      -- Call the callback with the response
-      if callback then
-        callback(response_text)
-      end
+      os.remove(request_file) -- Clean up request file
+      M.handle_proxy_response(exit_code, temp_file, callback)
     end
   })
+end
+
+-- Handle response from direct Claude API
+function M.handle_api_response(exit_code, temp_file, callback)
+  M.state.waiting_response = false
+  M.remove_thinking_indicator()
+
+  if exit_code ~= 0 then
+    M.show_error("API request failed with exit code: " .. exit_code)
+    return
+  end
+
+  -- Read response from temp file
+  local file = io.open(temp_file, "r")
+  if not file then
+    M.show_error("Failed to read API response")
+    return
+  end
+
+  local response = file:read("*all")
+  file:close()
+  os.remove(temp_file)
+
+  -- Parse JSON response
+  local ok, parsed = pcall(vim.fn.json_decode, response)
+  if not ok or not parsed then
+    M.show_error("Failed to parse API response")
+    return
+  end
+
+  -- Check for API errors
+  if parsed.error then
+    M.show_error("API error: " .. (parsed.error.message or "Unknown error"))
+    return
+  end
+
+  -- Extract response content
+  local content = parsed.content or {}
+  local response_text = ""
+
+  -- Get text from all text blocks
+  for _, part in ipairs(content) do
+    if part.type == "text" then
+      response_text = response_text .. part.text
+    end
+  end
+
+  -- Call the callback with the response
+  if callback then
+    callback(response_text)
+  end
+end
+
+-- Handle response from proxy API
+function M.handle_proxy_response(exit_code, temp_file, callback)
+  M.state.waiting_response = false
+  M.remove_thinking_indicator()
+
+  if exit_code ~= 0 then
+    M.show_error("Proxy API request failed with exit code: " .. exit_code)
+    return
+  end
+
+  -- Read response from temp file
+  local file = io.open(temp_file, "r")
+  if not file then
+    M.show_error("Failed to read proxy API response")
+    return
+  end
+
+  local response = file:read("*all")
+  file:close()
+  os.remove(temp_file)
+
+  -- Parse JSON response
+  local ok, parsed = pcall(vim.fn.json_decode, response)
+  if not ok or not parsed then
+    M.show_error("Failed to parse proxy API response")
+    return
+  end
+
+  -- Check for errors in proxy response
+  if parsed.error then
+    M.show_error("Proxy API error: " .. (parsed.error.message or "Unknown error"))
+    return
+  end
+
+  -- Extract response content based on proxy API format
+  local response_text = ""
+
+  -- Different response format for proxy
+  if parsed.content then
+    response_text = parsed.content
+  elseif parsed.choices and parsed.choices[1] and parsed.choices[1].message then
+    response_text = parsed.choices[1].message.content
+  elseif parsed.choices and parsed.choices[1] and parsed.choices[1].text then
+    response_text = parsed.choices[1].text
+  else
+    M.show_error("Unknown proxy response format")
+    return
+  end
+
+  -- Call the callback with the response
+  if callback then
+    callback(response_text)
+  end
 end
 
 -- Format messages for Claude API
@@ -712,8 +871,25 @@ function M.call_claude_api_directly(system_prompt, user_prompt, callback)
   -- Show the thinking status window
   show_status()
 
-  -- Get API key (reusing the existing function)
-  local api_key = M.get_api_key()
+  -- Determine whether to use proxy based on config
+  local use_proxy = config.api.proxy_enabled
+
+  -- Create a temporary file for curl output
+  local temp_file = os.tmpname()
+
+  if use_proxy then
+    -- Use proxy API
+    M.call_via_proxy(system_prompt, user_prompt, temp_file, hide_status, callback)
+  else
+    -- Use direct Claude API
+    M.call_via_direct_api(system_prompt, user_prompt, temp_file, hide_status, callback)
+  end
+end
+
+-- Direct API call to Claude API
+function M.call_via_direct_api(system_prompt, user_prompt, temp_file, hide_status, callback)
+  -- Get API key
+  local api_key = M.get_api_key(false)
   if not api_key then
     hide_status()
     vim.notify("API key not found", vim.log.levels.ERROR)
@@ -737,27 +913,40 @@ function M.call_claude_api_directly(system_prompt, user_prompt, callback)
   -- Convert request data to JSON
   local json_data = vim.fn.json_encode(request_data)
 
-  -- Create a temporary file for curl output
-  local temp_file = os.tmpname()
+  -- Create a temporary file for the request data
+  local request_file = os.tmpname()
+  local file = io.open(request_file, "w")
+  if not file then
+    hide_status()
+    vim.notify("Failed to create temporary file for request", vim.log.levels.ERROR)
+    return
+  end
 
-  -- Create the curl command
+  -- Write the JSON data to the file
+  file:write(json_data)
+  file:close()
+
+  -- Create the curl command using --data-binary @file to avoid escaping issues
   local cmd = string.format(
     "curl -s -X POST %s " ..
     "-H 'x-api-key: %s' " ..
     "-H 'anthropic-version: 2023-06-01' " ..
     "-H 'content-type: application/json' " ..
-    "-d '%s' > %s",
+    "--data-binary @%s > %s",
     config.api.endpoint,
     api_key,
-    json_data:gsub("'", "'\\''"), -- Escape single quotes
+    request_file,
     temp_file
   )
 
   -- Run the curl command in the background
   vim.fn.jobstart(cmd, {
     on_exit = function(_, exit_code)
+      os.remove(request_file) -- Clean up request file
+
       hide_status()
 
+      -- Process the response
       if exit_code ~= 0 then
         vim.notify("API request failed with exit code: " .. exit_code, vim.log.levels.ERROR)
         return
@@ -796,6 +985,125 @@ function M.call_claude_api_directly(system_prompt, user_prompt, callback)
         if part.type == "text" then
           response_text = response_text .. part.text
         end
+      end
+
+      -- Call the callback with the response
+      if callback then
+        callback(response_text)
+      end
+    end
+  })
+end
+
+-- Proxy API call
+function M.call_via_proxy(system_prompt, user_prompt, temp_file, hide_status, callback)
+  -- Get API key
+  local api_key = M.get_api_key(true)
+  if not api_key then
+    hide_status()
+    vim.notify("API key not found", vim.log.levels.ERROR)
+    return
+  end
+
+  -- Get proxy URL from environment
+  local proxy_url = os.getenv(config.api.proxy_url_env)
+  if not proxy_url or proxy_url == "" then
+    hide_status()
+    vim.notify("Proxy URL not found. Please set " .. config.api.proxy_url_env .. " environment variable.",
+      vim.log.levels.ERROR)
+    return
+  end
+
+  -- Prepare messages for proxy format
+  local user_messages = {
+    { role = "user", content = user_prompt }
+  }
+
+  -- Prepare the request data for proxy
+  local request_data = {
+    messages = user_messages,
+    model = config.api.proxy_model,
+    stream = false,
+    system = system_prompt,
+  }
+
+  -- Convert request data to JSON
+  local json_data = vim.fn.json_encode(request_data)
+
+  -- Create a temporary file for the request data
+  local request_file = os.tmpname()
+  local file = io.open(request_file, "w")
+  if not file then
+    hide_status()
+    vim.notify("Failed to create temporary file for request", vim.log.levels.ERROR)
+    return
+  end
+
+  -- Write the JSON data to the file
+  file:write(json_data)
+  file:close()
+
+  -- Create the curl command using --data-binary @file to avoid escaping issues
+  local cmd = string.format(
+    "curl -s -X POST %s " ..
+    "-H 'Authorization: Bearer %s' " ..
+    "-H 'content-type: application/json' " ..
+    "--data-binary @%s > %s",
+    proxy_url,
+    api_key,
+    request_file,
+    temp_file
+  )
+
+  -- Run the curl command in the background
+  vim.fn.jobstart(cmd, {
+    on_exit = function(_, exit_code)
+      os.remove(request_file) -- Clean up request file
+
+      hide_status()
+
+      if exit_code ~= 0 then
+        vim.notify("Proxy API request failed with exit code: " .. exit_code, vim.log.levels.ERROR)
+        return
+      end
+
+      -- Read response from temp file
+      local file = io.open(temp_file, "r")
+      if not file then
+        vim.notify("Failed to read proxy API response", vim.log.levels.ERROR)
+        return
+      end
+
+      local response = file:read("*all")
+      file:close()
+      os.remove(temp_file)
+
+      -- Parse JSON response
+      local ok, parsed = pcall(vim.fn.json_decode, response)
+      if not ok or not parsed then
+        vim.notify("Failed to parse proxy API response", vim.log.levels.ERROR)
+        return
+      end
+
+      -- Check for errors in proxy response
+      if parsed.error then
+        vim.notify("Proxy API error: " .. (parsed.error.message or "Unknown error"), vim.log.levels.ERROR)
+        return
+      end
+
+      -- Extract response content based on proxy API format
+      local response_text = ""
+
+      -- Different response format for proxy
+      if parsed.content then
+        response_text = parsed.content
+      elseif parsed.choices and parsed.choices[1] and parsed.choices[1].message then
+        response_text = parsed.choices[1].message.content
+      elseif parsed.choices and parsed.choices[1] and parsed.choices[1].text then
+        response_text = parsed.choices[1].text
+      else
+        vim.notify("Unknown proxy response format", vim.log.levels.ERROR)
+        return
       end
 
       -- Call the callback with the response
