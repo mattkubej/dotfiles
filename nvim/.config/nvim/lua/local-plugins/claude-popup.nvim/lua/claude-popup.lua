@@ -37,6 +37,7 @@ local default_config = {
       number = false,         -- Hide line numbers
       relativenumber = false, -- Hide relative line numbers
       signcolumn = "no",      -- Hide sign column
+      scrolloff = 5,          -- Keep 5 lines visible above/below cursor when scrolling
     },
     colors = {
       user_prompt = "Comment",       -- Color group for user messages
@@ -760,6 +761,11 @@ function M.create_popup()
     vim.api.nvim_buf_set_option(M.state.buf_id, "bufhidden", "hide")
     vim.api.nvim_buf_set_option(M.state.buf_id, "swapfile", false)
     vim.api.nvim_buf_set_option(M.state.buf_id, "filetype", "markdown")
+    vim.api.nvim_buf_set_option(M.state.buf_id, "modifiable", false)
+    vim.api.nvim_buf_set_option(M.state.buf_id, "readonly", true)
+    
+    -- Enable syntax highlighting
+    vim.cmd("syntax enable")
   end
 
   -- Create window for the popup
@@ -779,6 +785,9 @@ function M.create_popup()
   for option, value in pairs(config.ui.win_options) do
     vim.api.nvim_win_set_option(M.state.win_id, option, value)
   end
+  
+  -- Enable mouse support for scrolling
+  vim.api.nvim_win_set_option(M.state.win_id, "mouse", "a")
 
   -- Create input buffer
   if not M.state.input_buf_id or not vim.api.nvim_buf_is_valid(M.state.input_buf_id) then
@@ -805,22 +814,80 @@ function M.create_popup()
   vim.api.nvim_win_set_option(M.state.input_win_id, "wrap", true)
   vim.api.nvim_win_set_option(M.state.input_win_id, "cursorline", false)
 
-  -- Set local keymaps for both the main window and input window
-  local buffer_maps = {
+  -- Set local keymaps for the main content window
+  local content_window_maps = {
+    [config.keymaps.clear] = "lua require('claude-popup').clear_chat()",
+    ["<Esc>"] = "lua require('claude-popup').return_to_input()",
+    ["<C-[>"] = "lua require('claude-popup').return_to_input()",
+    ["i"] = "lua require('claude-popup').return_to_input()",
+    ["v"] = "v", -- Allow visual mode for selection
+    ["V"] = "V", -- Allow visual line mode for selection
+    [config.keymaps.toggle] = "lua require('claude-popup').toggle_popup()",
+    -- Scrolling keymaps
+    ["j"] = "j",
+    ["k"] = "k",
+    ["<Down>"] = "j",
+    ["<Up>"] = "k",
+    ["<C-d>"] = "<C-d>",
+    ["<C-u>"] = "<C-u>",
+    ["<C-f>"] = "<C-f>",
+    ["<C-b>"] = "<C-b>",
+    ["G"] = "G",
+    ["gg"] = "gg",
+  }
+  
+  -- Set keymaps for the input window
+  local input_window_maps = {
     [config.keymaps.clear] = "lua require('claude-popup').clear_chat()",
     ["<Esc>"] = "lua require('claude-popup').toggle_popup()",
     ["<C-[>"] = "lua require('claude-popup').toggle_popup()",
     [config.keymaps.toggle] = "lua require('claude-popup').toggle_popup()",
+    -- Scrolling from input window
+    ["<C-k>"] = "lua require('claude-popup').scroll_content('up')",
+    ["<C-j>"] = "lua require('claude-popup').scroll_content('down')",
+    ["<C-u>"] = "lua require('claude-popup').scroll_content('halfpage_up')",
+    ["<C-d>"] = "lua require('claude-popup').scroll_content('halfpage_down')",
+    ["<C-b>"] = "lua require('claude-popup').scroll_content('page_up')",
+    ["<C-f>"] = "lua require('claude-popup').scroll_content('page_down')",
+    ["<C-g><C-g>"] = "lua require('claude-popup').scroll_content('top')",
+    ["<C-g>g"] = "lua require('claude-popup').scroll_content('bottom')",
+    -- Focus content window for copy/selection (using Ctrl-y as it's less commonly used)
+    ["<C-y>"] = "<Esc>:lua require('claude-popup').focus_content_window()<CR>",
   }
 
-  -- Apply keymaps to both windows
-  for key, cmd in pairs(buffer_maps) do
+  -- Apply keymaps to content window
+  for key, cmd in pairs(content_window_maps) do
     if key then
-      -- Main popup window
-      vim.api.nvim_buf_set_keymap(M.state.buf_id, "n", key, ":" .. cmd .. "<CR>", { noremap = true, silent = true })
-
-      -- Input window (normal mode)
-      vim.api.nvim_buf_set_keymap(M.state.input_buf_id, "n", key, ":" .. cmd .. "<CR>", { noremap = true, silent = true })
+      -- For movement commands, map them directly without wrapping in command mode
+      if cmd == "j" or cmd == "k" or cmd == "G" or cmd == "gg" or 
+         cmd == "<C-d>" or cmd == "<C-u>" or cmd == "<C-f>" or cmd == "<C-b>" or
+         cmd == "v" or cmd == "V" then
+        vim.api.nvim_buf_set_keymap(M.state.buf_id, "n", key, cmd, { noremap = true, silent = true })
+      else
+        -- For functions calls, use command mode
+        vim.api.nvim_buf_set_keymap(M.state.buf_id, "n", key, ":" .. cmd .. "<CR>", { noremap = true, silent = true })
+      end
+    end
+  end
+  
+  -- Apply keymaps to input window
+  for key, cmd in pairs(input_window_maps) do
+    if key then
+      -- For Ctrl+Y content focus shortcut
+      if key == "<C-y>" then
+        -- Apply it directly without modification in normal mode
+        vim.api.nvim_buf_set_keymap(M.state.input_buf_id, "n", key, cmd, { noremap = true, silent = true })
+        -- And in insert mode
+        vim.api.nvim_buf_set_keymap(M.state.input_buf_id, "i", key, cmd, { noremap = true, silent = true })
+      else
+        -- Input window (normal mode)
+        vim.api.nvim_buf_set_keymap(M.state.input_buf_id, "n", key, ":" .. cmd .. "<CR>", { noremap = true, silent = true })
+        
+        -- Also make scrolling commands available in insert mode
+        if key:match("^<C%-%a>$") or key:match("^<C%-[dfubkj]>$") or key:match("^<C%-g>") then
+          vim.api.nvim_buf_set_keymap(M.state.input_buf_id, "i", key, "<Esc>:" .. cmd .. "<CR>a", { noremap = true, silent = true })
+        end
+      end
     end
   end
 
@@ -1038,20 +1105,22 @@ function M.display_chat_history()
   end
 
   -- Update buffer content
+  vim.api.nvim_buf_set_option(M.state.buf_id, "readonly", false)
   vim.api.nvim_buf_set_option(M.state.buf_id, "modifiable", true)
   vim.api.nvim_buf_set_lines(M.state.buf_id, 0, -1, false, display_lines)
   vim.api.nvim_buf_set_option(M.state.buf_id, "modifiable", false)
+  vim.api.nvim_buf_set_option(M.state.buf_id, "readonly", true)
 
   -- Apply highlighting
   M.apply_highlighting()
 
-  -- Scroll to the bottom
+  -- Scroll to the bottom, but don't center view (allowing scrolling)
   if M.state.win_id and vim.api.nvim_win_is_valid(M.state.win_id) then
     local line_count = #display_lines
     -- Only set cursor if there are actually lines in the buffer
     if line_count > 0 then
       vim.api.nvim_win_set_cursor(M.state.win_id, { line_count, 0 })
-      vim.cmd("normal! zz")
+      -- Don't center with zz to enable scrolling through history
     end
   end
 end
@@ -1082,6 +1151,7 @@ function M.add_thinking_indicator()
   end
 
   -- Add thinking indicator to buffer
+  vim.api.nvim_buf_set_option(M.state.buf_id, "readonly", false)
   vim.api.nvim_buf_set_option(M.state.buf_id, "modifiable", true)
 
   local lines = vim.api.nvim_buf_get_lines(M.state.buf_id, 0, -1, false)
@@ -1091,16 +1161,24 @@ function M.add_thinking_indicator()
 
   vim.api.nvim_buf_set_lines(M.state.buf_id, 0, -1, false, lines)
   vim.api.nvim_buf_set_option(M.state.buf_id, "modifiable", false)
+  vim.api.nvim_buf_set_option(M.state.buf_id, "readonly", true)
 
   -- Highlight the thinking text
   local ns_id = vim.api.nvim_create_namespace("claude_popup_thinking")
   vim.api.nvim_buf_add_highlight(M.state.buf_id, ns_id, config.ui.colors.thinking, #lines - 1, 0, -1)
 
-  -- Scroll to the bottom
+  -- Scroll to show the thinking indicator without disrupting the current view
   if M.state.win_id and vim.api.nvim_win_is_valid(M.state.win_id) then
     local line_count = #lines
     if line_count > 0 then
+      -- Store the current view
+      local current_view = vim.fn.winsaveview()
+      
+      -- Move cursor to the bottom to ensure indicator is in view
       vim.api.nvim_win_set_cursor(M.state.win_id, { line_count, 0 })
+      
+      -- Ensure the thinking indicator is visible
+      vim.cmd("normal! zb")
     end
   end
 end
@@ -1119,6 +1197,7 @@ end
 function M.show_error(message)
   -- Display error in the popup if it exists
   if M.state.buf_id and vim.api.nvim_buf_is_valid(M.state.buf_id) then
+    vim.api.nvim_buf_set_option(M.state.buf_id, "readonly", false)
     vim.api.nvim_buf_set_option(M.state.buf_id, "modifiable", true)
 
     local lines = vim.api.nvim_buf_get_lines(M.state.buf_id, 0, -1, false)
@@ -1127,6 +1206,7 @@ function M.show_error(message)
 
     vim.api.nvim_buf_set_lines(M.state.buf_id, 0, -1, false, lines)
     vim.api.nvim_buf_set_option(M.state.buf_id, "modifiable", false)
+    vim.api.nvim_buf_set_option(M.state.buf_id, "readonly", true)
 
     -- Highlight the error text
     local ns_id = vim.api.nvim_create_namespace("claude_popup_error")
@@ -1148,6 +1228,75 @@ function M.clear_chat()
   -- Add initial message if configured
   if config.chat.initial_message then
     M.add_message("assistant", config.chat.initial_message)
+  end
+end
+
+-- Window management and scrolling functions --
+
+-- Switch focus to the content window (for copying/selecting text)
+function M.focus_content_window()
+  if M.state.win_id and vim.api.nvim_win_is_valid(M.state.win_id) then
+    vim.api.nvim_set_current_win(M.state.win_id)
+    -- Show a subtle indication that we're in selection mode
+    vim.api.nvim_win_set_option(M.state.win_id, "cursorline", true)
+    -- Use a statusline message instead of colorcolumn
+    vim.api.nvim_win_set_option(M.state.win_id, "statusline", "-- CONTENT VIEW MODE: ESC or 'i' to return to input --")
+    vim.notify("Content window focused. Press ESC or 'i' to return to input box.", vim.log.levels.INFO)
+  end
+end
+
+-- Return focus to the input window
+function M.return_to_input()
+  -- Disable visual indicators in content window
+  if M.state.win_id and vim.api.nvim_win_is_valid(M.state.win_id) then
+    vim.api.nvim_win_set_option(M.state.win_id, "cursorline", false)
+    vim.api.nvim_win_set_option(M.state.win_id, "statusline", "")
+  end
+  
+  -- Focus input window and enter insert mode
+  if M.state.input_win_id and vim.api.nvim_win_is_valid(M.state.input_win_id) then
+    vim.api.nvim_set_current_win(M.state.input_win_id)
+    vim.cmd("startinsert")
+  end
+end
+
+-- Scroll the content window without changing input focus
+function M.scroll_content(direction)
+  if not M.state.win_id or not vim.api.nvim_win_is_valid(M.state.win_id) then
+    return
+  end
+  
+  -- Store current window to restore focus
+  local current_win = vim.api.nvim_get_current_win()
+  
+  -- Focus content window temporarily
+  vim.api.nvim_set_current_win(M.state.win_id)
+  
+  -- Perform scroll action based on direction
+  if direction == "up" then
+    vim.cmd("normal! 3k")
+  elseif direction == "down" then
+    vim.cmd("normal! 3j")
+  elseif direction == "halfpage_up" then
+    vim.cmd("normal! \x15") -- <C-u>
+  elseif direction == "halfpage_down" then
+    vim.cmd("normal! \x04") -- <C-d>
+  elseif direction == "page_up" then
+    vim.cmd("normal! \x02") -- <C-b>
+  elseif direction == "page_down" then
+    vim.cmd("normal! \x06") -- <C-f>
+  elseif direction == "top" then
+    vim.cmd("normal! gg")
+  elseif direction == "bottom" then
+    vim.cmd("normal! G")
+  end
+  
+  -- Restore focus to original window
+  vim.api.nvim_set_current_win(current_win)
+  
+  -- Maintain insert mode if we were in it
+  if current_win == M.state.input_win_id and vim.api.nvim_get_mode().mode:match("^i") then
+    vim.cmd("startinsert")
   end
 end
 
