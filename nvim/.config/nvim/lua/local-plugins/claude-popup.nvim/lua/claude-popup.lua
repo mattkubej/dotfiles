@@ -568,13 +568,26 @@ function M.ask_selection(opts)
   -- Show summary in chat
   M.add_message("assistant", summary)
   
-  -- For custom queries, we want to let the user add their own text
-  -- We'll show just the code but let them type additional questions
-  vim.api.nvim_buf_set_lines(M.state.input_buf_id, 0, -1, false, { "What would you like to know about this code?" })
+  -- For custom queries, we show a helpful placeholder in the input box
+  vim.api.nvim_buf_set_option(M.state.input_buf_id, "modifiable", true)
+  vim.api.nvim_buf_set_lines(M.state.input_buf_id, 0, -1, false, { "" })
+  
+  -- Set a placeholder that will be cleared when the user starts typing
+  vim.fn.prompt_setprompt(M.state.input_buf_id, "")
+  if vim.fn.exists("*setbuflinepre") == 1 then
+    -- Modern Neovim version
+    vim.api.nvim_set_option_value("buftype", "prompt", { buf = M.state.input_buf_id })
+  else
+    -- Older Neovim version
+    vim.api.nvim_buf_set_option(M.state.input_buf_id, "buftype", "prompt")
+  end
+  
+  -- Display selected code as part of Claude's message
+  M.state.chat_history[#M.state.chat_history].content = M.state.chat_history[#M.state.chat_history].content .. "\n\n" .. M.format_code_context(selection, filetype)
+  M.display_chat_history()
   
   -- Focus the input window for editing
   vim.api.nvim_set_current_win(M.state.input_win_id)
-  vim.api.nvim_win_set_cursor(M.state.input_win_id, {1, 0})
   vim.cmd("startinsert")
   
   -- Store a reference to the selected code for message formatting
@@ -582,7 +595,7 @@ function M.ask_selection(opts)
   M.state.stored_custom_prompt = config.code_prompts.custom.prompt
   
   -- Notify the user
-  vim.notify("Selection added to Claude prompt", vim.log.levels.INFO)
+  vim.notify("Code selection ready. Type your question or press Enter to analyze.", vim.log.levels.INFO)
 end
 
 -- Direct API call without using the popup UI
@@ -1201,8 +1214,8 @@ function M.submit_message()
   local lines = vim.api.nvim_buf_get_lines(M.state.input_buf_id, 0, -1, false)
   local display_message = table.concat(lines, "\n")
 
-  -- Don't submit empty messages
-  if display_message:match("^%s*$") then
+  -- Check if it's okay to send an empty message
+  if display_message:match("^%s*$") and not (M.state.selected_code and M.state.stored_custom_prompt) then
     vim.notify("Cannot send empty message", vim.log.levels.WARN)
     return
   end
@@ -1220,8 +1233,12 @@ function M.submit_message()
   if M.state.selected_code and M.state.stored_custom_prompt then
     -- Format a complete prompt with the selected code and custom question
     api_message = M.state.stored_custom_prompt .. "\n\n" .. 
-                   M.state.selected_code .. "\n\n" .. 
-                   "User question: " .. display_message
+                   M.state.selected_code .. "\n\n"
+    
+    -- Only add user question if they actually wrote something              
+    if display_message and display_message:match("%S") then
+      api_message = api_message .. "User question: " .. display_message
+    end
                    
     -- Clear stored values so we don't reuse them
     M.state.selected_code = nil
