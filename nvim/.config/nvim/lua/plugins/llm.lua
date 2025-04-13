@@ -41,8 +41,8 @@ return {
           model = "claude-3-7-sonnet-20250219", -- The Claude model to use
           api_key_env = "ANTHROPIC_API_KEY",    -- Environment variable for direct API key
 
-          -- Proxy configuration (set proxy_enabled to true to use corporate proxy)
-          proxy_enabled = true,                        -- Set to true to use corporate proxy instead of direct API
+          -- Proxy configuration (automatically enabled if LLM_PROXY is defined)
+          proxy_enabled = os.getenv("LLM_PROXY") ~= nil,  -- Auto-detect based on LLM_PROXY env var
           proxy_url_env = "LLM_PROXY",                 -- Environment variable for proxy URL
           proxy_model = "anthropic:claude-3-7-sonnet", -- Model name when using proxy
           proxy_api_key_env = "OPENAI_API_KEY",        -- API key env var for proxy
