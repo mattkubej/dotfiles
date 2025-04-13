@@ -68,11 +68,36 @@ local default_config = {
   
   -- Code interaction prompts
   code_prompts = {
-    -- Predefined prompts for different code interactions
-    improve = "Please improve this code. Consider performance, readability, error handling, and best practices:",
-    explain = "Please explain what this code does in detail:",
-    implement = "Please implement code based on this comment/specification:",
-    analyze = "Please analyze this code for potential issues, bugs, or improvements:",
+    -- Predefined prompts for different code interactions (detail is hidden from UI)
+    improve = {
+      summary = "Improving selected code...",
+      prompt = "As an expert programmer, please improve this code. Focus on:\n- Performance optimization\n- Better readability and code organization\n- Proper error handling and edge cases\n- Following language-specific best practices and idioms\n- Maintaining the original functionality\n\nProvide only the improved code without explanations unless there's something critical I should know:",
+    },
+    explain = {
+      summary = "Explaining selected code...",
+      prompt = "Please explain this code comprehensively:\n- Overall purpose and functionality\n- How each part contributes to the whole\n- Key algorithms or patterns used\n- Any non-obvious techniques or optimizations\n- Potential edge cases or limitations\n- Context of how this would fit into a larger system\n\nFormat your explanation clearly with sections and bullet points where appropriate:",
+    },
+    implement = {
+      summary = "Implementing code from comments...",
+      prompt = "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:",
+    },
+    -- Add alias for implement_comment
+    implement_comment = {
+      summary = "Implementing code from comments...",
+      prompt = "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:",
+    },
+    analyze = {
+      summary = "Analyzing code for issues and improvements...",
+      prompt = "Please analyze this code for:\n- Potential bugs or edge cases\n- Performance bottlenecks\n- Security vulnerabilities\n- Code smells or maintenance issues\n- Opportunities for simplification\n- Adherence to best practices\n\nOrganize your analysis by priority, focusing on the most important issues first:",
+    },
+    buffer = {
+      summary = "Analyzing current file...",
+      prompt = "Please help me understand this file. I'd like you to:\n- Summarize the overall purpose and functionality\n- Identify key components, classes, or functions\n- Explain the relationships between different parts\n- Note any interesting patterns or techniques used\n- Highlight potential issues or areas for improvement\n\nPlease be thorough but prioritize the most important aspects:",
+    },
+    custom = {
+      summary = "Discussing selected code...",
+      prompt = "I've selected some code and would like your insights on it. Please help me understand or improve this code based on our conversation.",
+    },
   },
 }
 
@@ -93,7 +118,7 @@ function M.setup(user_config)
   vim.api.nvim_create_user_command("ClaudeAskSelection", M.ask_selection, { range = true })
   vim.api.nvim_create_user_command("ClaudeImproveSelection", M.code_action("improve"), { range = true })
   vim.api.nvim_create_user_command("ClaudeExplainSelection", M.code_action("explain"), { range = true })
-  vim.api.nvim_create_user_command("ClaudeImplementComment", M.code_action("implement"), { range = true })
+  vim.api.nvim_create_user_command("ClaudeImplementComment", M.code_action("implement_comment"), { range = true })
   vim.api.nvim_create_user_command("ClaudeAnalyzeSelection", M.code_action("analyze"), { range = true })
 
   -- Setup keymappings
@@ -438,16 +463,23 @@ function M.ask_buffer()
     M.create_popup()
   end
   
+  -- Clear existing chat history for focused interaction
+  M.clear_chat(true) -- silent clear
+  
   -- Get the buffer content and filetype
   local content = M.get_buffer_content()
   local filetype = M.get_current_filetype()
   
-  -- Format as a prompt with code context
-  local prompt = "Please help me understand this " .. filetype .. " file:\n\n" .. 
-                 M.format_code_context(content, filetype)
+  -- Get the buffer prompt and add the code content
+  local summary = config.code_prompts.buffer.summary
+  local prompt_text = config.code_prompts.buffer.prompt .. "\n\n" ..
+                     M.format_code_context(content, filetype)
   
-  -- Fill the prompt but don't submit automatically
-  M.fill_prompt_and_submit(prompt, false)
+  -- Show summary in chat
+  M.add_message("assistant", summary)
+  
+  -- Fill the prompt and submit automatically
+  M.fill_prompt_and_submit(prompt_text, true)
 end
 
 -- Get selection from line range (for commands called with range)
@@ -484,12 +516,19 @@ function M.ask_selection(opts)
     M.create_popup()
   end
   
-  -- Format as a prompt with code context
-  local prompt = "Please help me understand this code:\n\n" .. 
-                 M.format_code_context(selection, filetype)
+  -- Clear existing chat history for focused interaction
+  M.clear_chat(true) -- silent clear
   
-  -- Fill the prompt but don't submit automatically
-  M.fill_prompt_and_submit(prompt, false)
+  -- Format as a prompt with code context
+  local summary = config.code_prompts.custom.summary
+  local prompt_text = config.code_prompts.custom.prompt .. "\n\n" .. 
+                     M.format_code_context(selection, filetype)
+  
+  -- Show summary in chat
+  M.add_message("assistant", summary)
+  
+  -- Fill the prompt but don't submit automatically since this is a custom query
+  M.fill_prompt_and_submit(prompt_text, false)
   
   -- Notify the user
   vim.notify("Selection added to Claude prompt", vim.log.levels.INFO)
@@ -662,20 +701,41 @@ function M.call_claude_api_directly(system_prompt, user_prompt, callback)
 end
 
 -- Replace code in buffer with Claude's output
-function M.inline_code_replacement(start_line, end_line, selection, filetype, action_type)
-  -- Define system prompts for different actions
-  local system_prompts = {
+function M.inline_code_replacement(start_line, end_line, selection, filetype, action_type, custom_prompt)
+  -- Define fallback system prompts for all action types
+  local fallback_system_prompts = {
     improve = "You are an expert programmer tasked with improving code. Focus on readability, performance, and best practices. Maintain the same functionality. Return ONLY the improved code WITHOUT explanations, comments about changes, markdown formatting, or code block indicators. The output should be plain code that can be directly inserted into the file.",
     
-    implement = "You are an expert programmer tasked with implementing code based on comments or specifications. Write clean, efficient code following best practices. Return ONLY the implemented code WITHOUT explanations, markdown formatting, or code block indicators. The output should be plain code that can be directly inserted into the file."
+    implement = "You are an expert programmer tasked with implementing code based on comments or specifications. Write clean, efficient code following best practices. Return ONLY the implemented code WITHOUT explanations, markdown formatting, or code block indicators. The output should be plain code that can be directly inserted into the file.",
+    
+    implement_comment = "You are an expert programmer tasked with implementing code based on comments or specifications. Write clean, efficient code following best practices. Return ONLY the implemented code WITHOUT explanations, markdown formatting, or code block indicators. The output should be plain code that can be directly inserted into the file."
   }
   
-  -- Create user prompt
-  local user_prompt = "Here is " .. filetype .. " code to " .. action_type .. ". Return ONLY the " .. 
-                     action_type .. "d code without any explanations, just the plain code:\n\n" .. selection
+  -- Get appropriate system prompt with fallback
+  local system_prompt = fallback_system_prompts[action_type]
   
-  -- Call Claude API directly
-  M.call_claude_api_directly(system_prompts[action_type], user_prompt, function(response)
+  if not system_prompt then
+    -- Default system prompt for any action type
+    system_prompt = "You are an expert programmer tasked with modifying code. Return ONLY the code without any explanations, markdown formatting, or code block indicators. The output should be plain code that can be directly inserted into the file."
+  end
+  
+  -- Create user prompt
+  local user_prompt
+  
+  if custom_prompt then
+    -- Use the enhanced prompt if provided
+    user_prompt = custom_prompt .. "\n\nHere is the " .. filetype .. " code:\n\n" .. selection .. 
+                 "\n\nReturn ONLY the code without explanations, markdown formatting or code block backticks."
+  else
+    -- Fallback to basic prompt
+    user_prompt = "Here is " .. filetype .. " code to " .. action_type .. ". Return ONLY the " .. 
+                  action_type .. "d code without any explanations, just the plain code:\n\n" .. selection
+  end
+  
+  -- We already have a valid system prompt from our fallbacks
+  
+  -- Call Claude API directly with the selected system prompt
+  M.call_claude_api_directly(system_prompt, user_prompt, function(response)
     -- Clean any potential code block formatting from the response
     response = response:gsub("^```[%w_]*\n", ""):gsub("\n```$", "")
     
@@ -714,28 +774,106 @@ function M.code_action(action_type)
     -- Get filetype
     local filetype = M.get_current_filetype()
     
-    -- For explain and analyze actions, use the popup
+    -- For explain and analyze actions, use the popup with enhanced prompts
     if action_type == "explain" or action_type == "analyze" then
       -- Ensure the popup is open
       if not M.state.is_visible then
         M.create_popup()
       end
       
-      -- Get the appropriate prompt for this action
-      local action_prompt = config.code_prompts[action_type] or "Please help with this code:"
+      -- Clear existing chat history for focused interaction
+      M.clear_chat(true) -- silent clear
+      
+      -- Define emergency fallback prompts for common actions
+      local fallback_prompts = {
+        explain = {
+          summary = "Explaining selected code...",
+          prompt = "Please explain this code comprehensively:\n- Overall purpose and functionality\n- How each part contributes to the whole\n- Key algorithms or patterns used\n- Any non-obvious techniques or optimizations\n- Potential edge cases or limitations\n\nFormat your explanation clearly with sections and bullet points where appropriate:"
+        },
+        analyze = {
+          summary = "Analyzing code for issues and improvements...",
+          prompt = "Please analyze this code for:\n- Potential bugs or edge cases\n- Performance bottlenecks\n- Security vulnerabilities\n- Code smells or maintenance issues\n- Opportunities for simplification\n- Adherence to best practices\n\nOrganize your analysis by priority, focusing on the most important issues first:"
+        },
+        improve = {
+          summary = "Improving selected code...",
+          prompt = "As an expert programmer, please improve this code. Focus on:\n- Performance optimization\n- Better readability and code organization\n- Proper error handling and edge cases\n- Following language-specific best practices and idioms\n- Maintaining the original functionality\n\nProvide only the improved code without explanations unless there's something critical I should know:"
+        },
+        implement = {
+          summary = "Implementing code from comments...",
+          prompt = "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:"
+        },
+        implement_comment = {
+          summary = "Implementing code from comments...",
+          prompt = "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:"
+        }
+      }
+      
+      -- Get the appropriate prompt using the fallback if needed
+      local prompt_info = fallback_prompts[action_type]
+      
+      -- If it's available in config, use that instead
+      if config.code_prompts and config.code_prompts[action_type] and 
+         type(config.code_prompts[action_type]) == "table" and
+         config.code_prompts[action_type].summary and 
+         config.code_prompts[action_type].prompt then
+         prompt_info = config.code_prompts[action_type]
+      end
+      
+      -- Make sure we have valid prompt info
+      if not prompt_info then
+        vim.notify("Error: No valid prompt for action type '" .. action_type .. "'", vim.log.levels.ERROR)
+        return
+      end
+      
+      -- Show summary in chat first
+      M.add_message("assistant", prompt_info.summary)
       
       -- Format the complete prompt
-      local prompt = action_prompt .. "\n\n" .. M.format_code_context(selection, filetype)
+      local prompt = prompt_info.prompt .. "\n\n" .. M.format_code_context(selection, filetype)
       
       -- Fill the prompt and submit automatically for code actions
       M.fill_prompt_and_submit(prompt, true)
       
-      -- Notify the user
-      vim.notify("Asking Claude to " .. action_type .. " the selected code", vim.log.levels.INFO)
     else
       -- For improve and implement actions, replace the code inline
-      vim.notify("Processing " .. action_type .. " request...", vim.log.levels.INFO)
-      M.inline_code_replacement(start_line, end_line, selection, filetype, action_type)
+      -- Define fallback prompts for inline replacements
+      local fallback_prompts = {
+        improve = {
+          summary = "Improving selected code...",
+          prompt = "As an expert programmer, please improve this code. Focus on:\n- Performance optimization\n- Better readability and code organization\n- Proper error handling and edge cases\n- Following language-specific best practices and idioms\n- Maintaining the original functionality\n\nProvide only the improved code without explanations unless there's something critical I should know:"
+        },
+        implement = {
+          summary = "Implementing code from comments...",
+          prompt = "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:"
+        },
+        implement_comment = {
+          summary = "Implementing code from comments...",
+          prompt = "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:"
+        }
+      }
+      
+      -- Get prompt info with fallback
+      local prompt_info = fallback_prompts[action_type]
+      
+      -- If it's available in config, use that instead
+      if config.code_prompts and config.code_prompts[action_type] and 
+         type(config.code_prompts[action_type]) == "table" and
+         config.code_prompts[action_type].summary and 
+         config.code_prompts[action_type].prompt then
+         prompt_info = config.code_prompts[action_type]
+      end
+      
+      -- Make sure we have valid prompt info
+      if not prompt_info then
+        vim.notify("Error: No valid prompt for action type '" .. action_type .. "'", vim.log.levels.ERROR)
+        return
+      end
+      
+      -- Notify the user with a better message
+      vim.notify(prompt_info.summary, vim.log.levels.INFO)
+      
+      -- Use enhanced prompts for better results
+      M.inline_code_replacement(start_line, end_line, selection, filetype, action_type, prompt_info.prompt)
     end
   end
 end
@@ -1052,6 +1190,17 @@ end
 
 -- Add a message to the chat
 function M.add_message(role, content)
+  -- Validate inputs to avoid errors
+  if not role then
+    vim.notify("Error: role is nil in add_message", vim.log.levels.ERROR)
+    role = "assistant"
+  end
+  
+  if not content then
+    vim.notify("Error: content is nil in add_message", vim.log.levels.ERROR)
+    content = "[No content provided]"
+  end
+  
   -- Add to the chat history
   table.insert(M.state.chat_history, {
     role = role,
@@ -1090,7 +1239,12 @@ function M.display_chat_history()
     table.insert(display_lines, prefix)
 
     -- Add content lines with proper wrapping
-    local content_lines = vim.split(msg.content, "\n")
+    -- Make sure content is a string to avoid errors
+    if msg.content == nil then
+      msg.content = "[No content]"
+    end
+    
+    local content_lines = vim.split(tostring(msg.content), "\n")
     for _, line in ipairs(content_lines) do
       table.insert(display_lines, line)
     end
@@ -1218,15 +1372,15 @@ function M.show_error(message)
 end
 
 -- Clear the chat history
-function M.clear_chat()
+function M.clear_chat(silent)
   -- Clear the history
   M.state.chat_history = {}
 
   -- Update the display
   M.display_chat_history()
 
-  -- Add initial message if configured
-  if config.chat.initial_message then
+  -- Add initial message if configured and not in silent mode
+  if config.chat.initial_message and not silent then
     M.add_message("assistant", config.chat.initial_message)
   end
 end
