@@ -178,6 +178,10 @@ function M.init_state()
     waiting_response = false, -- Whether we're waiting for a response
     chat_history = {},        -- Chat history
     message_marks = {},       -- Marks for each message in history
+    selected_code = nil,      -- Selected code for custom queries
+    stored_custom_prompt = nil, -- Stored prompt template for custom queries
+    thinking_indicator_active = false, -- Whether a thinking indicator is currently showing
+    original_assistant_message = nil,  -- Original content of assistant message before adding thinking indicator
   }
 
   -- Try to load chat history if it exists and saving is enabled
@@ -456,6 +460,25 @@ function M.fill_prompt_and_submit(prompt, auto_submit)
   end
 end
 
+-- Fill with display prompt but submit a different full prompt
+-- This allows hiding verbose prompts from the UI while still sending them to Claude
+function M.fill_prompt_and_submit_with_hidden_prompt(display_prompt, full_prompt)
+  -- Set the display prompt in the input buffer (what user sees)
+  vim.api.nvim_buf_set_lines(M.state.input_buf_id, 0, -1, false, vim.split(display_prompt, "\n"))
+  
+  -- Submit with delay to ensure UI updates
+  vim.defer_fn(function()
+    -- Store original message to display
+    local display_message = table.concat(vim.api.nvim_buf_get_lines(M.state.input_buf_id, 0, -1, false), "\n")
+    
+    -- Replace with the full prompt before submission
+    vim.api.nvim_buf_set_lines(M.state.input_buf_id, 0, -1, false, vim.split(full_prompt, "\n"))
+    
+    -- Custom submit that preserves display message
+    M.submit_message_with_display(display_message)
+  end, 100)
+end
+
 -- Ask about the current buffer
 function M.ask_buffer()
   -- First ensure the popup is open
@@ -472,14 +495,32 @@ function M.ask_buffer()
   
   -- Get the buffer prompt and add the code content
   local summary = config.code_prompts.buffer.summary
-  local prompt_text = config.code_prompts.buffer.prompt .. "\n\n" ..
+  local full_prompt = config.code_prompts.buffer.prompt .. "\n\n" ..
                      M.format_code_context(content, filetype)
   
   -- Show summary in chat
   M.add_message("assistant", summary)
   
-  -- Fill the prompt and submit automatically
-  M.fill_prompt_and_submit(prompt_text, true)
+  -- Show thinking indicator
+  M.add_thinking_indicator()
+  
+  -- Send directly to API without displaying user prompt
+  M.send_to_claude_silently(full_prompt, function(response)
+    -- Remove thinking indicator
+    M.remove_thinking_indicator()
+    
+    -- Add response to chat
+    M.add_message("assistant", response)
+    
+    -- Notify user when response is ready
+    vim.notify("Claude has responded!", vim.log.levels.INFO)
+    
+    -- Focus the input window again
+    if M.state.input_win_id and vim.api.nvim_win_is_valid(M.state.input_win_id) then
+      vim.api.nvim_set_current_win(M.state.input_win_id)
+      vim.cmd("startinsert")
+    end
+  end)
 end
 
 -- Get selection from line range (for commands called with range)
@@ -521,14 +562,24 @@ function M.ask_selection(opts)
   
   -- Format as a prompt with code context
   local summary = config.code_prompts.custom.summary
-  local prompt_text = config.code_prompts.custom.prompt .. "\n\n" .. 
+  local full_prompt = config.code_prompts.custom.prompt .. "\n\n" .. 
                      M.format_code_context(selection, filetype)
   
   -- Show summary in chat
   M.add_message("assistant", summary)
   
-  -- Fill the prompt but don't submit automatically since this is a custom query
-  M.fill_prompt_and_submit(prompt_text, false)
+  -- For custom queries, we want to let the user add their own text
+  -- We'll show just the code but let them type additional questions
+  vim.api.nvim_buf_set_lines(M.state.input_buf_id, 0, -1, false, { "What would you like to know about this code?" })
+  
+  -- Focus the input window for editing
+  vim.api.nvim_set_current_win(M.state.input_win_id)
+  vim.api.nvim_win_set_cursor(M.state.input_win_id, {1, 0})
+  vim.cmd("startinsert")
+  
+  -- Store a reference to the selected code for message formatting
+  M.state.selected_code = M.format_code_context(selection, filetype)
+  M.state.stored_custom_prompt = config.code_prompts.custom.prompt
   
   -- Notify the user
   vim.notify("Selection added to Claude prompt", vim.log.levels.INFO)
@@ -828,11 +879,31 @@ function M.code_action(action_type)
       -- Show summary in chat first
       M.add_message("assistant", prompt_info.summary)
       
-      -- Format the complete prompt
-      local prompt = prompt_info.prompt .. "\n\n" .. M.format_code_context(selection, filetype)
+      -- Format the complete prompt (for sending to API)
+      local full_prompt = prompt_info.prompt .. "\n\n" .. M.format_code_context(selection, filetype)
       
-      -- Fill the prompt and submit automatically for code actions
-      M.fill_prompt_and_submit(prompt, true)
+      -- For specialized commands, we'll skip displaying user input and just send to API
+      
+      -- Show thinking indicator
+      M.add_thinking_indicator()
+      
+      -- Send directly to API without displaying user prompt
+      M.send_to_claude_silently(full_prompt, function(response)
+        -- Remove thinking indicator
+        M.remove_thinking_indicator()
+        
+        -- Add response to chat
+        M.add_message("assistant", response)
+        
+        -- Notify user when response is ready
+        vim.notify("Claude has responded!", vim.log.levels.INFO)
+        
+        -- Focus the input window again
+        if M.state.input_win_id and vim.api.nvim_win_is_valid(M.state.input_win_id) then
+          vim.api.nvim_set_current_win(M.state.input_win_id)
+          vim.cmd("startinsert")
+        end
+      end)
       
     else
       -- For improve and implement actions, replace the code inline
@@ -1128,10 +1199,10 @@ function M.submit_message()
 
   -- Get the message from the input buffer
   local lines = vim.api.nvim_buf_get_lines(M.state.input_buf_id, 0, -1, false)
-  local message = table.concat(lines, "\n")
+  local display_message = table.concat(lines, "\n")
 
   -- Don't submit empty messages
-  if message:match("^%s*$") then
+  if display_message:match("^%s*$") then
     vim.notify("Cannot send empty message", vim.log.levels.WARN)
     return
   end
@@ -1139,8 +1210,23 @@ function M.submit_message()
   -- Clear the input buffer
   vim.api.nvim_buf_set_lines(M.state.input_buf_id, 0, -1, false, { "" })
 
-  -- Add the message to the chat
-  M.add_message("user", message)
+  -- Add the display message to the chat
+  M.add_message("user", display_message)
+  
+  -- Determine the actual message to send to the API
+  local api_message = display_message
+  
+  -- If we have selected code and custom prompt (from ask_selection), format a complete prompt
+  if M.state.selected_code and M.state.stored_custom_prompt then
+    -- Format a complete prompt with the selected code and custom question
+    api_message = M.state.stored_custom_prompt .. "\n\n" .. 
+                   M.state.selected_code .. "\n\n" .. 
+                   "User question: " .. display_message
+                   
+    -- Clear stored values so we don't reuse them
+    M.state.selected_code = nil
+    M.state.stored_custom_prompt = nil
+  end
 
   -- Flash input border to give visual feedback for submission
   local original_border = config.ui.border
@@ -1166,11 +1252,19 @@ function M.submit_message()
   -- Focus the chat window to see Claude's reply
   vim.api.nvim_set_current_win(M.state.win_id)
 
-  -- Prepare messages for the API
+  -- Prepare messages for the API - with special handling for the last user message
   local api_messages = {}
-  for _, msg in ipairs(M.state.chat_history) do
-    table.insert(api_messages, msg)
+  
+  -- Copy all but the last message
+  for i = 1, #M.state.chat_history - 1 do
+    table.insert(api_messages, M.state.chat_history[i])
   end
+  
+  -- Add the real API message instead of what's displayed
+  table.insert(api_messages, {
+    role = "user",
+    content = api_message
+  })
 
   -- Send to Claude API
   M.send_to_claude(api_messages, function(response)
@@ -1186,6 +1280,117 @@ function M.submit_message()
       vim.cmd("startinsert")
     end
   end)
+end
+
+-- Submit a message but display a different version in the chat
+-- This allows sending detailed prompts to the API while showing simpler versions in the UI
+function M.submit_message_with_display(display_message)
+  -- Don't submit if we're already waiting for a response
+  if M.state.waiting_response then
+    vim.notify("Claude is still thinking...", vim.log.levels.INFO)
+    return
+  end
+
+  -- Get the actual message to send from the input buffer
+  local lines = vim.api.nvim_buf_get_lines(M.state.input_buf_id, 0, -1, false)
+  local api_message = table.concat(lines, "\n")
+
+  -- Don't submit empty messages
+  if api_message:match("^%s*$") then
+    vim.notify("Cannot send empty message", vim.log.levels.WARN)
+    return
+  end
+
+  -- Clear the input buffer
+  vim.api.nvim_buf_set_lines(M.state.input_buf_id, 0, -1, false, { "" })
+
+  -- Add the display version to the chat history
+  M.add_message("user", display_message)
+
+  -- Flash input border to give visual feedback for submission
+  local original_border = config.ui.border
+  local width = math.floor(vim.o.columns * config.ui.width)
+  local height = math.floor(vim.o.lines * config.ui.height)
+  local row = math.floor((vim.o.lines - height) / 2)
+  local col = math.floor((vim.o.columns - width) / 2)
+
+  if M.state.input_win_id and vim.api.nvim_win_is_valid(M.state.input_win_id) then
+    vim.api.nvim_win_set_config(M.state.input_win_id, {
+      border = "double",
+    })
+
+    vim.defer_fn(function()
+      if M.state.input_win_id and vim.api.nvim_win_is_valid(M.state.input_win_id) then
+        vim.api.nvim_win_set_config(M.state.input_win_id, {
+          border = original_border,
+        })
+      end
+    end, 150)
+  end
+
+  -- Focus the chat window to see Claude's reply
+  vim.api.nvim_set_current_win(M.state.win_id)
+
+  -- Prepare messages for the API - replace the last user message
+  local api_messages = {}
+  
+  -- Copy all but the last message
+  for i = 1, #M.state.chat_history - 1 do
+    table.insert(api_messages, M.state.chat_history[i])
+  end
+  
+  -- Add the real API message instead of the display message
+  table.insert(api_messages, {
+    role = "user",
+    content = api_message
+  })
+
+  -- Send to Claude API
+  M.send_to_claude(api_messages, function(response)
+    -- Add response to chat
+    M.add_message("assistant", response)
+
+    -- Notify user when response is ready
+    vim.notify("Claude has responded!", vim.log.levels.INFO)
+
+    -- Focus the input window again
+    if M.state.input_win_id and vim.api.nvim_win_is_valid(M.state.input_win_id) then
+      vim.api.nvim_set_current_win(M.state.input_win_id)
+      vim.cmd("startinsert")
+    end
+  end)
+end
+
+-- Send to Claude API silently (no user message displayed)
+function M.send_to_claude_silently(prompt, callback)
+  -- Don't submit if we're already waiting for a response
+  if M.state.waiting_response then
+    vim.notify("Claude is still thinking...", vim.log.levels.INFO)
+    return
+  end
+  
+  -- Create a message for the API without displaying it in UI
+  local user_message = {
+    role = "user",
+    content = prompt
+  }
+  
+  -- Prepare messages for the API (all previous messages plus the hidden one)
+  local api_messages = {}
+  
+  -- Add all existing messages
+  for _, msg in ipairs(M.state.chat_history) do
+    table.insert(api_messages, msg)
+  end
+  
+  -- Add the hidden user message
+  table.insert(api_messages, user_message)
+  
+  -- Focus the chat window to see Claude's reply
+  vim.api.nvim_set_current_win(M.state.win_id)
+  
+  -- Send to Claude API
+  M.send_to_claude(api_messages, callback)
 end
 
 -- Add a message to the chat
@@ -1304,35 +1509,49 @@ function M.add_thinking_indicator()
     return
   end
 
-  -- Add thinking indicator to buffer
-  vim.api.nvim_buf_set_option(M.state.buf_id, "readonly", false)
-  vim.api.nvim_buf_set_option(M.state.buf_id, "modifiable", true)
+  -- Don't add another thinking indicator if one is already active
+  if M.state.thinking_indicator_active then
+    return
+  end
+  
+  -- Mark that a thinking indicator is active
+  M.state.thinking_indicator_active = true
+  
+  -- Check if we have a last assistant message to update
+  local last_index = #M.state.chat_history
+  
+  if last_index > 0 and M.state.chat_history[last_index].role == "assistant" then
+    -- Store original content for later restoration
+    local original_content = M.state.chat_history[last_index].content
+    M.state.original_assistant_message = original_content
+    
+    -- Update the message to show thinking status
+    M.state.chat_history[last_index].content = original_content .. "\n\n*Thinking...*"
+    
+    -- Redisplay with updated content
+    M.display_chat_history()
+  else
+    -- No suitable message to update, add a new thinking message
+    -- Add thinking indicator to buffer
+    vim.api.nvim_buf_set_option(M.state.buf_id, "readonly", false)
+    vim.api.nvim_buf_set_option(M.state.buf_id, "modifiable", true)
 
-  local lines = vim.api.nvim_buf_get_lines(M.state.buf_id, 0, -1, false)
-  table.insert(lines, "")
-  table.insert(lines, "Claude: ")
-  table.insert(lines, "Thinking...")
+    local lines = vim.api.nvim_buf_get_lines(M.state.buf_id, 0, -1, false)
+    table.insert(lines, "")
+    table.insert(lines, "Claude: ")
+    table.insert(lines, "*Thinking...*")
 
-  vim.api.nvim_buf_set_lines(M.state.buf_id, 0, -1, false, lines)
-  vim.api.nvim_buf_set_option(M.state.buf_id, "modifiable", false)
-  vim.api.nvim_buf_set_option(M.state.buf_id, "readonly", true)
+    vim.api.nvim_buf_set_lines(M.state.buf_id, 0, -1, false, lines)
+    vim.api.nvim_buf_set_option(M.state.buf_id, "modifiable", false)
+    vim.api.nvim_buf_set_option(M.state.buf_id, "readonly", true)
 
-  -- Highlight the thinking text
-  local ns_id = vim.api.nvim_create_namespace("claude_popup_thinking")
-  vim.api.nvim_buf_add_highlight(M.state.buf_id, ns_id, config.ui.colors.thinking, #lines - 1, 0, -1)
+    -- Highlight the thinking text
+    local ns_id = vim.api.nvim_create_namespace("claude_popup_thinking")
+    vim.api.nvim_buf_add_highlight(M.state.buf_id, ns_id, config.ui.colors.thinking, #lines - 1, 0, -1)
 
-  -- Scroll to show the thinking indicator without disrupting the current view
-  if M.state.win_id and vim.api.nvim_win_is_valid(M.state.win_id) then
-    local line_count = #lines
-    if line_count > 0 then
-      -- Store the current view
-      local current_view = vim.fn.winsaveview()
-      
-      -- Move cursor to the bottom to ensure indicator is in view
-      vim.api.nvim_win_set_cursor(M.state.win_id, { line_count, 0 })
-      
-      -- Ensure the thinking indicator is visible
-      vim.cmd("normal! zb")
+    -- Scroll to show the thinking indicator
+    if M.state.win_id and vim.api.nvim_win_is_valid(M.state.win_id) then
+      vim.api.nvim_win_set_cursor(M.state.win_id, { #lines, 0 })
     end
   end
 end
@@ -1343,7 +1562,24 @@ function M.remove_thinking_indicator()
     return
   end
 
-  -- We'll just redisplay the chat history without the indicator
+  -- Reset the thinking indicator flag
+  M.state.thinking_indicator_active = false
+  
+  -- Restore original message if we modified one
+  if M.state.original_assistant_message then
+    -- Find the last assistant message
+    local last_index = #M.state.chat_history
+    
+    if last_index > 0 and M.state.chat_history[last_index].role == "assistant" then
+      -- Restore original content
+      M.state.chat_history[last_index].content = M.state.original_assistant_message
+    end
+    
+    -- Clear the stored message
+    M.state.original_assistant_message = nil
+  end
+
+  -- Redisplay without the indicator
   M.display_chat_history()
 end
 
