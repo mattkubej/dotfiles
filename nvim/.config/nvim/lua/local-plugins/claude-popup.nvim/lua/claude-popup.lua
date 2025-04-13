@@ -308,6 +308,11 @@ function M.send_to_claude(messages, callback)
 
   -- Show thinking indicator
   M.add_thinking_indicator()
+  
+  -- Keep focus in the input window while waiting for response
+  if M.state.input_win_id and vim.api.nvim_win_is_valid(M.state.input_win_id) then
+    vim.api.nvim_set_current_win(M.state.input_win_id)
+  end
 
   -- Run the curl command in the background
   vim.fn.jobstart(cmd, {
@@ -1413,8 +1418,10 @@ function M.send_to_claude_silently(prompt, callback)
   -- Add the hidden user message
   table.insert(api_messages, user_message)
   
-  -- Focus the chat window to see Claude's reply
-  vim.api.nvim_set_current_win(M.state.win_id)
+  -- Keep focus in the input window while waiting for response
+  if M.state.input_win_id and vim.api.nvim_win_is_valid(M.state.input_win_id) then
+    vim.api.nvim_set_current_win(M.state.input_win_id)
+  end
   
   -- Send to Claude API
   M.send_to_claude(api_messages, callback)
@@ -1499,6 +1506,16 @@ function M.display_chat_history()
 
   -- Apply highlighting
   M.apply_highlighting()
+  
+  -- Apply Markdown syntax highlighting
+  vim.api.nvim_buf_set_option(M.state.buf_id, "syntax", "markdown")
+  
+  -- Make sure code blocks are highlighted properly
+  local ns_id = vim.api.nvim_create_namespace("claude_popup_syntax")
+  
+  -- Refresh the highlighting without changing the buffer
+  vim.api.nvim_buf_set_option(M.state.buf_id, "syntax", "")
+  vim.api.nvim_buf_set_option(M.state.buf_id, "syntax", "markdown")
 
   -- Scroll to the bottom, but don't center view (allowing scrolling)
   if M.state.win_id and vim.api.nvim_win_is_valid(M.state.win_id) then
@@ -1508,6 +1525,11 @@ function M.display_chat_history()
       vim.api.nvim_win_set_cursor(M.state.win_id, { line_count, 0 })
       -- Don't center with zz to enable scrolling through history
     end
+  end
+  
+  -- Return focus to input window if we were waiting for a response
+  if M.state.waiting_response and M.state.input_win_id and vim.api.nvim_win_is_valid(M.state.input_win_id) then
+    vim.api.nvim_set_current_win(M.state.input_win_id)
   end
 end
 
@@ -1555,7 +1577,7 @@ function M.add_thinking_indicator()
     -- Update the message to show thinking status
     M.state.chat_history[last_index].content = original_content .. "\n\n*Thinking...*"
     
-    -- Redisplay with updated content
+    -- Redisplay with updated content which will apply markdown syntax
     M.display_chat_history()
   else
     -- No suitable message to update, add a new thinking message
@@ -1575,6 +1597,9 @@ function M.add_thinking_indicator()
     -- Highlight the thinking text
     local ns_id = vim.api.nvim_create_namespace("claude_popup_thinking")
     vim.api.nvim_buf_add_highlight(M.state.buf_id, ns_id, config.ui.colors.thinking, #lines - 1, 0, -1)
+    
+    -- Ensure syntax highlighting is applied
+    vim.api.nvim_buf_set_option(M.state.buf_id, "syntax", "markdown")
 
     -- Scroll to show the thinking indicator
     if M.state.win_id and vim.api.nvim_win_is_valid(M.state.win_id) then
