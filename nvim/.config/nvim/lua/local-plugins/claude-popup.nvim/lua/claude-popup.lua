@@ -496,12 +496,6 @@ end
 
 -- Direct API call without using the popup UI
 function M.call_claude_api_directly(system_prompt, user_prompt, callback)
-  -- Format messages for Claude API
-  local messages = {
-    { role = "system", content = system_prompt },
-    { role = "user", content = user_prompt }
-  }
-  
   -- Show a thinking/progress indicator
   local spinner = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
   local spinner_idx = 1
@@ -580,14 +574,17 @@ function M.call_claude_api_directly(system_prompt, user_prompt, callback)
     return
   end
   
-  -- Format the messages
-  local formatted_messages = M.format_messages_for_api(messages)
+  -- Format messages for Claude API - use system as top-level parameter
+  local formatted_messages = {
+    { role = "user", content = user_prompt }
+  }
   
   -- Prepare the request data
   local request_data = {
     model = config.api.model,
     max_tokens = config.api.max_tokens,
     temperature = config.api.temperature,
+    system = system_prompt,
     messages = formatted_messages,
   }
   
