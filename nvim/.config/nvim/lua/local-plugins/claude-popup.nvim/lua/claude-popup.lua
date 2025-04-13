@@ -968,10 +968,18 @@ end
 
 -- Create the Claude popup window
 function M.create_popup()
-  -- Calculate dimensions
+  -- Calculate base dimensions
   local width = math.floor(vim.o.columns * config.ui.width)
-  local height = math.floor(vim.o.lines * config.ui.height)
-  local row = math.floor((vim.o.lines - height) / 2)
+  local total_height = math.floor(vim.o.lines * config.ui.height)
+  
+  -- Calculate content height with padding
+  local content_height = math.floor(total_height * 0.8) -- Use 80% of height for content
+  local input_height = 3
+  local padding = 1 -- Add a line of padding between windows
+  
+  -- Calculate window positions
+  local total_used_height = content_height + padding + input_height + 2 -- +2 for both borders
+  local row = math.floor((vim.o.lines - total_used_height) / 2)
   local col = math.floor((vim.o.columns - width) / 2)
 
   -- Create buffer if it doesn't exist
@@ -990,11 +998,13 @@ function M.create_popup()
     vim.cmd("syntax enable")
   end
 
-  -- Create window for the popup
+  -- Use the content height, input height, and padding calculated above
+  
+  -- Create window for the popup content
   M.state.win_id = vim.api.nvim_open_win(M.state.buf_id, true, {
     relative = "editor",
     width = width,
-    height = height - 3, -- Reserve space for input
+    height = content_height,
     row = row,
     col = col,
     border = config.ui.border,
@@ -1019,12 +1029,12 @@ function M.create_popup()
     vim.api.nvim_buf_set_option(M.state.input_buf_id, "swapfile", false)
   end
 
-  -- Create input window
+  -- Create input window with proper spacing below content window
   M.state.input_win_id = vim.api.nvim_open_win(M.state.input_buf_id, false, {
     relative = "editor",
     width = width,
-    height = 3,
-    row = row + height - 3,
+    height = input_height,
+    row = row + content_height + padding + 1, -- Add extra space for border + padding
     col = col,
     border = config.ui.border,
     title = " Message ",
