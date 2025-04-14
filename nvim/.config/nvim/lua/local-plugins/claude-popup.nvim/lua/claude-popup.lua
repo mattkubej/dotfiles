@@ -61,6 +61,7 @@ local default_config = {
     improve_selection = "<leader>ci", -- Ask Claude to improve selected code
     explain_selection = "<leader>ce", -- Ask Claude to explain selected code
     implement_comment = "<leader>cp", -- Ask Claude to implement code from comment selection
+    analyze_selection = "<leader>cn", -- Ask Claude to analyze selected code
   },
 
   -- Chat behavior
@@ -144,6 +145,7 @@ function M.setup(user_config)
     improve_selection = { cmd = "ClaudeImproveSelection", desc = "Ask Claude to improve selection" },
     explain_selection = { cmd = "ClaudeExplainSelection", desc = "Ask Claude to explain selection" },
     implement_comment = { cmd = "ClaudeImplementComment", desc = "Ask Claude to implement from comment" },
+    analyze_selection = { cmd = "ClaudeAnalyzeSelection", desc = "Ask Claude to analyze selection" },
   }
 
   -- Apply normal mode keymaps
