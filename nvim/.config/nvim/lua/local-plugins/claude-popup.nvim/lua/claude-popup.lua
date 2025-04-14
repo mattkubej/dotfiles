@@ -61,14 +61,14 @@ local default_config = {
     improve_selection = "<leader>ci", -- Ask Claude to improve selected code
     explain_selection = "<leader>ce", -- Ask Claude to explain selected code
     implement_comment = "<leader>cp", -- Ask Claude to implement code from comment selection
-    analyze_selection = "<leader>cn", -- Ask Claude to analyze selected code
+    analyze_selection = "<leader>cn", -- Ask Claude to analyze selected code for improvements and issues
   },
 
   -- Chat behavior
   chat = {
     save_history = true,                                             -- Whether to save chat history between sessions
     history_file = vim.fn.stdpath("data") .. "/claude_history.json", -- Chat history location
-    initial_message = "Hello! I'm Claude. How can I help you with your code today?",
+    initial_message = "Hello! I'm Claude. Here's how to use this chat:\n\n• Type your message and press Enter in normal mode to submit\n• Use C-s in insert mode to submit\n• Press Esc to exit insert mode, then use <leader>cc to toggle the window\n• Use <leader>cs in visual mode to send selected code\n• Use <leader>ce to explain selected code\n• Use <leader>ci to improve selected code\n• Use <leader>cp to implement code from comments\n• Use <leader>cn to analyze selected code for issues and improvements",
   },
 
   -- Code interaction prompts
@@ -1118,41 +1118,21 @@ end
 
 -- Replace code in buffer with Claude's output
 function M.inline_code_replacement(start_line, end_line, selection, filetype, action_type, custom_prompt)
-  -- Define fallback system prompts for all action types
-  local fallback_system_prompts = {
-    improve =
-    "You are an expert programmer tasked with improving code. Focus on readability, performance, and best practices. Maintain the same functionality. Return ONLY the improved code WITHOUT explanations, comments about changes, markdown formatting, or code block indicators. The output should be plain code that can be directly inserted into the file.",
-
-    implement =
-    "You are an expert programmer tasked with implementing code based on comments or specifications. Write clean, efficient code following best practices. Return ONLY the implemented code WITHOUT explanations, markdown formatting, or code block indicators. The output should be plain code that can be directly inserted into the file.",
-
-    implement_comment =
-    "You are an expert programmer tasked with implementing code based on comments or specifications. Write clean, efficient code following best practices. Return ONLY the implemented code WITHOUT explanations, markdown formatting, or code block indicators. The output should be plain code that can be directly inserted into the file."
-  }
-
-  -- Get appropriate system prompt with fallback
-  local system_prompt = fallback_system_prompts[action_type]
-
-  if not system_prompt then
-    -- Default system prompt for any action type
-    system_prompt =
-    "You are an expert programmer tasked with modifying code. Return ONLY the code without any explanations, markdown formatting, or code block indicators. The output should be plain code that can be directly inserted into the file."
-  end
+  -- Create a consistent system prompt for inline code replacements
+  local system_prompt = "You are an expert programmer tasked with modifying code. Return ONLY the code without any explanations, markdown formatting, or code block indicators. The output should be plain code that can be directly inserted into the file."
 
   -- Create user prompt
   local user_prompt
 
   if custom_prompt then
-    -- Use the enhanced prompt if provided
+    -- Use the configured prompt
     user_prompt = custom_prompt .. "\n\nHere is the " .. filetype .. " code:\n\n" .. selection ..
         "\n\nReturn ONLY the code without explanations, markdown formatting or code block backticks."
   else
-    -- Fallback to basic prompt
-    user_prompt = "Here is " .. filetype .. " code to " .. action_type .. ". Return ONLY the " ..
-        action_type .. "d code without any explanations, just the plain code:\n\n" .. selection
+    -- Error case - should always have a prompt from config
+    vim.notify("Error: No prompt provided for action type '" .. action_type .. "'", vim.log.levels.ERROR)
+    return
   end
-
-  -- We already have a valid system prompt from our fallbacks
 
   -- Call Claude API directly with the selected system prompt
   M.call_claude_api_directly(system_prompt, user_prompt, function(response)
@@ -1203,40 +1183,11 @@ function M.code_action(action_type)
 
       -- Clear existing chat history for focused interaction
       M.clear_chat(true) -- silent clear
-
-      -- Define emergency fallback prompts for common actions
-      local fallback_prompts = {
-        explain = {
-          summary = "Explaining selected code...",
-          prompt =
-          "Please explain this code comprehensively:\n- Overall purpose and functionality\n- How each part contributes to the whole\n- Key algorithms or patterns used\n- Any non-obvious techniques or optimizations\n- Potential edge cases or limitations\n\nFormat your explanation clearly with sections and bullet points where appropriate:"
-        },
-        analyze = {
-          summary = "Analyzing code for issues and improvements...",
-          prompt =
-          "Please analyze this code for:\n- Potential bugs or edge cases\n- Performance bottlenecks\n- Security vulnerabilities\n- Code smells or maintenance issues\n- Opportunities for simplification\n- Adherence to best practices\n\nOrganize your analysis by priority, focusing on the most important issues first:"
-        },
-        improve = {
-          summary = "Improving selected code...",
-          prompt =
-          "As an expert programmer, please improve this code. Focus on:\n- Performance optimization\n- Better readability and code organization\n- Proper error handling and edge cases\n- Following language-specific best practices and idioms\n- Maintaining the original functionality\n\nProvide only the improved code without explanations unless there's something critical I should know:"
-        },
-        implement = {
-          summary = "Implementing code from comments...",
-          prompt =
-          "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:"
-        },
-        implement_comment = {
-          summary = "Implementing code from comments...",
-          prompt =
-          "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:"
-        }
-      }
-
-      -- Get the appropriate prompt using the fallback if needed
-      local prompt_info = fallback_prompts[action_type]
-
-      -- If it's available in config, use that instead
+      
+      -- Get the appropriate prompt from config
+      local prompt_info = nil
+      
+      -- Check if the prompt is available in config
       if config.code_prompts and config.code_prompts[action_type] and
           type(config.code_prompts[action_type]) == "table" and
           config.code_prompts[action_type].summary and
@@ -1246,7 +1197,7 @@ function M.code_action(action_type)
 
       -- Make sure we have valid prompt info
       if not prompt_info then
-        vim.notify("Error: No valid prompt for action type '" .. action_type .. "'", vim.log.levels.ERROR)
+        vim.notify("Error: No valid prompt configuration for action type '" .. action_type .. "'", vim.log.levels.ERROR)
         return
       end
 
@@ -1280,29 +1231,11 @@ function M.code_action(action_type)
       end)
     else
       -- For improve and implement actions, replace the code inline
-      -- Define fallback prompts for inline replacements
-      local fallback_prompts = {
-        improve = {
-          summary = "Improving selected code...",
-          prompt =
-          "As an expert programmer, please improve this code. Focus on:\n- Performance optimization\n- Better readability and code organization\n- Proper error handling and edge cases\n- Following language-specific best practices and idioms\n- Maintaining the original functionality\n\nProvide only the improved code without explanations unless there's something critical I should know:"
-        },
-        implement = {
-          summary = "Implementing code from comments...",
-          prompt =
-          "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:"
-        },
-        implement_comment = {
-          summary = "Implementing code from comments...",
-          prompt =
-          "Please implement code based on this comment/specification. Your implementation should:\n- Follow best practices for the language\n- Include appropriate error handling\n- Be well-structured and maintainable\n- Include helpful comments where needed\n- Be optimized for readability and performance\n\nProvide the complete implementation without explanations unless there are important design decisions to highlight:"
-        }
-      }
-
-      -- Get prompt info with fallback
-      local prompt_info = fallback_prompts[action_type]
-
-      -- If it's available in config, use that instead
+      
+      -- Get prompt info from config
+      local prompt_info = nil
+      
+      -- If it's available in config, use it
       if config.code_prompts and config.code_prompts[action_type] and
           type(config.code_prompts[action_type]) == "table" and
           config.code_prompts[action_type].summary and
@@ -1312,7 +1245,7 @@ function M.code_action(action_type)
 
       -- Make sure we have valid prompt info
       if not prompt_info then
-        vim.notify("Error: No valid prompt for action type '" .. action_type .. "'", vim.log.levels.ERROR)
+        vim.notify("Error: No valid prompt configuration for action type '" .. action_type .. "'", vim.log.levels.ERROR)
         return
       end
 
@@ -2021,6 +1954,14 @@ end
 function M.clear_chat(silent)
   -- Clear the history
   M.state.chat_history = {}
+
+  -- If configured to save history, remove the saved history file
+  if config.chat.save_history then
+    local history_file = config.chat.history_file
+    if vim.fn.filereadable(history_file) == 1 then
+      os.remove(history_file)
+    end
+  end
 
   -- Update the display
   M.display_chat_history()
