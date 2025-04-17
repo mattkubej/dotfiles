@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+
+# Exit if not in a git repository
+if ! git rev-parse --is-inside-work-tree &>/dev/null; then
+  echo "Error: Not in a git repository"
+  exit 1
+fi
+
+# Get user's home directory
+HOME_DIR="$HOME"
+
+# Get the git directory path (the one we want to exclude)
+GIT_DIR=$(git rev-parse --git-common-dir)
+GIT_DIR=$(cd "$GIT_DIR" && pwd)
+
+# Get all worktrees with their branches in a clean format
+worktree_info=$(git worktree list | while read -r line; do
+  # Extract path (first word)
+  path=$(echo "$line" | awk '{print $1}')
+  
+  # Skip if this path contains .git at the end
+  if [[ "$path" == *"/.git" ]]; then
+    continue
+  fi
+  
+  # Skip if this is the git directory we want to exclude
+  if [[ "$path" == "$GIT_DIR" || "$path" == "$GIT_DIR/.." ]]; then
+    continue
+  fi
+  
+  # Replace home directory with ~
+  path=${path/$HOME_DIR/\~}
+  
+  # Get the rest of the line (commit and branch info)
+  rest=$(echo "$line" | cut -d' ' -f2-)
+  
+  # Extract SHA (first word of rest)
+  sha=$(echo "$rest" | awk '{print $1}')
+  
+  # Extract branch info
+  if [[ "$rest" == *"[main]"* ]]; then
+    type="[MAIN]"
+    branch="(main)"
+  elif [[ "$rest" == *"["* ]]; then
+    type="[WORKTREE]"
+    branch=$(echo "$rest" | grep -o '\[.*\]' | sed 's/\[/(/; s/\]/)/;')
+  else
+    type="[WORKTREE]"
+    branch="(detached HEAD)"
+  fi
+  
+  # Format the output
+  printf "%-50s  %-12s  %s %s\n" "$path" "$type" "$sha" "$branch"
+done)
+
+# If no worktrees found
+if [[ -z "$worktree_info" ]]; then
+  echo "No worktrees found"
+  exit 1
+fi
+
+# Use fzf to select a worktree with a cleaner interface
+selected=$(echo "$worktree_info" | fzf --height 40% --reverse \
+  --header="Select a worktree to switch to" \
+  --no-preview)
+
+# Extract the path from the selection
+if [[ -n "$selected" ]]; then
+  # Extract just the path part (before any labels)
+  worktree_path=$(echo "$selected" | awk '{print $1}' | xargs)
+  
+  # Replace ~ with the actual home directory
+  worktree_path="${worktree_path/#\~/$HOME_DIR}"
+  
+  # Print the path we're switching to
+  echo "Switching to: $worktree_path"
+  
+  # Use exec to replace the current shell process with a new one in the selected directory
+  exec bash -c "cd \"$worktree_path\" && exec \$SHELL"
+fi
