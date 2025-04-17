@@ -70,3 +70,5 @@ end
 if type -q refresh_openai_key
   refresh_openai_key
 end
+
+alias pr-description='claude -p (cat ~/prompts/pr-description.md) --allowedTools "Bash(git diff:*)" "Bash(git log:*)"'
