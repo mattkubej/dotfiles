@@ -62,21 +62,5 @@ vim.g.etrw_dirhistmax = 0 -- do not save any netrw history or bookmarks
 
 opt.clipboard = 'unnamedplus'
 
--- system clipboard within spin
-if os.getenv('SPIN') == '1' then
-  vim.g.clipboard = {
-    name = 'pbcopy',
-    copy = {
-      ['+'] = 'pbcopy',
-      ['*'] = 'pbcopy',
-    },
-    paste = {
-      ['+'] = 'pbpaste',
-      ['*'] = 'pbpaste',
-    },
-    cache_enabled = 1,
-  }
-end
-
 -- copilot configuration needs to execute before the plugin is loaded
 vim.g.copilot_no_tab_map = true

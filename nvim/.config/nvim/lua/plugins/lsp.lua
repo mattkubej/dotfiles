@@ -24,9 +24,8 @@ return {
         config = function()
           local nvim_lsp = require('lspconfig')
           require('typescript-tools').setup({
-            single_file_support = os.getenv("SPIN") ~= nil,
             settings = {
-              separate_diagnostic_server = os.getenv("SPIN") == nil,
+              separate_diagnostic_server = true,
               tsserver_max_memory = 10240,
               root_dir = nvim_lsp.util.root_pattern("package.json"),
             },
