@@ -1,0 +1,27 @@
+[time]
+disabled = false
+format = '[$time]($style) '
+time_format = "%H:%M"
+style = "bright-black"
+
+[cmd_duration]
+min_time = 100 
+format = "took [$duration]($style) "
+
+[git_status]
+disabled = true
+
+[nodejs]
+disabled = true
+
+[package]
+disabled = true
+
+[ruby]
+disabled = true
+
+[gcloud]
+disabled = true
+
+[nix_shell]
+disabled = true
