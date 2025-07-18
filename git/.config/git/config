@@ -30,3 +30,6 @@
 
 [pager]
   difftool = true
+
+[lfs]
+  setlockablereadonly = false
