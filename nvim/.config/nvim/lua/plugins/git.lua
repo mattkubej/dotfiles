@@ -13,7 +13,7 @@ return {
 
         map('n', ']h', function()
           if vim.wo.diff then
-            vim.cmd.normal({']h', bang = true})
+            vim.cmd.normal({ ']h', bang = true })
           else
             gs.nav_hunk('next')
           end
@@ -21,7 +21,7 @@ return {
 
         map('n', '[h', function()
           if vim.wo.diff then
-            vim.cmd.normal({'[h', bang = true})
+            vim.cmd.normal({ '[h', bang = true })
           else
             gs.nav_hunk('prev')
           end
@@ -33,10 +33,14 @@ return {
   },
   {
     'tpope/vim-fugitive',
+    dependencies = {
+      'tpope/vim-rhubarb',
+    },
     keys = {
       { '<leader>gs', vim.cmd.Git,                        desc = '[G]it [S]tatus' },
       { '<leader>gp', function() vim.cmd.Git('push') end, desc = '[G]it [P]ush' },
-    }
+    },
+    cmd = { 'Git', 'GBrowse' },
   },
   {
     "kdheepak/lazygit.nvim",
