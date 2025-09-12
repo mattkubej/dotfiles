@@ -7,6 +7,7 @@ return {
         aerial = true,
         cmp = true,
         fidget = true,
+        fzf = true,
         gitsigns = true,
         illuminate = {
           enabled = true,
@@ -24,7 +25,6 @@ return {
         native_lsp = { enabled = true },
         neotest = true,
         nvimtree = true,
-        telescope = true,
         treesitter = true,
         treesitter_context = true,
       })
