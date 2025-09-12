@@ -64,3 +64,5 @@ opt.clipboard = 'unnamedplus'
 
 -- copilot configuration needs to execute before the plugin is loaded
 vim.g.copilot_no_tab_map = true
+
+opt.laststatus = 3

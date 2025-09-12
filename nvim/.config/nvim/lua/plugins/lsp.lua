@@ -18,24 +18,24 @@ return {
         }
       },
       { 'folke/neodev.nvim', opts = {} },
-      {
-        "pmizio/typescript-tools.nvim",
-        dependencies = { "nvim-lua/plenary.nvim" },
-        config = function()
-          local nvim_lsp = require('lspconfig')
-          require('typescript-tools').setup({
-            settings = {
-              separate_diagnostic_server = true,
-              tsserver_max_memory = 10240,
-              root_dir = nvim_lsp.util.root_pattern("package.json"),
-            },
-            on_attach = function(client)
-              client.server_capabilities.documentFormattingProvider = false
-              client.server_capabilities.documentFormattingRangeProvider = false
-            end,
-          })
-        end,
-      }
+      -- {
+      --   "pmizio/typescript-tools.nvim",
+      --   dependencies = { "nvim-lua/plenary.nvim" },
+      --   config = function()
+      --     local nvim_lsp = require('lspconfig')
+      --     require('typescript-tools').setup({
+      --       settings = {
+      --         separate_diagnostic_server = true,
+      --         tsserver_max_memory = 10240,
+      --         root_dir = nvim_lsp.util.root_pattern("package.json"),
+      --       },
+      --       on_attach = function(client)
+      --         client.server_capabilities.documentFormattingProvider = false
+      --         client.server_capabilities.documentFormattingRangeProvider = false
+      --       end,
+      --     })
+      --   end,
+      -- }
     },
     config = function()
       local lsp = require('lspconfig')
@@ -130,12 +130,45 @@ return {
           end,
         },
       })
+
+      -- Setup tsgo as custom server (not available in Mason)
+      local configs = require('lspconfig.configs')
+      if not configs.tsgo then
+        configs.tsgo = {
+          default_config = {
+            cmd = { 'tsgo', '--lsp', '--stdio' },
+            filetypes = {
+              'javascript',
+              'javascriptreact',
+              'javascript.jsx',
+              'typescript',
+              'typescriptreact',
+              'typescript.tsx',
+            },
+            root_dir = lsp.util.root_pattern(
+              'tsconfig.json',
+              'jsconfig.json',
+              'package.json',
+              'tsconfig.base.json',
+              '.git'
+            ),
+            single_file_support = true,
+          },
+        }
+      end
+
+      lsp.tsgo.setup({
+        capabilities = lsp_capabilities,
+      })
+
       require("mason-null-ls").setup({
         ensure_installed = {},
         automatic_installation = false,
         handlers = {},
       })
+
       local null_ls = require('null-ls')
+
       null_ls.setup({
         sources = {
           null_ls.builtins.formatting.prettier.with({

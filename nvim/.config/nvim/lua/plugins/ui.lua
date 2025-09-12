@@ -55,22 +55,6 @@ return {
     }
   },
   {
-    'folke/zen-mode.nvim',
-    opts = {
-      window = {
-        width = 120,
-        options = {
-          number = true,
-          relativenumber = true,
-        }
-      },
-    },
-    cmd = "ZenMode",
-    keys = {
-      { "<leader>zz", vim.cmd.ZenMode, desc = "Toggle Zen Mode" },
-    },
-  },
-  {
     'RRethy/vim-illuminate',
     config = function()
       require('illuminate').configure({
@@ -105,4 +89,26 @@ return {
       require('modes').setup()
     end,
   },
+  {
+    'shortcuts/no-neck-pain.nvim',
+    lazy = false,
+    opts = {
+      width = 140,
+      autocmds = {
+        enableOnVimEnter = true,
+        skipEnteringNoNeckPainBuffer = true,
+      },
+      mappings = {
+        toggle = "<leader>np",
+      },
+      buffers = {
+        wo = {
+          fillchars = "eob: ",
+        },
+        colors = {
+          background = "catppuccin-mocha",
+        }
+      }
+    },
+  }
 }

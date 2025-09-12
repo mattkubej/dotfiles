@@ -16,6 +16,11 @@ return {
       return {
         defaults = {
           layout_strategy = 'vertical',
+          layout_config = {
+            vertical = {
+              width = 0.6,
+            },
+          },
           mappings = {
             n = {
               ['<C-r>'] = actions.delete_buffer
