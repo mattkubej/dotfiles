@@ -66,3 +66,17 @@ opt.clipboard = 'unnamedplus'
 vim.g.copilot_no_tab_map = true
 
 opt.laststatus = 3
+
+-- Enable list mode
+opt.list = true
+
+-- Configure listchars to show only problematic whitespace
+opt.listchars = {
+    tab = "→ ",      -- Show actual tab characters
+    trail = "·",     -- Show trailing spaces
+    extends = "⟩",   -- Show when line continues beyond viewport
+    precedes = "⟨",  -- Show when line has content before viewport
+    nbsp = "␣",      -- Show non-breaking spaces
+    space = "·",  -- DON'T use this with ibl (too noisy)
+    eol = "↴",    -- Usually too noisy
+}
