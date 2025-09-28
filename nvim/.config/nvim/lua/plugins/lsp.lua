@@ -1,12 +1,63 @@
 return {
   {
+    'williamboman/mason.nvim',
+    opts = {}
+  },
+
+  {
+    'stevearc/conform.nvim',
+    event = { "BufReadPre", "BufNewFile" },
+    config = function()
+      require('conform').setup({
+        formatters_by_ft = {
+          javascript = { "prettier" },
+          typescript = { "prettier" },
+          javascriptreact = { "prettier" },
+          typescriptreact = { "prettier" },
+          json = { "prettier" },
+          jsonc = { "prettier" },
+          html = { "prettier" },
+          css = { "prettier" },
+          scss = { "prettier" },
+          markdown = { "prettier" },
+          yaml = { "prettier" },
+          graphql = { "prettier" },
+        },
+        format_on_save = function(bufnr)
+          -- Disable with a global or buffer-local variable
+          if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+            return
+          end
+          return { timeout_ms = 500, lsp_fallback = true }
+        end,
+      })
+
+      -- Commands to toggle format on save
+      vim.api.nvim_create_user_command("FormatDisable", function(args)
+        if args.bang then
+          vim.g.disable_autoformat = true
+        else
+          vim.b.disable_autoformat = true
+        end
+      end, {
+        desc = "Disable autoformat-on-save",
+        bang = true,
+      })
+
+      vim.api.nvim_create_user_command("FormatEnable", function()
+        vim.b.disable_autoformat = false
+        vim.g.disable_autoformat = false
+      end, {
+        desc = "Re-enable autoformat-on-save",
+      })
+    end
+  },
+
+  {
     'neovim/nvim-lspconfig',
     dependencies = {
-      'williamboman/mason.nvim',
       'williamboman/mason-lspconfig.nvim',
       'onsails/lspkind.nvim',
-      'nvimtools/none-ls.nvim',
-      'jay-babu/mason-null-ls.nvim',
       {
         'j-hui/fidget.nvim',
         opts = {
@@ -17,25 +68,7 @@ return {
           },
         }
       },
-      { 'folke/neodev.nvim', opts = {} },
-      -- {
-      --   "pmizio/typescript-tools.nvim",
-      --   dependencies = { "nvim-lua/plenary.nvim" },
-      --   config = function()
-      --     local nvim_lsp = require('lspconfig')
-      --     require('typescript-tools').setup({
-      --       settings = {
-      --         separate_diagnostic_server = true,
-      --         tsserver_max_memory = 10240,
-      --         root_dir = nvim_lsp.util.root_pattern("package.json"),
-      --       },
-      --       on_attach = function(client)
-      --         client.server_capabilities.documentFormattingProvider = false
-      --         client.server_capabilities.documentFormattingRangeProvider = false
-      --       end,
-      --     })
-      --   end,
-      -- }
+      { 'folke/lazydev.nvim', ft = 'lua', opts = {} },
     },
     config = function()
       local lsp = require('lspconfig')
@@ -66,7 +99,7 @@ return {
           nmap('<leader>rn', vim.lsp.buf.rename, 'Rename')
           nmap('<leader>ca', vim.lsp.buf.code_action, 'Code action')
           nmap('<leader>f', function()
-            vim.lsp.buf.format({ timeout_ms = 10000 })
+            require('conform').format({ async = true, lsp_fallback = true })
           end, 'Format current buffer')
         end
       })
@@ -79,17 +112,8 @@ return {
         float = { border = 'rounded' },
       })
 
-      vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(
-        vim.lsp.handlers.hover,
-        { border = 'rounded' }
-      )
+      vim.o.winborder = 'rounded'
 
-      vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(
-        vim.lsp.handlers.signature_help,
-        { border = 'rounded' }
-      )
-
-      require("lspconfig.ui.windows").default_options.border = "rounded"
 
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       local lsp_capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
@@ -123,7 +147,13 @@ return {
                 Lua = {
                   diagnostics = {
                     globals = { 'vim' }
-                  }
+                  },
+                  workspace = {
+                    checkThirdParty = false,
+                  },
+                  telemetry = {
+                    enable = false,
+                  },
                 }
               }
             })
@@ -159,22 +189,6 @@ return {
 
       lsp.tsgo.setup({
         capabilities = lsp_capabilities,
-      })
-
-      require("mason-null-ls").setup({
-        ensure_installed = {},
-        automatic_installation = false,
-        handlers = {},
-      })
-
-      local null_ls = require('null-ls')
-
-      null_ls.setup({
-        sources = {
-          null_ls.builtins.formatting.prettier.with({
-            prefer_local = 'node_modules/.bin',
-          }),
-        }
       })
     end
   },
