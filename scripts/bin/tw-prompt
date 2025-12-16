@@ -1,0 +1,20 @@
+#!/usr/bin/env fish
+read -P "Feature: " name
+and begin
+    # Source config
+    source ~/.config/tsession/config
+
+    set -l dated (date +"%m-%d")-$name
+    set -l worktree_path "$MONOREPO_WORKTREES/$dated"
+    set -l target_dir "$worktree_path/$MONOREPO_SUBDIR"
+
+    # Create session with command that runs on startup
+    tmux new-session -d -s "$dated" -c "$MONOREPO_GIT" fish -c "git worktree add -b $dated $worktree_path; and cd $target_dir; exec fish"
+
+    # Switch to session (popup closes)
+    if test -z "$TMUX"
+        tmux attach -t "$dated"
+    else
+        tmux switch-client -t "$dated"
+    end
+end

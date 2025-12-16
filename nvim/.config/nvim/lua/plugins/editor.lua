@@ -121,11 +121,20 @@ return {
     },
   },
   {
+    'folke/flash.nvim',
+    event = 'VeryLazy',
+    opts = {},
+    keys = {
+      { '<leader>j', function() require('flash').jump() end, mode = { 'n', 'x', 'o' }, desc = 'Flash jump' },
+      { '<leader>J', function() require('flash').treesitter() end, mode = { 'n', 'x', 'o' }, desc = 'Flash treesitter' },
+    },
+  },
+  {
     'stevearc/aerial.nvim',
     opts = {
       on_attach = function(bufnr)
-        vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr })
-        vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr })
+        vim.keymap.set("n", "[[", "<cmd>AerialPrev<CR>", { buffer = bufnr })
+        vim.keymap.set("n", "]]", "<cmd>AerialNext<CR>", { buffer = bufnr })
       end,
       layout = {
         min_width = 0.1,

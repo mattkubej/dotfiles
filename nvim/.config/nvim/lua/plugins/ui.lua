@@ -32,7 +32,7 @@ return {
       vim.cmd('colorscheme catppuccin-frappe')
 
       local colors = require("catppuccin.palettes").get_palette("frappe")
-      vim.api.nvim_set_hl(0, "Whitespace", { fg = colors.surface0 })  -- Very faint
+      vim.api.nvim_set_hl(0, "Whitespace", { fg = colors.surface0 }) -- Very faint
       vim.api.nvim_set_hl(0, "NonText", { fg = colors.surface0 })
     end
   },
@@ -102,7 +102,8 @@ return {
         skipEnteringNoNeckPainBuffer = true,
       },
       mappings = {
-        toggle = "<leader>np",
+        enabled = true,
+        toggle = "<leader>z",
       },
       buffers = {
         wo = {

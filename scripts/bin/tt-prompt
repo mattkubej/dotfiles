@@ -1,0 +1,3 @@
+#!/usr/bin/env fish
+read -P "Try: " name
+and tt $name

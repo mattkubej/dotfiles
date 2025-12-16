@@ -137,6 +137,7 @@ return {
           'eslint',
           'jsonls',
           'stylelint_lsp',
+          'ts_ls'
         },
         handlers = {
           default_setup,
@@ -162,34 +163,34 @@ return {
       })
 
       -- Setup tsgo as custom server (not available in Mason)
-      local configs = require('lspconfig.configs')
-      if not configs.tsgo then
-        configs.tsgo = {
-          default_config = {
-            cmd = { 'tsgo', '--lsp', '--stdio' },
-            filetypes = {
-              'javascript',
-              'javascriptreact',
-              'javascript.jsx',
-              'typescript',
-              'typescriptreact',
-              'typescript.tsx',
-            },
-            root_dir = lsp.util.root_pattern(
-              'tsconfig.json',
-              'jsconfig.json',
-              'package.json',
-              'tsconfig.base.json',
-              '.git'
-            ),
-            single_file_support = true,
-          },
-        }
-      end
-
-      lsp.tsgo.setup({
-        capabilities = lsp_capabilities,
-      })
+      -- local configs = require('lspconfig.configs')
+      -- if not configs.tsgo then
+      --   configs.tsgo = {
+      --     default_config = {
+      --       cmd = { 'tsgo', '--lsp', '--stdio' },
+      --       filetypes = {
+      --         'javascript',
+      --         'javascriptreact',
+      --         'javascript.jsx',
+      --         'typescript',
+      --         'typescriptreact',
+      --         'typescript.tsx',
+      --       },
+      --       root_dir = lsp.util.root_pattern(
+      --         'tsconfig.json',
+      --         'jsconfig.json',
+      --         'package.json',
+      --         'tsconfig.base.json',
+      --         '.git'
+      --       ),
+      --       single_file_support = true,
+      --     },
+      --   }
+      -- end
+      --
+      -- lsp.tsgo.setup({
+      --   capabilities = lsp_capabilities,
+      -- })
     end
   },
 }

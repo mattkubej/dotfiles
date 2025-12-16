@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Clean up finished worktrees and their sessions
+
+# Source config
+if [[ -f ~/.config/tsession/config ]]; then
+    source <(grep '^set -gx' ~/.config/tsession/config | sed 's/set -gx \([^ ]*\) /export \1=/; s/"//g')
+fi
+
+cd "$MONOREPO_GIT"
+
+# Get worktrees and mark active sessions
+git worktree list | while read -r line; do
+    path=$(echo "$line" | awk '{print $1}')
+    name=$(basename "$path")
+    if tmux has-session -t "$name" 2>/dev/null; then
+        echo "$line [SESSION ACTIVE]"
+    else
+        echo "$line"
+    fi
+done | fzf --multi --header="Select worktrees to remove (TAB to select multiple)" | while read -r line; do
+    path=$(echo "$line" | awk '{print $1}')
+    name=$(basename "$path")
+
+    # Kill session if it exists
+    tmux kill-session -t "$name" 2>/dev/null
+
+    # Remove worktree
+    git worktree remove "$path" --force
+    echo "Removed worktree: $name"
+done

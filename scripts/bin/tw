@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# Create worktree with tmux session
+
+# Source config
+if [[ -f ~/.config/tsession/config ]]; then
+    source <(grep '^set -gx' ~/.config/tsession/config | sed 's/set -gx /export /; s/"//g')
+fi
+
+name="$1"
+subdir="${2:-$MONOREPO_SUBDIR}"
+
+if [[ -z "$name" ]]; then
+    echo "Usage: tw <feature-name> [subdirectory]"
+    echo "  Default subdirectory: $MONOREPO_SUBDIR"
+    exit 1
+fi
+
+# Add date prefix
+dated="$(date +"%m-%d")-$name"
+worktree_path="$MONOREPO_WORKTREES/$dated"
+target_dir="$worktree_path"
+
+# Handle subdirectory
+if [[ "$subdir" != "." && -n "$subdir" ]]; then
+    target_dir="$target_dir/$subdir"
+fi
+
+# Create worktree from bare repo
+cd "$MONOREPO_GIT"
+git worktree add -b "$dated" "$worktree_path"
+
+# Create tmux session
+tmux new-session -d -s "$dated" -c "$target_dir"
+
+# Switch to session
+if [[ -z "$TMUX" ]]; then
+    tmux attach -t "$dated"
+else
+    tmux switch-client -t "$dated"
+fi

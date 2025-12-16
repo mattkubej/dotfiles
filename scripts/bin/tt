@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Create try experiment session
+
+# Source config
+if [[ -f ~/.config/tsession/config ]]; then
+    source <(grep '^set -gx' ~/.config/tsession/config | sed 's/set -gx /export /; s/"//g')
+fi
+
+name="${1:-experiment}"
+dated="$(date +"%Y-%m-%d")-$name"
+
+# Create directory
+mkdir -p "$TRY_PATH/$dated"
+
+# Create and switch to session
+if [[ -z "$TMUX" ]]; then
+    tmux new-session -s "$dated" -c "$TRY_PATH/$dated"
+else
+    tmux new-session -d -s "$dated" -c "$TRY_PATH/$dated"
+    tmux switch-client -t "$dated"
+fi

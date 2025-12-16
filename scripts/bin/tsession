@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# tsession - fuzzy find and switch tmux sessions
+
+list_sessions() {
+    tmux list-sessions -F "#{session_name}:#{pane_current_path}" 2>/dev/null | while IFS=: read -r name path; do
+        # Shorten path for display
+        display_path="${path/#$HOME/\~}"
+        printf "%-25s %s\n" "$name" "$display_path"
+    done
+}
+
+selected=$(list_sessions | fzf \
+    --layout=reverse \
+    --border=none \
+    --prompt="session > " \
+    --header="enter: switch  ^x: kill" \
+    --bind="ctrl-x:execute(tmux kill-session -t {1})+reload(tsession-list)")
+
+if [[ -n "$selected" ]]; then
+    name=$(echo "$selected" | awk '{print $1}')
+
+    if [[ -z "$TMUX" ]]; then
+        tmux attach -t "$name"
+    else
+        tmux switch-client -t "$name"
+    fi
+fi

@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Launch Claude in current directory
+claude --dangerously-skip-permissions
