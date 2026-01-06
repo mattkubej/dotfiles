@@ -40,3 +40,32 @@ vim.keymap.set("n", "<leader>w", "<cmd>update<CR>", { desc = "Save file" })
 vim.keymap.set("n", "<leader>wq", "<cmd>wq<CR>", { desc = "Save and quit" })
 vim.keymap.set("n", "<leader>q", "<cmd>q<CR>", { desc = "Quit" })
 
+-- Quickfix navigation
+vim.keymap.set("n", "]q", "<cmd>cnext<CR>zz", { desc = "Next quickfix" })
+vim.keymap.set("n", "[q", "<cmd>cprev<CR>zz", { desc = "Previous quickfix" })
+vim.keymap.set("n", "]Q", "<cmd>clast<CR>zz", { desc = "Last quickfix" })
+vim.keymap.set("n", "[Q", "<cmd>cfirst<CR>zz", { desc = "First quickfix" })
+
+-- Location list navigation
+vim.keymap.set("n", "]w", "<cmd>lnext<CR>zz", { desc = "Next location" })
+vim.keymap.set("n", "[w", "<cmd>lprev<CR>zz", { desc = "Previous location" })
+
+-- Buffer navigation
+vim.keymap.set("n", "<S-h>", "<cmd>bprevious<CR>", { desc = "Previous buffer" })
+vim.keymap.set("n", "<S-l>", "<cmd>bnext<CR>", { desc = "Next buffer" })
+vim.keymap.set("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "Delete buffer" })
+
+-- Window navigation
+vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Window left" })
+vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Window down" })
+vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Window up" })
+vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Window right" })
+
+-- Better indenting (stay in visual mode)
+vim.keymap.set("v", "<", "<gv", { desc = "Indent left" })
+vim.keymap.set("v", ">", ">gv", { desc = "Indent right" })
+
+-- Add blank lines
+vim.keymap.set("n", "]<Space>", "o<Esc>k", { desc = "Add blank line below" })
+vim.keymap.set("n", "[<Space>", "O<Esc>j", { desc = "Add blank line above" })
+

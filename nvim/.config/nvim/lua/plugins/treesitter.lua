@@ -57,28 +57,61 @@ return {
           enable = true,
           lookahead = true,
           keymaps = {
-            ['aa'] = '@parameter.outer',
-            ['ia'] = '@parameter.inner',
-            ['af'] = '@function.outer',
-            ['if'] = '@function.inner',
-            ['ac'] = '@class.outer',
-            ['ic'] = '@class.inner',
+            -- Parameter/argument
+            ['aa'] = { query = '@parameter.outer', desc = 'around argument' },
+            ['ia'] = { query = '@parameter.inner', desc = 'inside argument' },
+            -- Function
+            ['af'] = { query = '@function.outer', desc = 'around function' },
+            ['if'] = { query = '@function.inner', desc = 'inside function' },
+            -- Class
+            ['ac'] = { query = '@class.outer', desc = 'around class' },
+            ['ic'] = { query = '@class.inner', desc = 'inside class' },
+            -- Block (if/for/while/etc)
+            ['ab'] = { query = '@block.outer', desc = 'around block' },
+            ['ib'] = { query = '@block.inner', desc = 'inside block' },
+            -- Conditional
+            ['ai'] = { query = '@conditional.outer', desc = 'around conditional' },
+            ['ii'] = { query = '@conditional.inner', desc = 'inside conditional' },
+            -- Loop
+            ['al'] = { query = '@loop.outer', desc = 'around loop' },
+            ['il'] = { query = '@loop.inner', desc = 'inside loop' },
+            -- Call (function call)
+            ['am'] = { query = '@call.outer', desc = 'around method/call' },
+            ['im'] = { query = '@call.inner', desc = 'inside method/call' },
+            -- Comment
+            ['a/'] = { query = '@comment.outer', desc = 'around comment' },
+            -- Return statement
+            ['ar'] = { query = '@return.outer', desc = 'around return' },
+            ['ir'] = { query = '@return.inner', desc = 'inside return' },
+            -- Assignment
+            ['a='] = { query = '@assignment.outer', desc = 'around assignment' },
+            ['i='] = { query = '@assignment.inner', desc = 'inside assignment' },
+            ['l='] = { query = '@assignment.lhs', desc = 'assignment LHS' },
+            ['r='] = { query = '@assignment.rhs', desc = 'assignment RHS' },
           },
         },
         move = {
           enable = true,
           set_jumps = true,
           goto_next_start = {
-            [']v'] = '@function.outer',
-            [']c'] = '@class.outer',
+            [']v'] = { query = '@function.outer', desc = 'Next function' },
+            [']c'] = { query = '@class.outer', desc = 'Next class' },
+            [']a'] = { query = '@parameter.inner', desc = 'Next argument' },
+            [']l'] = { query = '@loop.outer', desc = 'Next loop' },
+            [']m'] = { query = '@call.outer', desc = 'Next method/call' },
+            [']/'] = { query = '@comment.outer', desc = 'Next comment' },
           },
           goto_next_end = {
             [']V'] = '@function.outer',
             [']C'] = '@class.outer',
           },
           goto_previous_start = {
-            ['[v'] = '@function.outer',
-            ['[c'] = '@class.outer',
+            ['[v'] = { query = '@function.outer', desc = 'Previous function' },
+            ['[c'] = { query = '@class.outer', desc = 'Previous class' },
+            ['[a'] = { query = '@parameter.inner', desc = 'Previous argument' },
+            ['[l'] = { query = '@loop.outer', desc = 'Previous loop' },
+            ['[m'] = { query = '@call.outer', desc = 'Previous method/call' },
+            ['[/'] = { query = '@comment.outer', desc = 'Previous comment' },
           },
           goto_previous_end = {
             ['[V'] = '@function.outer',

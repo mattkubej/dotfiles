@@ -3,6 +3,26 @@ return {
   'tpope/vim-unimpaired',
   'tpope/vim-repeat',
   'mattn/emmet-vim',
+
+  -- Comment operations (gc to toggle)
+  {
+    'numToStr/Comment.nvim',
+    event = 'VeryLazy',
+    opts = {},
+  },
+
+  -- Search and replace with preview
+  {
+    'nvim-pack/nvim-spectre',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    keys = {
+      { '<leader>sr', function() require('spectre').toggle() end, desc = 'Search & Replace (Spectre)' },
+      { '<leader>sR', function() require('spectre').open_visual({ select_word = true }) end, desc = 'Replace word under cursor' },
+      { '<leader>sR', function() require('spectre').open_visual() end, mode = 'v', desc = 'Replace selection' },
+    },
+    opts = {},
+  },
+
   {
     'echasnovski/mini.surround',
     opts = {

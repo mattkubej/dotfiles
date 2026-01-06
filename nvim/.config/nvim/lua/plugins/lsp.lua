@@ -80,14 +80,21 @@ return {
             if desc then
               desc = 'LSP: ' .. desc
             end
-
             vim.keymap.set('n', keys, func, { buffer = event.buf, desc = desc })
           end
 
+          -- Diagnostics
           nmap('<leader>D', vim.diagnostic.open_float, 'Open diagnostic float')
-          nmap('[d', vim.diagnostic.goto_prev, 'Go to previous diagnostic')
-          nmap(']d', vim.diagnostic.goto_next, 'Go to next diagnostic')
+          nmap('[d', vim.diagnostic.goto_prev, 'Previous diagnostic')
+          nmap(']d', vim.diagnostic.goto_next, 'Next diagnostic')
+          nmap('[e', function()
+            vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })
+          end, 'Previous error')
+          nmap(']e', function()
+            vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
+          end, 'Next error')
 
+          -- Navigation
           nmap('K', vim.lsp.buf.hover, 'Hover documentation')
           nmap('gd', vim.lsp.buf.definition, 'Go to definition')
           nmap('gD', vim.lsp.buf.declaration, 'Go to declaration')
@@ -96,11 +103,52 @@ return {
           nmap('gr', require('fzf-lua').lsp_references, 'Go to references')
           nmap('gs', vim.lsp.buf.signature_help, 'Signature documentation')
 
-          nmap('<leader>rn', vim.lsp.buf.rename, 'Rename')
+          -- Refactoring
+          nmap('<leader>rn', vim.lsp.buf.rename, 'Rename symbol')
           nmap('<leader>ca', vim.lsp.buf.code_action, 'Code action')
           nmap('<leader>f', function()
             require('conform').format({ async = true, lsp_fallback = true })
-          end, 'Format current buffer')
+          end, 'Format buffer')
+
+          -- Inlay hints toggle (if supported)
+          if vim.lsp.inlay_hint then
+            nmap('<leader>ih', function()
+              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
+            end, 'Toggle inlay hints')
+            -- Enable inlay hints by default
+            vim.lsp.inlay_hint.enable(true)
+          end
+
+          -- Document highlight on cursor hold
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          if client and client.server_capabilities.documentHighlightProvider then
+            vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+              buffer = event.buf,
+              callback = vim.lsp.buf.document_highlight,
+            })
+            vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+              buffer = event.buf,
+              callback = vim.lsp.buf.clear_references,
+            })
+          end
+
+          -- Configure inlay hints for TypeScript
+          if client and client.name == 'ts_ls' then
+            local inlay_settings = {
+              includeInlayParameterNameHints = 'all',
+              includeInlayFunctionParameterTypeHints = true,
+              includeInlayVariableTypeHints = true,
+              includeInlayPropertyDeclarationTypeHints = true,
+              includeInlayFunctionLikeReturnTypeHints = true,
+              includeInlayEnumMemberValueHints = true,
+            }
+            client:notify('workspace/didChangeConfiguration', {
+              settings = {
+                typescript = { inlayHints = inlay_settings },
+                javascript = { inlayHints = inlay_settings },
+              },
+            })
+          end
         end
       })
 
@@ -155,8 +203,29 @@ return {
                   telemetry = {
                     enable = false,
                   },
+                  hint = {
+                    enable = true,
+                  },
                 }
               }
+            })
+          end,
+          rust_analyzer = function()
+            lsp.rust_analyzer.setup({
+              capabilities = lsp_capabilities,
+              settings = {
+                ['rust-analyzer'] = {
+                  inlayHints = {
+                    bindingModeHints = { enable = true },
+                    chainingHints = { enable = true },
+                    closingBraceHints = { enable = true },
+                    closureReturnTypeHints = { enable = 'always' },
+                    lifetimeElisionHints = { enable = 'always' },
+                    parameterHints = { enable = true },
+                    typeHints = { enable = true },
+                  },
+                },
+              },
             })
           end,
         },
