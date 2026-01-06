@@ -8,7 +8,6 @@ opt.relativenumber = true
 
 opt.hidden     = true
 opt.showmode   = false
-opt.updatetime = 1000
 opt.hlsearch   = false
 opt.scrolloff  = 10
 
@@ -58,7 +57,7 @@ opt.formatoptions = opt.formatoptions
     + 'q'
     + 'r'
 
-vim.g.etrw_dirhistmax = 0 -- do not save any netrw history or bookmarks
+vim.g.netrw_dirhistmax = 0 -- do not save any netrw history or bookmarks
 
 opt.clipboard = 'unnamedplus'
 
