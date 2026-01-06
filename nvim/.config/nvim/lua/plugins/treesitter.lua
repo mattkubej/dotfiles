@@ -100,10 +100,10 @@ return {
       require("nvim-treesitter.configs").setup(opts)
 
       local move = require('nvim-treesitter.textobjects.move')
-      vim.keymap.set({ 'n', 'x', 'o' }, '<leader>w', function()
+      vim.keymap.set({ 'n', 'x', 'o' }, ']i', function()
         move.goto_next_start('@conditional.outer')
       end, { desc = 'Next conditional' })
-      vim.keymap.set({ 'n', 'x', 'o' }, '<leader>b', function()
+      vim.keymap.set({ 'n', 'x', 'o' }, '[i', function()
         move.goto_previous_start('@conditional.outer')
       end, { desc = 'Prev conditional' })
     end,

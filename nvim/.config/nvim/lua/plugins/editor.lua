@@ -3,7 +3,6 @@ return {
   'tpope/vim-unimpaired',
   'tpope/vim-repeat',
   'mattn/emmet-vim',
-  { 'echasnovski/mini.pairs',   opts = {}, version = false },
   {
     'echasnovski/mini.surround',
     opts = {
@@ -29,10 +28,8 @@ return {
   {
     'mbbill/undotree',
     cmd = "UndotreeToggle",
-    opts = {
-      keys = {
-        { "<leader>u", vim.cmd.UndotreeToggle },
-      },
+    keys = {
+      { "<leader>u", vim.cmd.UndotreeToggle, desc = "Toggle Undotree" },
     },
   },
   {
@@ -100,12 +97,12 @@ return {
     'folke/trouble.nvim',
     opts = {},
     keys = {
-      { "<leader>xx", vim.cmd.TroubleToggle },
-      { "<leader>xw", function() vim.cmd.TroubleToggle('workspace_diagnostics') end },
-      { "<leader>xd", function() vim.cmd.TroubleToggle('document_diagnostics') end },
-      { "<leader>xl", function() vim.cmd.TroubleToggle('loclist') end },
-      { "<leader>xq", function() vim.cmd.TroubleToggle('quickfix') end },
-      { "<leader>xr", function() vim.cmd.TroubleToggle('lsp_references') end },
+      { "<leader>xx", function() require('trouble').toggle() end, desc = "Toggle Trouble" },
+      { "<leader>xw", function() require('trouble').toggle('workspace_diagnostics') end, desc = "Workspace diagnostics" },
+      { "<leader>xd", function() require('trouble').toggle('document_diagnostics') end, desc = "Document diagnostics" },
+      { "<leader>xl", function() require('trouble').toggle('loclist') end, desc = "Location list" },
+      { "<leader>xq", function() require('trouble').toggle('quickfix') end, desc = "Quickfix list" },
+      { "<leader>xr", function() require('trouble').toggle('lsp_references') end, desc = "LSP references" },
     },
   },
   {

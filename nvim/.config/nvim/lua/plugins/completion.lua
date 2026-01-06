@@ -11,6 +11,7 @@ return {
     },
     config = function()
       local cmp = require('cmp')
+      local ls = require('luasnip')
       local cmp_select = { behavior = cmp.SelectBehavior.Select }
       local lspkind = require('lspkind')
 
@@ -31,8 +32,24 @@ return {
           { name = 'luasnip',  max_item_count = 3 },
         },
         mapping = cmp.mapping.preset.insert({
-          ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
-          ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
+          ['<C-n>'] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_next_item(cmp_select)
+            elseif ls.expand_or_jumpable() then
+              ls.expand_or_jump()
+            else
+              fallback()
+            end
+          end, { 'i', 's' }),
+          ['<C-p>'] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_prev_item(cmp_select)
+            elseif ls.jumpable(-1) then
+              ls.jump(-1)
+            else
+              fallback()
+            end
+          end, { 'i', 's' }),
           ['<CR>'] = cmp.mapping.confirm({ select = false }),
           ['<C-Space>'] = cmp.mapping.complete(),
           ['<C-e>'] = cmp.mapping.abort(),
@@ -81,16 +98,11 @@ return {
         })
       })
 
-      local ls = require('luasnip')
-
-      vim.keymap.set({ "i", "s" }, "<C-n>", function() ls.jump(1) end, { silent = true })
-      vim.keymap.set({ "i", "s" }, "<C-p>", function() ls.jump(-1) end, { silent = true })
-
-      vim.keymap.set({ "i", "s" }, "<C-e>", function()
+      vim.keymap.set({ "i", "s" }, "<C-l>", function()
         if ls.choice_active() then
           ls.change_choice(1)
         end
-      end, { silent = true })
+      end, { silent = true, desc = "Cycle snippet choice" })
     end
   },
 }

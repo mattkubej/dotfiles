@@ -14,7 +14,7 @@ return {
           lsp = false
         },
         indent_blankline = {
-          enabled = false,
+          enabled = true,
           scope_color = "sapphire",
           colored_indent_levels = false,
         },

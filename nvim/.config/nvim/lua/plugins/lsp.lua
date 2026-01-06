@@ -84,7 +84,7 @@ return {
             vim.keymap.set('n', keys, func, { buffer = event.buf, desc = desc })
           end
 
-          nmap('<leader>d', vim.diagnostic.open_float, 'Open diagnostic float')
+          nmap('<leader>D', vim.diagnostic.open_float, 'Open diagnostic float')
           nmap('[d', vim.diagnostic.goto_prev, 'Go to previous diagnostic')
           nmap(']d', vim.diagnostic.goto_next, 'Go to next diagnostic')
 
@@ -161,36 +161,6 @@ return {
           end,
         },
       })
-
-      -- Setup tsgo as custom server (not available in Mason)
-      -- local configs = require('lspconfig.configs')
-      -- if not configs.tsgo then
-      --   configs.tsgo = {
-      --     default_config = {
-      --       cmd = { 'tsgo', '--lsp', '--stdio' },
-      --       filetypes = {
-      --         'javascript',
-      --         'javascriptreact',
-      --         'javascript.jsx',
-      --         'typescript',
-      --         'typescriptreact',
-      --         'typescript.tsx',
-      --       },
-      --       root_dir = lsp.util.root_pattern(
-      --         'tsconfig.json',
-      --         'jsconfig.json',
-      --         'package.json',
-      --         'tsconfig.base.json',
-      --         '.git'
-      --       ),
-      --       single_file_support = true,
-      --     },
-      --   }
-      -- end
-      --
-      -- lsp.tsgo.setup({
-      --   capabilities = lsp_capabilities,
-      -- })
     end
   },
 }
