@@ -116,7 +116,7 @@ return {
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
             end, 'Toggle inlay hints')
             -- Enable inlay hints by default
-            vim.lsp.inlay_hint.enable(true)
+            vim.lsp.inlay_hint.enable(false)
           end
 
           -- Document highlight on cursor hold

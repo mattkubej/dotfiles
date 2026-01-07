@@ -38,7 +38,7 @@ vim.keymap.set("n", "<leader>rw", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left>
 
 vim.keymap.set("n", "<leader>w", "<cmd>update<CR>", { desc = "Save file" })
 vim.keymap.set("n", "<leader>wq", "<cmd>wq<CR>", { desc = "Save and quit" })
-vim.keymap.set("n", "<leader>q", "<cmd>q<CR>", { desc = "Quit" })
+vim.keymap.set("n", "<leader>q", "<cmd>qa!<CR>", { desc = "Quit" })
 
 -- Quickfix navigation
 vim.keymap.set("n", "]q", "<cmd>cnext<CR>zz", { desc = "Next quickfix" })

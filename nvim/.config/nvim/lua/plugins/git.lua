@@ -44,11 +44,10 @@ return {
   },
   {
     'linrongbin16/gitlinker.nvim',
-    config = function()
-      require('gitlinker').setup()
-    end,
+    cmd = "GitLink",
+    opts = {},
     keys = {
-      { '<leader>gl', '<cmd>GitLink<cr>', mode = { 'n', 'v' }, desc = '[G]it [L]ink (copy)' },
+      { '<leader>gl', '<cmd>GitLink<cr>',  mode = { 'n', 'v' }, desc = '[G]it [L]ink (copy)' },
       { '<leader>gL', '<cmd>GitLink!<cr>', mode = { 'n', 'v' }, desc = '[G]it [L]ink (open)' },
     },
   },
