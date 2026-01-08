@@ -72,7 +72,6 @@ if type -q refresh_openai_key
 end
 
 alias pr-description='claude -p (cat ~/prompts/pr-description.md) --allowedTools "Bash(git diff:*)" "Bash(git log:*)"'
-eval (SHELL=/opt/homebrew/bin/fish ~/.local/try.rb init ~/src/tries | string collect)
 
 # Added by tec agent
 test -x /Users/mattkubej/.local/state/tec/profiles/base/current/global/init && /Users/mattkubej/.local/state/tec/profiles/base/current/global/init fish | source
@@ -85,7 +84,5 @@ function nvm
   bass source '/opt/dev/sh/nvm/nvm.sh' ';' nvm $argv
 end
 
-# Load default node version on shell startup
-nvm use default --silent 2>/dev/null
 eval (SHELL=/opt/homebrew/bin/fish ~/.local/try.rb init ~/src/tries | string collect)
 export PATH="$HOME/.local/bin:$PATH"
