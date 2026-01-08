@@ -24,13 +24,35 @@ else
   abbr -a lll 'ls -la'
 end
 
-# brew
-eval "$(/opt/homebrew/bin/brew shellenv)"
+# brew (hardcoded for speed - always /opt/homebrew on Apple Silicon)
+# to regenerate: /opt/homebrew/bin/brew shellenv
+set -gx HOMEBREW_PREFIX /opt/homebrew
+set -gx HOMEBREW_CELLAR /opt/homebrew/Cellar
+set -gx HOMEBREW_REPOSITORY /opt/homebrew
+fish_add_path --global /opt/homebrew/bin /opt/homebrew/sbin
+set -q MANPATH; or set -gx MANPATH ''
+set -gx MANPATH :$MANPATH
+set -gx INFOPATH /opt/homebrew/share/info:$INFOPATH
 
-# pyenv
-set -Ux PYENV_ROOT $HOME/.pyenv
-set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
-pyenv init - fish | source
+# pyenv (lazy loaded)
+set -gx PYENV_ROOT $HOME/.pyenv
+fish_add_path --global $PYENV_ROOT/bin $PYENV_ROOT/shims
+
+function __pyenv_init_if_needed
+  if not set -q __pyenv_initialized
+    set -g __pyenv_initialized 1
+    command pyenv init --no-rehash - fish | source
+  end
+end
+
+for cmd in python python3 pip pip3
+  eval "function $cmd --wraps $cmd; __pyenv_init_if_needed; command $cmd \$argv; end"
+end
+
+function pyenv --wraps pyenv
+  __pyenv_init_if_needed
+  command pyenv $argv
+end
 
 # local scripts
 set -x PATH $PATH $HOME/bin
@@ -67,9 +89,6 @@ if not string match -q -- $PNPM_HOME $PATH
 end
 # pnpm end
 
-if type -q refresh_openai_key
-  refresh_openai_key
-end
 
 alias pr-description='claude -p (cat ~/prompts/pr-description.md) --allowedTools "Bash(git diff:*)" "Bash(git log:*)"'
 
@@ -84,5 +103,6 @@ function nvm
   bass source '/opt/dev/sh/nvm/nvm.sh' ';' nvm $argv
 end
 
-eval (SHELL=/opt/homebrew/bin/fish ~/.local/try.rb init ~/src/tries | string collect)
+# try function is auto-loaded from ~/.config/fish/functions/try.fish
+# to regenerate: ~/.local/try.rb init ~/src/tries > ~/.config/fish/functions/try.fish
 export PATH="$HOME/.local/bin:$PATH"
