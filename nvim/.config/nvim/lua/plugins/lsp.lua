@@ -69,6 +69,7 @@ return {
         }
       },
       { 'folke/lazydev.nvim', ft = 'lua', opts = {} },
+      'yioneko/nvim-vtsls',
     },
     config = function()
       local lsp = require('lspconfig')
@@ -131,24 +132,6 @@ return {
               callback = vim.lsp.buf.clear_references,
             })
           end
-
-          -- Configure inlay hints for TypeScript
-          if client and client.name == 'ts_ls' then
-            local inlay_settings = {
-              includeInlayParameterNameHints = 'all',
-              includeInlayFunctionParameterTypeHints = true,
-              includeInlayVariableTypeHints = true,
-              includeInlayPropertyDeclarationTypeHints = true,
-              includeInlayFunctionLikeReturnTypeHints = true,
-              includeInlayEnumMemberValueHints = true,
-            }
-            client:notify('workspace/didChangeConfiguration', {
-              settings = {
-                typescript = { inlayHints = inlay_settings },
-                javascript = { inlayHints = inlay_settings },
-              },
-            })
-          end
         end
       })
 
@@ -185,7 +168,7 @@ return {
           'eslint',
           'jsonls',
           'stylelint_lsp',
-          'ts_ls'
+          'vtsls',
         },
         handlers = {
           default_setup,
@@ -227,6 +210,38 @@ return {
                 },
               },
             })
+          end,
+          vtsls = function()
+            require("lspconfig").vtsls.setup({
+              capabilities = lsp_capabilities,
+              settings = {
+                vtsls = {
+                  autoUseWorkspaceTsdk = true,
+                  experimental = {
+                    completion = {
+                      enableServerSideFuzzyMatch = true,
+                    },
+                  },
+                },
+                typescript = {
+                  updateImportsOnFileMove = { enabled = "always" },
+                  inlayHints = {
+                    parameterNames = { enabled = "literals" },
+                    parameterTypes = { enabled = true },
+                    variableTypes = { enabled = true },
+                    propertyDeclarationTypes = { enabled = true },
+                    functionLikeReturnTypes = { enabled = true },
+                    enumMemberValues = { enabled = true },
+                  },
+                },
+              },
+            })
+          end,
+          ts_ls = function()
+            -- do nothing to prevent it from starting
+          end,
+          tsserver = function()
+            -- do nothing to prevent it from starting
           end,
         },
       })

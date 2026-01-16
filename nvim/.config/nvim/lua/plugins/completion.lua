@@ -8,10 +8,21 @@ return {
       'hrsh7th/cmp-buffer',
       'hrsh7th/cmp-path',
       'hrsh7th/cmp-cmdline',
+      'rafamadriz/friendly-snippets',
     },
     config = function()
       local cmp = require('cmp')
       local ls = require('luasnip')
+      
+      require("luasnip.loaders.from_vscode").lazy_load()
+
+      -- Integrate nvim-autopairs with cmp
+      local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+      cmp.event:on(
+        'confirm_done',
+        cmp_autopairs.on_confirm_done()
+      )
+
       local cmp_select = { behavior = cmp.SelectBehavior.Select }
       local lspkind = require('lspkind')
 
