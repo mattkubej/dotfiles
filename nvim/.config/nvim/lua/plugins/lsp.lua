@@ -69,7 +69,6 @@ return {
         }
       },
       { 'folke/lazydev.nvim', ft = 'lua', opts = {} },
-      'yioneko/nvim-vtsls',
     },
     config = function()
       local lsp = require('lspconfig')
@@ -168,7 +167,6 @@ return {
           'eslint',
           'jsonls',
           'stylelint_lsp',
-          'vtsls',
         },
         handlers = {
           default_setup,
@@ -212,38 +210,44 @@ return {
             })
           end,
           vtsls = function()
-            require("lspconfig").vtsls.setup({
-              capabilities = lsp_capabilities,
-              settings = {
-                vtsls = {
-                  autoUseWorkspaceTsdk = true,
-                  experimental = {
-                    completion = {
-                      enableServerSideFuzzyMatch = true,
-                    },
-                  },
-                },
-                typescript = {
-                  updateImportsOnFileMove = { enabled = "always" },
-                  inlayHints = {
-                    parameterNames = { enabled = "literals" },
-                    parameterTypes = { enabled = true },
-                    variableTypes = { enabled = true },
-                    propertyDeclarationTypes = { enabled = true },
-                    functionLikeReturnTypes = { enabled = true },
-                    enumMemberValues = { enabled = true },
-                  },
-                },
-              },
-            })
+            -- disabled in favor of tsgo
           end,
           ts_ls = function()
-            -- do nothing to prevent it from starting
+            -- disabled in favor of tsgo
           end,
           tsserver = function()
-            -- do nothing to prevent it from starting
+            -- disabled in favor of tsgo
           end,
         },
+      })
+
+      -- Setup tsgo as custom server (not available in Mason)
+      local configs = require('lspconfig.configs')
+      if not configs.tsgo then
+        configs.tsgo = {
+          default_config = {
+            cmd = { 'tsgo', '--lsp', '--stdio' },
+            filetypes = {
+              'javascript',
+              'javascriptreact',
+              'javascript.jsx',
+              'typescript',
+              'typescriptreact',
+              'typescript.tsx',
+            },
+            root_dir = lsp.util.root_pattern(
+              'tsconfig.json',
+              'jsconfig.json',
+              'package.json',
+              '.git'
+            ),
+            single_file_support = true,
+          },
+        }
+      end
+
+      lsp.tsgo.setup({
+        capabilities = lsp_capabilities,
       })
     end
   },
