@@ -97,9 +97,9 @@ return {
             [']v'] = { query = '@function.outer', desc = 'Next function' },
             [']c'] = { query = '@class.outer', desc = 'Next class' },
             [']a'] = { query = '@parameter.inner', desc = 'Next argument' },
-            [']l'] = { query = '@loop.outer', desc = 'Next loop' },
-            [']m'] = { query = '@call.outer', desc = 'Next method/call' },
-            [']/'] = { query = '@comment.outer', desc = 'Next comment' },
+            [']w'] = { query = '@loop.outer', desc = 'Next loop (while)' },
+            [']r'] = { query = '@call.outer', desc = 'Next call (run)' },
+            [']g'] = { query = '@comment.outer', desc = 'Next comment (gloss)' },
           },
           goto_next_end = {
             [']V'] = '@function.outer',
@@ -109,9 +109,9 @@ return {
             ['[v'] = { query = '@function.outer', desc = 'Previous function' },
             ['[c'] = { query = '@class.outer', desc = 'Previous class' },
             ['[a'] = { query = '@parameter.inner', desc = 'Previous argument' },
-            ['[l'] = { query = '@loop.outer', desc = 'Previous loop' },
-            ['[m'] = { query = '@call.outer', desc = 'Previous method/call' },
-            ['[/'] = { query = '@comment.outer', desc = 'Previous comment' },
+            ['[w'] = { query = '@loop.outer', desc = 'Previous loop (while)' },
+            ['[r'] = { query = '@call.outer', desc = 'Previous call (run)' },
+            ['[g'] = { query = '@comment.outer', desc = 'Previous comment (gloss)' },
           },
           goto_previous_end = {
             ['[V'] = '@function.outer',
@@ -133,12 +133,12 @@ return {
       require("nvim-treesitter.configs").setup(opts)
 
       local move = require('nvim-treesitter.textobjects.move')
-      vim.keymap.set({ 'n', 'x', 'o' }, ']i', function()
+      vim.keymap.set({ 'n', 'x', 'o' }, ']t', function()
         move.goto_next_start('@conditional.outer')
-      end, { desc = 'Next conditional' })
-      vim.keymap.set({ 'n', 'x', 'o' }, '[i', function()
+      end, { desc = 'Next conditional (test)' })
+      vim.keymap.set({ 'n', 'x', 'o' }, '[t', function()
         move.goto_previous_start('@conditional.outer')
-      end, { desc = 'Prev conditional' })
+      end, { desc = 'Prev conditional (test)' })
     end,
   },
 }
