@@ -99,6 +99,14 @@ test -x /Users/mattkubej/.local/state/tec/profiles/base/current/global/init && /
 # Set NVM directory
 set -gx NVM_DIR "$HOME/.nvm"
 
+# nvm default node in PATH (fast - no nvm loading)
+set -l nvm_default_file "$NVM_DIR/alias/default"
+if test -f $nvm_default_file
+  set -l nvm_default_version (cat $nvm_default_file)
+  set -l nvm_default_bin "$NVM_DIR/versions/node/v$nvm_default_version/bin"
+  test -d $nvm_default_bin; and fish_add_path --global $nvm_default_bin
+end
+
 function nvm
   bass source '/opt/dev/sh/nvm/nvm.sh' ';' nvm $argv
 end
