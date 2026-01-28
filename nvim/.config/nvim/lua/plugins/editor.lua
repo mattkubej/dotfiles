@@ -16,7 +16,7 @@ return {
     'nvim-pack/nvim-spectre',
     dependencies = { 'nvim-lua/plenary.nvim' },
     keys = {
-      { '<leader>sr', function() require('spectre').toggle() end, desc = 'Search & Replace (Spectre)' },
+      { '<leader>S', function() require('spectre').toggle() end, desc = 'Search & Replace (Spectre)' },
       { '<leader>sR', function() require('spectre').open_visual({ select_word = true }) end, desc = 'Replace word under cursor' },
       { '<leader>sR', function() require('spectre').open_visual() end, mode = 'v', desc = 'Replace selection' },
     },
@@ -126,18 +126,6 @@ return {
     },
   },
   {
-    'hedyhli/outline.nvim',
-    opts = {
-      outline_window = {
-        show_numbers = true,
-        show_relative_numbers = true,
-      },
-    },
-    keys = {
-      { '<leader>tt', '<cmd>Outline<CR>', desc = "Toggle outline" }
-    },
-  },
-  {
     'folke/flash.nvim',
     event = 'VeryLazy',
     opts = {},
@@ -160,7 +148,7 @@ return {
       },
     },
     keys = {
-      { "<leader>co", "<cmd>AerialToggle!<CR>", desc = "Toggle Aerial" }
+      { "<leader>o", "<cmd>AerialToggle!<CR>", desc = "Toggle Aerial" }
     }
   },
   {
