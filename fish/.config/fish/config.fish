@@ -1,5 +1,8 @@
 fish_vi_key_bindings
 
+# Use ~/.config for XDG apps on macOS (lazygit, etc.)
+set -gx XDG_CONFIG_HOME "$HOME/.config"
+
 # scratchpad for quick note taking
 alias sp='nvim $HOME/notes/scratchpad-(date +"%m-%d-%Y").md'
 

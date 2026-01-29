@@ -1,2 +1,14 @@
 disableStartupPopups: true
 promptToReturnFromSubprocess: false
+gui:
+  nerdFontsVersion: "3"
+  skipDiscardChangeWarning: true
+  skipStashWarning: true
+git:
+  pagers:
+    - colorArg: always
+      pager: delta --paging=never
+os:
+  editPreset: nvim
+  filePreviewPager: bat --color=always --style=plain --paging=never
+reporting: "off"

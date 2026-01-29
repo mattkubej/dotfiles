@@ -112,7 +112,13 @@ return {
         colors = {
           background = "catppuccin-mocha",
         }
-      }
+      },
+      integrations = {
+        aerial = {
+          position = "right",
+          reopen = true,
+        },
+      },
     },
   }
 }
