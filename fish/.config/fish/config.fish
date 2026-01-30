@@ -117,3 +117,9 @@ end
 # try function is auto-loaded from ~/.config/fish/functions/try.fish
 # to regenerate: ~/.local/try.rb init ~/src/tries > ~/.config/fish/functions/try.fish
 export PATH="$HOME/.local/bin:$PATH"
+
+set --export BUN_INSTALL "$HOME/.bun"
+set --export PATH $BUN_INSTALL/bin $PATH
+
+# Added by Antigravity
+fish_add_path /Users/mattkubej/.antigravity/antigravity/bin
