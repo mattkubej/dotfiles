@@ -95,10 +95,6 @@ end
 
 alias pr-description='claude -p (cat ~/prompts/pr-description.md) --allowedTools "Bash(git diff:*)" "Bash(git log:*)"'
 
-# Added by tec agent
-test -x /Users/mattkubej/.local/state/tec/profiles/base/current/global/init && /Users/mattkubej/.local/state/tec/profiles/base/current/global/init fish | source
-
-
 # Set NVM directory
 set -gx NVM_DIR "$HOME/.nvm"
 
@@ -123,3 +119,6 @@ set --export PATH $BUN_INSTALL/bin $PATH
 
 # Added by Antigravity
 fish_add_path /Users/mattkubej/.antigravity/antigravity/bin
+
+# tec profile (must be last to take precedence over Homebrew)
+test -x /Users/mattkubej/.local/state/tec/profiles/base/current/global/init && /Users/mattkubej/.local/state/tec/profiles/base/current/global/init fish | source
