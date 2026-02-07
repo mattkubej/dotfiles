@@ -6,6 +6,11 @@
 [core]
   editor = nvim
   pager = delta
+  fsmonitor = true
+  untrackedCache = true
+
+[fetch]
+  writeCommitGraph = true
 
 [interactive]
   diffFilter = delta --color-only
