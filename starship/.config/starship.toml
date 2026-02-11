@@ -1,14 +1,30 @@
+add_newline = true
+command_timeout = 1000
+format = "$directory$git_branch$git_state\n$time$character"
+right_format = "$cmd_duration"
+
 [time]
 disabled = false
 format = '[$time]($style) '
 time_format = "%H:%M"
 style = "bright-black"
 
+[directory]
+fish_style_pwd_dir_length = 1
+before_repo_root_style = "bold green"
+
+[character]
+success_symbol = "[❯](bold #A5D6A7)[❯](bold #FFF59D)[❯](bold #FFAB91)"
+error_symbol = "[❯](bold red)[❯](bold red)[❯](bold red)"
+
 [cmd_duration]
-min_time = 100 
+min_time = 100
 format = "took [$duration]($style) "
 
 [git_status]
+disabled = true
+
+[git_metrics]
 disabled = true
 
 [nodejs]
@@ -18,6 +34,21 @@ disabled = true
 disabled = true
 
 [ruby]
+disabled = true
+
+[python]
+disabled = true
+
+[rust]
+disabled = true
+
+[swift]
+disabled = true
+
+[terraform]
+disabled = true
+
+[bun]
 disabled = true
 
 [gcloud]
