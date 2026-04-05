@@ -1,15 +1,7 @@
 return {
   'tpope/vim-sleuth',
-  'tpope/vim-unimpaired',
   'tpope/vim-repeat',
   'mattn/emmet-vim',
-
-  -- Comment operations (gc to toggle)
-  {
-    'numToStr/Comment.nvim',
-    event = 'VeryLazy',
-    opts = {},
-  },
 
   -- Search and replace with preview
   {
@@ -44,13 +36,6 @@ return {
       { 'ga', '<Plug>(EasyAlign)', mode = 'x', desc = 'Easy align' },
       { 'ga', '<Plug>(EasyAlign)', mode = 'n', desc = 'Easy align' },
     }
-  },
-  {
-    'mbbill/undotree',
-    cmd = "UndotreeToggle",
-    keys = {
-      { "<leader>u", vim.cmd.UndotreeToggle, desc = "Toggle Undotree" },
-    },
   },
   {
     'nvim-tree/nvim-tree.lua',

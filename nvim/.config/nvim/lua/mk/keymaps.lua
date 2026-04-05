@@ -29,9 +29,6 @@ vim.keymap.set("n", "#", "#zz", { desc = "Search word backward (centered)" })
 
 vim.keymap.set("x", "<leader>p", [["_dP]], { desc = "Paste without yanking" })
 
-vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]], { desc = "Yank to clipboard" })
-vim.keymap.set("n", "<leader>Y", [["+Y]], { desc = "Yank line to clipboard" })
-
 vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]], { desc = "Delete to black hole" })
 
 vim.keymap.set("n", "<leader>rw", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], { desc = "Replace word under cursor" })
@@ -68,4 +65,10 @@ vim.keymap.set("v", ">", ">gv", { desc = "Indent right" })
 -- Add blank lines
 vim.keymap.set("n", "]<Space>", "o<Esc>k", { desc = "Add blank line below" })
 vim.keymap.set("n", "[<Space>", "O<Esc>j", { desc = "Add blank line above" })
+
+-- Built-in Undotree (Neovim 0.12+)
+vim.keymap.set("n", "<leader>u", function()
+  vim.cmd.packadd('nvim.undotree')
+  vim.cmd('Undotree')
+end, { desc = "Toggle Undotree" })
 

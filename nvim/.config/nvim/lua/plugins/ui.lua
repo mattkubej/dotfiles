@@ -2,11 +2,11 @@ return {
   {
     'catppuccin/nvim',
     name = 'catppuccin',
+    lazy = false,
+    priority = 1000,
     config = function()
       require('catppuccin').setup({
         aerial = true,
-        cmp = true,
-        fidget = true,
         fzf = true,
         gitsigns = true,
         illuminate = {
@@ -37,11 +37,8 @@ return {
     end
   },
   {
-    'stevearc/dressing.nvim',
-    opts = {},
-  },
-  {
     'nvim-lualine/lualine.nvim',
+    dependencies = { 'catppuccin' },
     opts = {
       options = {
         theme = 'catppuccin',
@@ -51,7 +48,10 @@ return {
         lualine_a = { 'mode' },
         lualine_b = { 'hostname' },
         lualine_c = { 'branch', { 'filename', path = 1 }, 'aerial' },
-        lualine_x = { 'diff', 'encoding', 'fileformat' }, -- filetype causes lag
+        lualine_x = {
+          { function() return vim.lsp.status() end, cond = function() return vim.lsp.status() ~= '' end },
+          'diff', 'encoding', 'fileformat',
+        },
         lualine_y = { 'progress' },
         lualine_z = { 'location' },
       },

@@ -2,32 +2,39 @@ return {
   {
     "ibhagwan/fzf-lua",
     dependencies = { "nvim-tree/nvim-web-devicons" },
-    opts = {
-      'telescope',
-      winopts = {
-        height = 0.85,
-        width = 0.80,
-        row = 0.35,
-        col = 0.50,
-        preview = {
-          layout = 'vertical',
-          vertical = 'up:55%',
+    event = 'VeryLazy',
+    config = function()
+      local fzf = require('fzf-lua')
+      fzf.setup({
+        'telescope',
+        winopts = {
+          height = 0.85,
+          width = 0.80,
+          row = 0.35,
+          col = 0.50,
+          preview = {
+            layout = 'vertical',
+            vertical = 'up:55%',
+          }
+        },
+        files = {
+          rg_opts = "--color=never --files --hidden --follow -g '!.git' -g '!node_modules'",
+        },
+        buffers = {
+          actions = {
+            ['ctrl-r'] = {
+              fn = function(...)
+                return fzf.actions.buf_del(...)
+              end,
+              reload = true
+            },
+          }
         }
-      },
-      files = {
-        rg_opts = "--color=never --files --hidden --follow -g '!.git' -g '!node_modules'",
-      },
-      buffers = {
-        actions = {
-          ['ctrl-r'] = {
-            fn = function(...)
-              return require('fzf-lua').actions.buf_del(...)
-            end,
-            reload = true
-          },
-        }
-      }
-    },
+      })
+
+      -- Register as vim.ui.select handler (replaces dressing.nvim)
+      fzf.register_ui_select()
+    end,
     keys = {
       -- File/buffer search
       { '<leader>sf', function() require('fzf-lua').files() end,                desc = 'Find files' },

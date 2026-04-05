@@ -1,144 +1,170 @@
 return {
   {
     'nvim-treesitter/nvim-treesitter',
-    dependencies = {
-      {
-        'nvim-treesitter/nvim-treesitter-context',
-        opts = {
-          max_lines = 3,
-        }
-      },
-      'nvim-treesitter/nvim-treesitter-textobjects',
-      'windwp/nvim-ts-autotag',
-      {
-        'windwp/nvim-autopairs',
-        event = "InsertEnter",
-        opts = {
-          check_ts = true,
-        }
-      },
-    },
-    build = function()
-      require("nvim-treesitter.install").update({ with_sync = true })()
+    branch = 'main',
+    build = ':TSUpdate',
+    lazy = false,
+    config = function()
+      require('nvim-treesitter').setup({})
+
+      -- Install parsers if missing
+      local wanted = {
+        'javascript', 'typescript', 'tsx',
+        'c', 'lua', 'rust', 'go', 'python',
+        'ruby', 'gitcommit', 'html', 'css',
+        'json', 'yaml', 'markdown', 'markdown_inline',
+      }
+      local installed = require('nvim-treesitter.config').get_installed()
+      local to_install = vim.iter(wanted):filter(function(p)
+        return not vim.tbl_contains(installed, p)
+      end):totable()
+      if #to_install > 0 then
+        require('nvim-treesitter').install(to_install)
+      end
+
+      -- Enable treesitter highlighting and indentation
+      vim.api.nvim_create_autocmd('FileType', {
+        callback = function()
+          pcall(vim.treesitter.start)
+          vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end,
+      })
+
+      -- Incremental selection using built-in 0.12 node selection (an/in)
+      -- Preserves <C-space>/<BS> ergonomics
+      vim.keymap.set('n', '<C-space>', 'van', { desc = 'Start incremental selection' })
+      vim.keymap.set('x', '<C-space>', 'an', { desc = 'Expand selection' })
+      vim.keymap.set('x', '<C-s>', 'an', { desc = 'Expand selection (scope)' })
+      vim.keymap.set('x', '<BS>', 'in', { desc = 'Shrink selection' })
     end,
-    opts = {
-      ensure_installed = {
-        "javascript",
-        "typescript",
-        "c",
-        "lua",
-        "rust",
-        "go",
-        "python",
-        "gitcommit",
-        "tsx",
-      },
-      sync_install = false,
-      auto_install = true,
-      indent = {
-        enable = true,
-      },
-      matchup = {
-        enable = true,
-      },
-      highlight = { enable = true, },
-      autotag = { enable = true, },
-      incremental_selection = {
-        enable = true,
-        keymaps = {
-          init_selection = '<c-space>',
-          node_incremental = '<c-space>',
-          scope_incremental = '<c-s>',
-          node_decremental = '<bs>',
-        },
-      },
-      textobjects = {
+  },
+
+  {
+    'nvim-treesitter/nvim-treesitter-textobjects',
+    branch = 'main',
+    dependencies = { 'nvim-treesitter/nvim-treesitter' },
+    init = function()
+      vim.g.no_plugin_maps = true
+    end,
+    config = function()
+      local tso = require('nvim-treesitter-textobjects')
+      tso.setup({
         select = {
-          enable = true,
           lookahead = true,
-          keymaps = {
-            -- Parameter/argument
-            ['aa'] = { query = '@parameter.outer', desc = 'around argument' },
-            ['ia'] = { query = '@parameter.inner', desc = 'inside argument' },
-            -- Function
-            ['af'] = { query = '@function.outer', desc = 'around function' },
-            ['if'] = { query = '@function.inner', desc = 'inside function' },
-            -- Class
-            ['ac'] = { query = '@class.outer', desc = 'around class' },
-            ['ic'] = { query = '@class.inner', desc = 'inside class' },
-            -- Block (if/for/while/etc)
-            ['ab'] = { query = '@block.outer', desc = 'around block' },
-            ['ib'] = { query = '@block.inner', desc = 'inside block' },
-            -- Conditional
-            ['ai'] = { query = '@conditional.outer', desc = 'around conditional' },
-            ['ii'] = { query = '@conditional.inner', desc = 'inside conditional' },
-            -- Loop
-            ['al'] = { query = '@loop.outer', desc = 'around loop' },
-            ['il'] = { query = '@loop.inner', desc = 'inside loop' },
-            -- Call (function call)
-            ['am'] = { query = '@call.outer', desc = 'around method/call' },
-            ['im'] = { query = '@call.inner', desc = 'inside method/call' },
-            -- Comment
-            ['a/'] = { query = '@comment.outer', desc = 'around comment' },
-            -- Return statement
-            ['ar'] = { query = '@return.outer', desc = 'around return' },
-            ['ir'] = { query = '@return.inner', desc = 'inside return' },
-            -- Assignment
-            ['a='] = { query = '@assignment.outer', desc = 'around assignment' },
-            ['i='] = { query = '@assignment.inner', desc = 'inside assignment' },
-            ['l='] = { query = '@assignment.lhs', desc = 'assignment LHS' },
-            ['r='] = { query = '@assignment.rhs', desc = 'assignment RHS' },
-          },
         },
         move = {
-          enable = true,
           set_jumps = true,
-          goto_next_start = {
-            [']v'] = { query = '@function.outer', desc = 'Next function' },
-            [']c'] = { query = '@class.outer', desc = 'Next class' },
-            [']a'] = { query = '@parameter.inner', desc = 'Next argument' },
-            [']f'] = { query = '@loop.outer', desc = 'Next loop (for)' },
-            [']r'] = { query = '@call.outer', desc = 'Next call (run)' },
-            [']g'] = { query = '@comment.outer', desc = 'Next comment (gloss)' },
-          },
-          goto_next_end = {
-            [']V'] = '@function.outer',
-            [']C'] = '@class.outer',
-          },
-          goto_previous_start = {
-            ['[v'] = { query = '@function.outer', desc = 'Previous function' },
-            ['[c'] = { query = '@class.outer', desc = 'Previous class' },
-            ['[a'] = { query = '@parameter.inner', desc = 'Previous argument' },
-            ['[f'] = { query = '@loop.outer', desc = 'Previous loop (for)' },
-            ['[r'] = { query = '@call.outer', desc = 'Previous call (run)' },
-            ['[g'] = { query = '@comment.outer', desc = 'Previous comment (gloss)' },
-          },
-          goto_previous_end = {
-            ['[V'] = '@function.outer',
-            ['[C'] = '@class.outer',
-          },
         },
-        swap = {
-          enable = true,
-          swap_next = {
-            ['<leader>a'] = '@parameter.inner',
-          },
-          swap_previous = {
-            ['<leader>A'] = '@parameter.inner',
-          },
-        },
-      },
-    },
-    config = function(_, opts)
-      require("nvim-treesitter.configs").setup(opts)
+      })
 
-      local move = require('nvim-treesitter.textobjects.move')
-      vim.keymap.set({ 'n', 'x', 'o' }, ']t', function()
-        move.goto_next_start('@conditional.outer')
-      end, { desc = 'Next conditional (test)' })
-      vim.keymap.set({ 'n', 'x', 'o' }, '[t', function()
-        move.goto_previous_start('@conditional.outer')
-      end, { desc = 'Prev conditional (test)' })
+      local select = require('nvim-treesitter-textobjects.select')
+      local move = require('nvim-treesitter-textobjects.move')
+      local swap = require('nvim-treesitter-textobjects.swap')
+
+      local function sel(mapping, query, desc)
+        vim.keymap.set({ 'x', 'o' }, mapping, function()
+          select.select_textobject(query, 'textobjects')
+        end, { desc = desc })
+      end
+
+      -- Select textobjects
+      sel('aa', '@parameter.outer', 'around argument')
+      sel('ia', '@parameter.inner', 'inside argument')
+      sel('af', '@function.outer', 'around function')
+      sel('if', '@function.inner', 'inside function')
+      sel('ac', '@class.outer', 'around class')
+      sel('ic', '@class.inner', 'inside class')
+      sel('ab', '@block.outer', 'around block')
+      sel('ib', '@block.inner', 'inside block')
+      sel('ai', '@conditional.outer', 'around conditional')
+      sel('ii', '@conditional.inner', 'inside conditional')
+      sel('al', '@loop.outer', 'around loop')
+      sel('il', '@loop.inner', 'inside loop')
+      sel('am', '@call.outer', 'around method/call')
+      sel('im', '@call.inner', 'inside method/call')
+      sel('a/', '@comment.outer', 'around comment')
+      sel('ar', '@return.outer', 'around return')
+      sel('ir', '@return.inner', 'inside return')
+      sel('a=', '@assignment.outer', 'around assignment')
+      sel('i=', '@assignment.inner', 'inside assignment')
+      sel('l=', '@assignment.lhs', 'assignment LHS')
+      sel('r=', '@assignment.rhs', 'assignment RHS')
+
+      -- Move between textobjects
+      local function mnext(mapping, query, desc)
+        vim.keymap.set({ 'n', 'x', 'o' }, mapping, function()
+          move.goto_next_start(query, 'textobjects')
+        end, { desc = desc })
+      end
+
+      local function mprev(mapping, query, desc)
+        vim.keymap.set({ 'n', 'x', 'o' }, mapping, function()
+          move.goto_previous_start(query, 'textobjects')
+        end, { desc = desc })
+      end
+
+      local function mnext_end(mapping, query)
+        vim.keymap.set({ 'n', 'x', 'o' }, mapping, function()
+          move.goto_next_end(query, 'textobjects')
+        end)
+      end
+
+      local function mprev_end(mapping, query)
+        vim.keymap.set({ 'n', 'x', 'o' }, mapping, function()
+          move.goto_previous_end(query, 'textobjects')
+        end)
+      end
+
+      mnext(']v', '@function.outer', 'Next function')
+      mnext(']c', '@class.outer', 'Next class')
+      mnext(']a', '@parameter.inner', 'Next argument')
+      mnext(']f', '@loop.outer', 'Next loop (for)')
+      mnext(']r', '@call.outer', 'Next call (run)')
+      mnext(']g', '@comment.outer', 'Next comment (gloss)')
+      mnext(']t', '@conditional.outer', 'Next conditional (test)')
+
+      mprev('[v', '@function.outer', 'Previous function')
+      mprev('[c', '@class.outer', 'Previous class')
+      mprev('[a', '@parameter.inner', 'Previous argument')
+      mprev('[f', '@loop.outer', 'Previous loop (for)')
+      mprev('[r', '@call.outer', 'Previous call (run)')
+      mprev('[g', '@comment.outer', 'Previous comment (gloss)')
+      mprev('[t', '@conditional.outer', 'Previous conditional (test)')
+
+      mnext_end(']V', '@function.outer')
+      mnext_end(']C', '@class.outer')
+      mprev_end('[V', '@function.outer')
+      mprev_end('[C', '@class.outer')
+
+      -- Swap parameters
+      vim.keymap.set('n', '<leader>a', function()
+        swap.swap_next('@parameter.inner')
+      end, { desc = 'Swap next argument' })
+
+      vim.keymap.set('n', '<leader>A', function()
+        swap.swap_previous('@parameter.inner')
+      end, { desc = 'Swap previous argument' })
     end,
+  },
+
+  {
+    'nvim-treesitter/nvim-treesitter-context',
+    opts = {
+      max_lines = 3,
+    },
+  },
+
+  {
+    'windwp/nvim-ts-autotag',
+    event = 'InsertEnter',
+    opts = {},
+  },
+
+  {
+    'windwp/nvim-autopairs',
+    event = 'InsertEnter',
+    opts = {
+      check_ts = true,
+    },
   },
 }
