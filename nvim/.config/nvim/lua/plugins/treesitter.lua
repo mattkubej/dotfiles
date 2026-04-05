@@ -30,12 +30,18 @@ return {
         end,
       })
 
-      -- Incremental selection using built-in 0.12 node selection (an/in)
-      -- Preserves <C-space>/<BS> ergonomics
-      vim.keymap.set('n', '<C-space>', 'van', { desc = 'Start incremental selection' })
-      vim.keymap.set('x', '<C-space>', 'an', { desc = 'Expand selection' })
-      vim.keymap.set('x', '<C-s>', 'an', { desc = 'Expand selection (scope)' })
-      vim.keymap.set('x', '<BS>', 'in', { desc = 'Shrink selection' })
+      -- Incremental selection using built-in 0.12 node selection API
+      local ts_select = require('vim.treesitter._select')
+      vim.keymap.set('n', '<C-space>', function()
+        vim.cmd('normal! v')
+        ts_select.select_parent(1)
+      end, { desc = 'Start incremental selection' })
+      vim.keymap.set('x', '<C-space>', function()
+        ts_select.select_parent(1)
+      end, { desc = 'Expand selection' })
+      vim.keymap.set('x', '<BS>', function()
+        ts_select.select_child(1)
+      end, { desc = 'Shrink selection' })
     end,
   },
 
