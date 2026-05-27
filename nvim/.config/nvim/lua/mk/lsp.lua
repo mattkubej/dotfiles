@@ -73,6 +73,7 @@ vim.lsp.enable({
   'sorbet',
   'ruby_lsp',
   'eslint',
+  'oxlint',
   'jsonls',
   'stylelint_lsp',
   'tsgo',

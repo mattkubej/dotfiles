@@ -8,12 +8,20 @@ return {
     'stevearc/conform.nvim',
     event = { "BufReadPre", "BufNewFile" },
     config = function()
+      local function js_formatter(bufnr)
+        if vim.fs.root(bufnr, { ".oxfmtrc.json", ".oxfmtrc.jsonc" }) then
+          return { "oxfmt" }
+        end
+
+        return { "prettier" }
+      end
+
       require('conform').setup({
         formatters_by_ft = {
-          javascript = { "prettier" },
-          typescript = { "prettier" },
-          javascriptreact = { "prettier" },
-          typescriptreact = { "prettier" },
+          javascript = js_formatter,
+          typescript = js_formatter,
+          javascriptreact = js_formatter,
+          typescriptreact = js_formatter,
           json = { "prettier" },
           jsonc = { "prettier" },
           html = { "prettier" },
@@ -23,12 +31,16 @@ return {
           yaml = { "prettier" },
           graphql = { "prettier" },
         },
+        default_format_opts = {
+          timeout_ms = 3000,
+          lsp_format = 'fallback',
+        },
         format_on_save = function(bufnr)
           -- Disable with a global or buffer-local variable
           if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
             return
           end
-          return { timeout_ms = 500, lsp_format = 'fallback' }
+          return { timeout_ms = 3000, lsp_format = 'fallback' }
         end,
       })
 
