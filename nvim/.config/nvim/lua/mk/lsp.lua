@@ -1,11 +1,40 @@
 vim.api.nvim_create_autocmd('LspAttach', {
   desc = 'LSP actions',
   callback = function(event)
+    local client = vim.lsp.get_client_by_id(event.data.client_id)
+
     local nmap = function(keys, func, desc)
       if desc then
         desc = 'LSP: ' .. desc
       end
       vim.keymap.set('n', keys, func, { buffer = event.buf, desc = desc })
+    end
+
+    local imap = function(keys, func, desc)
+      if desc then
+        desc = 'LSP: ' .. desc
+      end
+      vim.keymap.set('i', keys, func, { buffer = event.buf, desc = desc })
+    end
+
+    if client and client:supports_method('textDocument/completion', event.buf) then
+      local completion = client.server_capabilities.completionProvider
+
+      if client.name == 'tsgo' and completion and completion.triggerCharacters then
+        completion.triggerCharacters = vim.tbl_filter(function(trigger)
+          return trigger ~= ' '
+        end, completion.triggerCharacters)
+      end
+
+      vim.lsp.completion.enable(true, client.id, event.buf, {
+        autotrigger = true,
+      })
+
+      imap('<C-Space>', vim.lsp.completion.get, 'Trigger completion')
+    end
+
+    if client and client:supports_method('textDocument/signatureHelp', event.buf) then
+      imap('<C-k>', vim.lsp.buf.signature_help, 'Signature documentation')
     end
 
     -- Diagnostics

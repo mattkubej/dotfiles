@@ -4,6 +4,25 @@ vim.keymap.set("n", "<leader>pv", vim.cmd.Ex, { desc = "Open netrw" })
 
 vim.keymap.set("i", "<C-c>", "<esc>", { desc = "Exit insert mode" })
 
+pcall(vim.keymap.del, { "i", "s" }, "<Tab>")
+pcall(vim.keymap.del, { "i", "s" }, "<S-Tab>")
+
+vim.keymap.set({ "i", "s" }, "<C-f>", function()
+  if vim.snippet.active({ direction = 1 }) then
+    return "<Cmd>lua vim.snippet.jump(1)<CR>"
+  end
+
+  return "<C-f>"
+end, { expr = true, silent = true, desc = "Snippet jump forward" })
+
+vim.keymap.set({ "i", "s" }, "<C-b>", function()
+  if vim.snippet.active({ direction = -1 }) then
+    return "<Cmd>lua vim.snippet.jump(-1)<CR>"
+  end
+
+  return "<C-b>"
+end, { expr = true, silent = true, desc = "Snippet jump back" })
+
 vim.keymap.set("n", "<leader><leader>", "<c-^>", { desc = "Alternate file" })
 
 vim.keymap.set("n", "<leader>+", "<cmd>vertical resize +5<CR>", { desc = "Increase window width" })
@@ -71,4 +90,3 @@ vim.keymap.set("n", "<leader>u", function()
   vim.cmd.packadd('nvim.undotree')
   vim.cmd('Undotree')
 end, { desc = "Toggle Undotree" })
-

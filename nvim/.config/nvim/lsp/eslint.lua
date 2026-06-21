@@ -24,6 +24,7 @@ return {
     'eslint.config.cts',
     'package.json',
   },
+  workspace_required = true,
   before_init = function(_, config)
     local root = config.root_dir
     if root then

@@ -70,7 +70,7 @@ opt.listchars = {
 }
 
 -- Built-in autocomplete (Neovim 0.12+)
-vim.o.completeopt = 'menu,menuone,noselect,fuzzy'
+vim.o.completeopt = 'menu,menuone,noselect,popup,fuzzy'
 vim.o.autocomplete = true
 vim.o.pumborder = 'rounded'
 vim.o.pummaxwidth = 40
