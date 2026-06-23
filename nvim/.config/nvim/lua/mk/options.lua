@@ -69,8 +69,7 @@ opt.listchars = {
     eol = "↴",    -- Usually too noisy
 }
 
--- Built-in autocomplete (Neovim 0.12+)
+-- Completion menu (LSP completion is configured in mk.lsp)
 vim.o.completeopt = 'menu,menuone,noselect,popup,fuzzy'
-vim.o.autocomplete = true
 vim.o.pumborder = 'rounded'
 vim.o.pummaxwidth = 40

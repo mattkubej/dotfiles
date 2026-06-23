@@ -1,3 +1,5 @@
+require('mk.tsgo').apply_completion_range_workaround()
+
 vim.api.nvim_create_autocmd('LspAttach', {
   desc = 'LSP actions',
   callback = function(event)
@@ -34,7 +36,9 @@ vim.api.nvim_create_autocmd('LspAttach', {
     end
 
     if client and client:supports_method('textDocument/signatureHelp', event.buf) then
-      imap('<C-k>', vim.lsp.buf.signature_help, 'Signature documentation')
+      imap('<C-k>', function()
+        vim.lsp.buf.signature_help({ focus = false })
+      end, 'Signature documentation')
     end
 
     -- Diagnostics
@@ -55,7 +59,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
     nmap('gi', vim.lsp.buf.implementation, 'Go to implementation')
     nmap('go', vim.lsp.buf.type_definition, 'Go to type definition')
     nmap('gr', function() require('fzf-lua').lsp_references() end, 'Go to references')
-    nmap('gs', vim.lsp.buf.signature_help, 'Signature documentation')
 
     -- Refactoring
     nmap('<leader>rn', vim.lsp.buf.rename, 'Rename symbol')
