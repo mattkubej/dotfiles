@@ -37,12 +37,10 @@ default-root-container-orientation = 'auto'
 # See https://nikitabobko.github.io/AeroSpace/guide#key-mapping
 key-mapping.preset = 'qwerty'
 
-# Mouse follows focus when focused monitor changes
-# Drop it from your config, if you don't like this behavior
-# See https://nikitabobko.github.io/AeroSpace/guide#on-focus-changed-callbacks
-# See https://nikitabobko.github.io/AeroSpace/commands#move-mouse
-on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
-on-focus-changed = [] 
+# Keep the pointer where it is when focus changes. This avoids mouse jumps when
+# new windows open on another monitor or an app briefly steals focus.
+on-focused-monitor-changed = []
+on-focus-changed = []
 
 # Gaps between windows (inner-*) and between monitor edges (outer-*).
 # Possible values:
