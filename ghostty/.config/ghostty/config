@@ -1,4 +1,3 @@
 theme = Catppuccin Frappe
 font-family = BerkeleyMono Nerd Font
-keybind = shift+enter=text:\x1b\r
 custom-shader = shaders/cursor_warp.glsl
